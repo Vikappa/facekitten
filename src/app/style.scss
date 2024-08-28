@@ -1,0 +1,22 @@
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+
+body{
+  background-color: #f1f1f1 !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+}
+
+h1{
+font-weight: bold !important;
+}
+
+$custom-colors: (
+  "tertiary": #6d84b4,
+  "quaternary": #afbdd4,
+  "quinary": #d8dfea,
+  "success": #10d421,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+@import '~bootstrap/scss/bootstrap';
