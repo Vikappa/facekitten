@@ -1,33 +1,31 @@
 'use client'
 import Image from "next/image";
+import Link from "next/link";
 import { SetStateAction, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 
 interface LoginPageProps {
-    // Define your props here
   }
   
 const LoginPage: React.FC<LoginPageProps> = () => {
-    const [email, setEmail] = useState(''); // Stato per l'email
-const [password, setPassword] = useState(''); // Stato per la password reale
-const [maskedPassword, setMaskedPassword] = useState(''); // Stato per la password mascherata
+    const [email, setEmail] = useState('');
+const [password, setPassword] = useState(''); 
+const [maskedPassword, setMaskedPassword] = useState(''); 
 
 const handleEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => {
-  setEmail(e.target.value); // Aggiorna lo stato dell'email
+  setEmail(e.target.value); 
 };
 
 const handlePasswordChange = (e: { target: { value: any; }; }) => {
   const inputValue = e.target.value;
 
-  // Se il nuovo input è più lungo, aggiungi un carattere (gatto)
   if (inputValue.length > maskedPassword.length) {
-    setPassword(password + inputValue.slice(-1)); // Aggiungi l'ultimo carattere alla password reale
-    setMaskedPassword(maskedPassword + '😺'); // Aggiungi un gatto alla password mascherata
+    setPassword(password + inputValue.slice(-1)); 
+    setMaskedPassword(maskedPassword + '😺');
   } 
-  // Se il nuovo input è più corto, rimuovi l'ultimo carattere
   else if (inputValue.length < maskedPassword.length) {
-    setPassword(password.slice(0, -1)); // Rimuovi l'ultimo carattere dalla password reale
-    setMaskedPassword(maskedPassword.slice(0, -2)); // Rimuovi l'ultimo gatto dalla password mascherata
+    setPassword(password.slice(0, -1));
+    setMaskedPassword(maskedPassword.slice(0, -2)); 
   }
 };
 
@@ -44,10 +42,10 @@ useEffect(() => {
 
   return (
     <div>
-      <div className="row py-5">
-        <div className="col-12 col-sm-6 d-flex justify-content-center align-items-center">
+      <div className="row py-5 justify-content-between">
+        <div className="col-12 col-sm-5 d-flex align-items-center">
           <Image
-            className="img-fluid d-sm-none" 
+            className="img-fluid d-sm-none m-5 mx-auto " 
             alt="logo"
             width={80}
             height={80}
@@ -55,35 +53,44 @@ useEffect(() => {
           />
           <div className="d-none d-sm-block">
             <h1 className="text-primary">facekitten</h1>
-            <p>facekitten prrrr meow meow maow maooooow frrr mew mieeeeo mew mmiao meeeow mow</p>
+            <p className="pb-5">Facekitten prrrr meow meow maow maooooow frrr mew mieeeeo mew mmiao meeeow mow</p>
           </div>
         </div>
 
-        <Form className="col-12 col-sm-6 bg-white p-3 rounded shadow" onSubmit={handleSubmit}>
+        <Form className="col-12 col-sm-5 bg-sm-white p-3 rounded sm-shadow" onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Control 
+            <Form.Control
+               
               type="text" 
               placeholder="Email o numero di telefono" 
               value={email} 
-              onChange={handleEmailChange} // Gestore per l'email
+              onChange={handleEmailChange} 
+              style={{fontSize:'0.55rem'}} 
             />
           </Form.Group>
 
           <Form.Group className="mb-3 col-12" controlId="formBasicPassword">
-            <Form.Control 
+            <Form.Control
+               
               type="text" 
               placeholder="Pawsword" 
               value={maskedPassword}
-              onChange={handlePasswordChange} // Gestore per la password
+              onChange={handlePasswordChange} 
               autoComplete="off"
+              style={{fontSize:'0.55rem'}} 
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit" className="w-100 fw-bold">
+          <Button style={{fontSize:'0.7rem'}} variant="primary" type="submit" className="w-100 fw-bold d-sm-hidden rounded-pill rounded-sm-2">
             Accedi
           </Button>
-        <hr/>
-        <Button variant="success" className="text-white">Iscriviti</Button>
+          <div className="d-flex justify-content-center p-2">
+          <Link href={'/'} style={{fontSize:'0.55rem'}} className="text-decoration-none m-0 p-0">Password dimenticata?</Link>
+          </div>
+        <hr className="mt-1"/>
+        <div className="d-flex">
+        <Button style={{fontSize:'0.7rem'}} variant="success" className="text-white px-3 mx-auto">Crea nuovo account</Button>
+        </div>
         </Form>
       </div>    </div>
   );
