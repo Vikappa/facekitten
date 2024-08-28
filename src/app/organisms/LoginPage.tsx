@@ -41,11 +41,10 @@ useEffect(() => {
 }, [password]);
 
   return (
-    <div>
-      <div className="row py-5 justify-content-between">
-        <div className="col-12 col-sm-5 d-flex align-items-center">
+      <div className="row py-5 justify-content-evenly">
+        <div className="col-12 col-sm-5 d-flex align-items-between">
           <Image
-            className="img-fluid d-sm-none m-5 mx-auto " 
+            className="img-fluid d-sm-none m-5 mx-auto" 
             alt="logo"
             width={80}
             height={80}
@@ -65,7 +64,7 @@ useEffect(() => {
               placeholder="Email o numero di telefono" 
               value={email} 
               onChange={handleEmailChange} 
-              style={{fontSize:'0.55rem'}} 
+              style={{fontSize:'0.7rem'}} 
             />
           </Form.Group>
 
@@ -77,7 +76,7 @@ useEffect(() => {
               value={maskedPassword}
               onChange={handlePasswordChange} 
               autoComplete="off"
-              style={{fontSize:'0.55rem'}} 
+              style={{fontSize:'0.7rem'}} 
             />
           </Form.Group>
 
@@ -85,14 +84,14 @@ useEffect(() => {
             Accedi
           </Button>
           <div className="d-flex justify-content-center p-2">
-          <Link href={'/'} style={{fontSize:'0.55rem'}} className="text-decoration-none m-0 p-0">Password dimenticata?</Link>
+          <Link href={'/'} style={{fontSize:'0.7rem'}} className="text-decoration-none m-0 p-0">Password dimenticata?</Link>
           </div>
         <hr className="mt-1"/>
         <div className="d-flex">
         <Button style={{fontSize:'0.7rem'}} variant="success" className="text-white px-3 mx-auto">Crea nuovo account</Button>
         </div>
         </Form>
-      </div>    </div>
+      </div> 
   );
 };
 
