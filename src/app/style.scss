@@ -1,14 +1,15 @@
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
 @import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
 
-body{
+body {
   background-color: #f1f1f1 !important;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-h1{
-font-weight: bold !important;
+h1 {
+  font-weight: bold !important;
 }
 
 $custom-colors: (
@@ -19,4 +20,23 @@ $custom-colors: (
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);
+
 @import '~bootstrap/scss/bootstrap';
+
+$rounded-sizes: (
+  1: 0.125rem, // 2px
+  2: 0.25rem,  // 4px
+  3: 0.5rem,   // 8px
+  4: 0.75rem,  // 12px
+  5: 1rem,     // 16px
+);
+
+@each $breakpoint, $value in $grid-breakpoints {
+  @include media-breakpoint-up($breakpoint) {
+    @each $size, $radius in $rounded-sizes {
+      .rounded-#{$breakpoint}-#{$size} {
+        border-radius: $radius !important;
+      }
+    }
+  }
+}

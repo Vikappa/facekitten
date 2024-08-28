@@ -12256,4 +12256,109 @@ textarea.form-control-lg {
   .d-print-none {
     display: none !important;
   }
+}
+.rounded-xs-1 {
+  border-radius: 0.125rem !important;
+}
+
+.rounded-xs-2 {
+  border-radius: 0.25rem !important;
+}
+
+.rounded-xs-3 {
+  border-radius: 0.5rem !important;
+}
+
+.rounded-xs-4 {
+  border-radius: 0.75rem !important;
+}
+
+.rounded-xs-5 {
+  border-radius: 1rem !important;
+}
+
+@media (min-width: 576px) {
+  .rounded-sm-1 {
+    border-radius: 0.125rem !important;
+  }
+  .rounded-sm-2 {
+    border-radius: 0.25rem !important;
+  }
+  .rounded-sm-3 {
+    border-radius: 0.5rem !important;
+  }
+  .rounded-sm-4 {
+    border-radius: 0.75rem !important;
+  }
+  .rounded-sm-5 {
+    border-radius: 1rem !important;
+  }
+}
+@media (min-width: 768px) {
+  .rounded-md-1 {
+    border-radius: 0.125rem !important;
+  }
+  .rounded-md-2 {
+    border-radius: 0.25rem !important;
+  }
+  .rounded-md-3 {
+    border-radius: 0.5rem !important;
+  }
+  .rounded-md-4 {
+    border-radius: 0.75rem !important;
+  }
+  .rounded-md-5 {
+    border-radius: 1rem !important;
+  }
+}
+@media (min-width: 992px) {
+  .rounded-lg-1 {
+    border-radius: 0.125rem !important;
+  }
+  .rounded-lg-2 {
+    border-radius: 0.25rem !important;
+  }
+  .rounded-lg-3 {
+    border-radius: 0.5rem !important;
+  }
+  .rounded-lg-4 {
+    border-radius: 0.75rem !important;
+  }
+  .rounded-lg-5 {
+    border-radius: 1rem !important;
+  }
+}
+@media (min-width: 1200px) {
+  .rounded-xl-1 {
+    border-radius: 0.125rem !important;
+  }
+  .rounded-xl-2 {
+    border-radius: 0.25rem !important;
+  }
+  .rounded-xl-3 {
+    border-radius: 0.5rem !important;
+  }
+  .rounded-xl-4 {
+    border-radius: 0.75rem !important;
+  }
+  .rounded-xl-5 {
+    border-radius: 1rem !important;
+  }
+}
+@media (min-width: 1400px) {
+  .rounded-xxl-1 {
+    border-radius: 0.125rem !important;
+  }
+  .rounded-xxl-2 {
+    border-radius: 0.25rem !important;
+  }
+  .rounded-xxl-3 {
+    border-radius: 0.5rem !important;
+  }
+  .rounded-xxl-4 {
+    border-radius: 0.75rem !important;
+  }
+  .rounded-xxl-5 {
+    border-radius: 1rem !important;
+  }
 }/*# sourceMappingURL=style.css.map */
