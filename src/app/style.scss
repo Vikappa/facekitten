@@ -17,6 +17,7 @@ $custom-colors: (
   "quaternary": #afbdd4,
   "quinary": #d8dfea,
   "success": #10d421,
+  "white": #ffffff
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);
@@ -37,6 +38,28 @@ $rounded-sizes: (
       .rounded-#{$breakpoint}-#{$size} {
         border-radius: $radius !important;
       }
+    }
+  }
+}
+
+@each $breakpoint, $value in $grid-breakpoints {
+  @include media-breakpoint-up($breakpoint) {
+    .bg-#{$breakpoint}-white {
+      background-color: map-get($custom-colors, "white") !important;
+    }
+  }
+}
+
+$shadows: (
+  "sm": 0 2px 4px rgba(0, 0, 0, 0.1),   
+  "md": 0 4px 8px rgba(0, 0, 0, 0.2),  
+  "lg": 0 6px 12px rgba(0, 0, 0, 0.3),   
+);
+
+@each $breakpoint, $value in $grid-breakpoints {
+  @include media-breakpoint-up($breakpoint) {
+    .#{$breakpoint}-shadow {
+      box-shadow: map-get($shadows, "sm") !important;
     }
   }
 }
