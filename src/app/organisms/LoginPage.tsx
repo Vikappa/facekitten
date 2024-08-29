@@ -4,14 +4,15 @@ import Link from "next/link";
 import { SetStateAction, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
+import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 
 interface LoginPageProps {
   }
   
 const LoginPage: React.FC<LoginPageProps> = () => {
     const [email, setEmail] = useState('');
-const [password, setPassword] = useState(''); 
-const [maskedPassword, setMaskedPassword] = useState(''); 
+    const [password, setPassword] = useState(''); 
+    const [maskedPassword, setMaskedPassword] = useState(''); 
 
 const handleEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => {
   setEmail(e.target.value); 
@@ -36,12 +37,11 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   console.log("Password:", password);
 };
 
-useEffect(() => {
-  console.log(password)
-  console.log(maskedPassword)
-}, [password]);
+const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
 
   return (
+    <>
+    <CreaNuovoAccountModale show={showModaleCreaAccount} setShow={setShowModaleCreaAccount} />
       <div className="row py-sm-5 my-sm-5 justify-content-evenly position-relative">
         <div className="col-12 col-sm-5 d-flex align-items-between my-sm-5 pt-sm-5">
           <Image
@@ -89,16 +89,24 @@ useEffect(() => {
           </div>
         <hr className="mt-1 d-none d-sm-block" />
         <div className="d-flex">
-        <Button style={{fontSize:'1rem'}} variant="success" className="d-none d-sm-block text-white p-2 mx-auto fw-bold m-3">Crea nuovo account</Button>
+        <Button 
+        style={{fontSize:'1rem'}} 
+        variant="success" 
+        className="d-none d-sm-block text-white p-2 mx-auto fw-bold m-3"
+        onClick={() => setShowModaleCreaAccount(true)}
+        >Crea nuovo account</Button>
         </div>
         </Form>
 
         <div className="d-sm-none mt-5 text-center position-relative bottom-0 w-100 d-flex flex-column">
-        <button type="button" className="btn btn-outline-primary rounded-pill w-100">Crea nuovo account</button>
+        <button onClick={() => setShowModaleCreaAccount(true)} type="button" className="btn btn-outline-primary rounded-pill w-100">Crea nuovo account</button>
         <p className="d-flex text-center align-items-center justify-content-center m-2 text-tertiary"><IoLogoOctocat className="fs-4 m-1" />
         Meow</p>
         </div>
       </div> 
+      
+
+    </>
   );
 };
 
