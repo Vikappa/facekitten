@@ -101,7 +101,7 @@ const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
         <div className="d-sm-none mt-5 text-center position-relative bottom-0 w-100 d-flex flex-column">
         <button onClick={() => setShowModaleCreaAccount(true)} type="button" className="btn btn-outline-primary rounded-pill w-100">Crea nuovo account</button>
         <p className="d-flex text-center align-items-center justify-content-center m-2 text-tertiary"><IoLogoOctocat className="fs-4 m-1" />
-        Meow</p>
+        Mewta</p>
         </div>
       </div> 
       
