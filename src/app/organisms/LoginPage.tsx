@@ -56,7 +56,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <Form className="col-12 col-sm-5 bg-sm-white p-3 rounded sm-shadow" onSubmit={handleSubmit}>
+        <Form className="col-12 col-sm-4 bg-sm-white p-3 rounded sm-shadow-3" onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Control
                
@@ -88,7 +88,7 @@ useEffect(() => {
           </div>
         <hr className="mt-1"/>
         <div className="d-flex">
-        <Button style={{fontSize:'0.7rem'}} variant="success" className="text-white px-3 mx-auto">Crea nuovo account</Button>
+        <Button style={{fontSize:'0.7rem'}} variant="success" className="text-white px-2 mx-auto fw-bold">Crea nuovo account</Button>
         </div>
         </Form>
       </div> 

@@ -49,17 +49,21 @@ $rounded-sizes: (
     }
   }
 }
-
+ 
 $shadows: (
-  "sm": 0 2px 4px rgba(0, 0, 0, 0.1),   
-  "md": 0 4px 8px rgba(0, 0, 0, 0.2),  
-  "lg": 0 6px 12px rgba(0, 0, 0, 0.3),   
+  1: 0 2px 4px rgba(0, 0, 0, 0.1), 
+  2: 0 4px 8px rgba(0, 0, 0, 0.2),   
+  3: 0 6px 12px rgba(0, 0, 0, 0.3), 
+  4: 0 8px 16px rgba(0, 0, 0, 0.4), 
+  5: 0 10px 20px rgba(0, 0, 0, 0.5),
 );
 
 @each $breakpoint, $value in $grid-breakpoints {
   @include media-breakpoint-up($breakpoint) {
-    .#{$breakpoint}-shadow {
-      box-shadow: map-get($shadows, "sm") !important;
+    @each $size, $shadow in $shadows {
+      .#{$breakpoint}-shadow-#{$size} {
+        box-shadow: $shadow !important;
+      }
     }
   }
 }
