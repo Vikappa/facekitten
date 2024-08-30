@@ -5,7 +5,8 @@ import { SetStateAction, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
-
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
+import { setEmail, setPassword } from "../lib/slices/userCrediantSlice";
 interface LoginPageProps {
   }
   
@@ -13,6 +14,7 @@ const LoginPage: React.FC<LoginPageProps> = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
     const [maskedPassword, setMaskedPassword] = useState(''); 
+    const dispatch = useAppDispatch();
 
 const handleEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => {
   setEmail(e.target.value); 
@@ -52,7 +54,7 @@ const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
             src={'/img/facekittenlogo.png'}
           />
           <div className="d-none d-sm-block">
-            <h1 style={{fontSize:'3.5rem'}} className="text-primary">facekitten</h1>
+            <h1 style={{fontSize:'3.5rem'}} className="text-primary fw-bold">facekitten</h1>
             <p className="pb-5 fs-4">Facekitten prrrr meow meow maow maooooow frrr mew mieeeeo mew mmiao meeeow mow</p>
           </div>
         </div>
