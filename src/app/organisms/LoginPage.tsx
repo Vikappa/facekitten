@@ -6,7 +6,7 @@ import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setEmail, setPassword } from "../lib/slices/userCrediantSlice";
+import { stringify } from "querystring";
 interface LoginPageProps {
   }
   
@@ -34,9 +34,9 @@ const handlePasswordChange = (e: { target: { value: any; }; }) => {
 };
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  console.log("Email:", email);
-  console.log("Password:", password);
+  localStorage.setItem('facekittenData', stringify({
+    friendList: ['001','002','003', '004'],
+  }));
 };
 
 const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
