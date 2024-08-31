@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap"
 
-const RoundGreyBorderLess = ({ iconSelected, iconUnselected, selected, onClick, bgSelected, bgNotSelected }: {bgSelected:string, bgNotSelected:string, iconSelected: any;iconUnselected: any;selected: boolean; onClick: () => void }) => {
+const RoundGreyBorderLess = ({ iconSelected, iconUnselected, selected, onClick, bgSelected, bgNotSelected, size }: {bgSelected:string, bgNotSelected:string, iconSelected: any;iconUnselected: any;selected: boolean; onClick: () => void; size: number }) => {
     return (
         <Button 
         onClick={onClick}

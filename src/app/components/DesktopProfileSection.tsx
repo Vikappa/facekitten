@@ -23,6 +23,7 @@ const DesktopProfileSection = () => {
             onClick={handleFirstButton}
             bgSelected="bg-quinary"
             bgNotSelected="bg-grayBg"
+            size={30}
             />
         </div>
     )
