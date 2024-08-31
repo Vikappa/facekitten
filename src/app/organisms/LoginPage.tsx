@@ -35,7 +35,11 @@ const handlePasswordChange = (e: { target: { value: any; }; }) => {
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   const initialData: storageData = {
     friends: [],
-    chats: []
+    chats: [],
+    userDetails: {
+      profilepicture:"",
+      name:""
+    }
   }
   localStorage.setItem('facekittenData', JSON.stringify(initialData));
 };

@@ -6,6 +6,7 @@ import { FaFacebookMessenger } from "react-icons/fa";
 import { RiMessengerLine } from "react-icons/ri";
 import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
+import ProfileRoundButton from "../atoms/ProfileRoundButton";
 
 const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void}) => {
 
@@ -29,6 +30,14 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             setSelected(0)
         } else {
             setSelected(7)
+        }
+    }
+
+    const handleProfileButtonButton = () => {
+        if(selected === 8){
+            setSelected(0)
+        } else {
+            setSelected(8)
         }
     }
 
@@ -64,6 +73,11 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             bgSelected="bg-quinary"
             bgNotSelected="bg-grayBg"
             size={30}
+            />
+
+            <ProfileRoundButton 
+            selected={(selected === 8)} 
+            handleProfileButtonButton={handleProfileButtonButton}
             />
 
         </div>
