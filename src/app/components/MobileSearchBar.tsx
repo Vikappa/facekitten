@@ -1,28 +1,35 @@
 'use client'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Form } from "react-bootstrap"
 import { CiSearch } from "react-icons/ci";
 import Image from "next/image";
 import RoundActivableButton from '../atoms/RoundActivableButton'
 import { GoArrowLeft } from "react-icons/go";
 
-const MobileSearchBar = () => {
+const MobileSearchBar = (
+    {showMobileSearch, setShowMobileSearch, setSelected }:
+    {showMobileSearch:boolean;
+    setShowMobileSearch(showMobileSearch:boolean):void;
+    setSelected(selected:number):void
+    }) => {
 
-    const [showSearch, setShowSearch] = useState(false)
     const [searchValue, setSearchValue] = useState('')
-
+    useEffect(() => {
+        setSelected(0)
+    }, [showMobileSearch, setSelected])
+    
 
     return(
         <div className="d-block d-sm-none">
             <Form className="d-flex position-relative align-items-center gap-3">
                 {
-                    showSearch ?
+                    showMobileSearch ?
                     <>
                     <RoundActivableButton
                     iconSelected={<GoArrowLeft />}
                     iconUnselected={<GoArrowLeft />}
                     selected={false}
-                    onClick={() => {setShowSearch(false)}}
+                    onClick={() => {setShowMobileSearch(false)}}
                     bgSelected={'bg-grayBg'}
                     bgNotSelected={'bg-grayBg'}
                     size={22}
@@ -40,7 +47,7 @@ const MobileSearchBar = () => {
                     :
                     <>
                     <Image src={'/img/facekittenlogo.png'} alt="Logo" width={42} height={42}/>
-                    <RoundActivableButton bgSelected={'bg-grayBg'} bgNotSelected={'bg-grayBg'} iconSelected={<CiSearch/>} iconUnselected={<CiSearch/>} selected={false} onClick={() => setShowSearch(true)} size={24}/>
+                    <RoundActivableButton bgSelected={'bg-grayBg'} bgNotSelected={'bg-grayBg'} iconSelected={<CiSearch/>} iconUnselected={<CiSearch/>} selected={false} onClick={() => setShowMobileSearch(true)} size={24}/>
                     </>
                 }
 
