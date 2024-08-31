@@ -2,6 +2,8 @@ import { useState } from "react"
 import DesktopSearchbar from "./DesktopSearchbar"
 import MobileSearchBar from "./MobileSearchBar"
 import MidNavBar from "./MidNavBar"
+import DesktopProfileSection from "./DesktopProfileSection"
+import MobileProfileSection from "./MobileProfileSection"
 
 const NavBar = () => {
 
@@ -13,6 +15,9 @@ const NavBar = () => {
         <MobileSearchBar/>
 
         <MidNavBar/>
+
+        <DesktopProfileSection/>
+        <MobileProfileSection/>
 
     </div>
     )
