@@ -6,7 +6,7 @@ import { getProfilePicture } from "../utils/Various";
 const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: boolean; handleProfileButtonButton(selected:boolean):void }) => {
 
     const  randomProfilepictureUrl = getProfilePicture()
-
+    console.log(randomProfilepictureUrl)
     const showDropdownUserDesktop = () => {
         
     }
@@ -27,7 +27,9 @@ const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: b
         `
         }
     style={{
-        backgroundImage:`url(${randomProfilepictureUrl})`
+        backgroundImage:`url(${randomProfilepictureUrl})`,
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center', 
     }}
         >
         </Button>
