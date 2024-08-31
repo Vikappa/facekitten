@@ -4,7 +4,6 @@
 @import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
 
 body {
-  background-color: #f1f1f1 !important;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -13,7 +12,8 @@ $custom-colors: (
   "quaternary": #afbdd4,
   "quinary": #d8dfea,
   "success": #17c525,
-  "white": #ffffff
+  "white": #ffffff,
+  "grayBg": #f1f1f1
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);
