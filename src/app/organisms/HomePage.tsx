@@ -1,7 +1,8 @@
 import NavBar from "../components/NavBar"
+import { storageData } from "../utils/CustomTypes"
 
 const HomePage = (
-    {data}: {data: any}
+    {data}: {data: storageData}
 ) => {
     return (
         <div>
