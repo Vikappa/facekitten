@@ -12663,4 +12663,24 @@ textarea.form-control-lg {
   .xxl-shadow-5 {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5) !important;
   }
+}
+.thicker-hr {
+  border-bottom: 3px solid #007bff !important;
+  background-color: #007bff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  width: 100%;
+  position: relative;
+  min-width: 130%;
+  bottom: -10px;
+  left: -6px;
+}
+
+.midNavBarButton {
+  padding: 0.5rem 2rem !important;
+  border-radius: 20%;
+}
+
+.midNavBarButton:hover {
+  background-color: #F0F2F5 !important;
 }/*# sourceMappingURL=style.css.map */

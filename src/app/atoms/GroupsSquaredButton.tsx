@@ -5,11 +5,11 @@ const GroupSquaredButton = ({selected}: {selected: boolean}) => {
 
     if(selected){
         return(
-            <BsPeople  />
+            <BsPeopleFill className="fs-2 text-primary"/>
         )
     } else {
         return(
-            <BsPeopleFill  />
+            <BsPeople className="fs-2"/>
         )
     }
 }

@@ -3,15 +3,12 @@ import { GoHome } from "react-icons/go";
 
 const HomeSquaredButton = ({selected}: {selected: boolean}) => {
 
-    if(selected){
         return(
-            <GoHomeFill />
+            selected? 
+            <GoHomeFill className="fs-2 text-primary" />
+            :
+            <GoHome className="fs-2"/>
         )
-    } else {
-        return(
-            <GoHome />
-        )
-    }
 }
 
 export default HomeSquaredButton

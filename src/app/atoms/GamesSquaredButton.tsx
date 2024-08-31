@@ -5,11 +5,11 @@ const GamesSquaredButton = ({selected}: {selected: boolean}) => {
 
     if(selected){
         return(
-            <IoGameControllerOutline   />
+            <IoGameControllerSharp className="fs-2 text-primary" />
         )
     } else {
         return(
-            <IoGameControllerSharp  />
+            <IoGameControllerOutline className="fs-2"  />
         )
     }
 }
