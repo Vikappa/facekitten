@@ -7,10 +7,9 @@ import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { stringify } from "querystring";
-interface LoginPageProps {
-  }
+import { storageData } from "../utils/StorageDataTypes";
   
-const LoginPage: React.FC<LoginPageProps> = () => {
+const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState(''); 
     const [maskedPassword, setMaskedPassword] = useState(''); 
@@ -34,9 +33,11 @@ const handlePasswordChange = (e: { target: { value: any; }; }) => {
 };
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  localStorage.setItem('facekittenData', stringify({
-    friendList: ['001','002','003', '004'],
-  }));
+  const initialData: storageData = {
+    friends: [],
+    chats: []
+  }
+  localStorage.setItem('facekittenData', JSON.stringify(initialData));
 };
 
 const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);

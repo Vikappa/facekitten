@@ -4,7 +4,7 @@ import { CiSearch } from "react-icons/ci";
 
 const DesktopSearchbar = () => {
     return(
-        <div className="d-flex align-items-center gap-3">
+        <div className="d-none d-sm-flex align-items-center gap-3">
         <Image src={'/img/facekittenlogo.png'} alt="Logo" width={50} height={50}/>
         <CiSearch className="position-absolute" style={{transform:'translate(300%,0)'}} size={25}/>
         <Form className="d-none d-sm-block">

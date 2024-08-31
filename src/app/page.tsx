@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import HomePage from './organisms/HomePage';
 import LoginPage from './organisms/LoginPage';
-import { storageData } from './utils/CustomTypes';
+import { storageData } from './utils/StorageDataTypes';
 import './style.css';
 
 export default function Home() {
@@ -18,6 +18,7 @@ export default function Home() {
       }
     } catch (error) {
       console.log("LocalStorage non trovato, presento LoginPage");
+      console.log(error)
     }
     
   }, []);
