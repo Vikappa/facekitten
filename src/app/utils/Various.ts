@@ -4,13 +4,13 @@ export const sortRandomProfilePictureQuery = () => {
 
 
     const sortRandomCatSize = (): string => {
-        const catSizes = ['cat', 'kitten', 'leopard', 'mouser', 'feline']
+        const catSizes = ['cat', 'kitten', 'feline']
         const randomIndex = Math.floor(Math.random() * catSizes.length)
         return catSizes[randomIndex]
     }
 
     const sortRandomCatColor = (): string => {
-        const catColors = ['black', 'white', 'orange', 'gray', 'spotted']
+        const catColors = ['black', 'white', 'orange', 'gray', 'spotted', '']
         const randomIndex = Math.floor(Math.random() * catColors.length)
         return catColors[randomIndex]
     }
