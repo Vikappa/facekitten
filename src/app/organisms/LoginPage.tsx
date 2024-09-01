@@ -37,8 +37,8 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     friends: [],
     chats: [],
     userDetails: {
-      profilepicture:"",
-      name:""
+      name:email,
+      profilepicture:''
     }
   }
   localStorage.setItem('facekittenData', JSON.stringify(initialData));
@@ -69,7 +69,7 @@ const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
             <Form.Control
               className="p-3"
               type="text" 
-              placeholder="Email o numero di telefono" 
+              placeholder="Digita il tuo nome" 
               value={email} 
               onChange={handleEmailChange} 
               style={{fontSize:'1rem'}} 
