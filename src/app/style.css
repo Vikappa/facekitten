@@ -12683,4 +12683,8 @@ textarea.form-control-lg {
 
 .midNavBarButton:hover {
   background-color: #F0F2F5 !important;
+}
+
+.liHoverEffect:hover {
+  background-color: var(--bs-grayBg) !important;
 }/*# sourceMappingURL=style.css.map */

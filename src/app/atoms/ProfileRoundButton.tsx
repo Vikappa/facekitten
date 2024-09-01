@@ -92,7 +92,7 @@ const ProfileRoundButton = (
             onClick={handleClick} size={0}        
         />
         </div>
-        <DeskTopProfileDropdown show={showDropDown} />
+        <DeskTopProfileDropdown show={showDropDown} storageData={storageData} />
         </div>
     )
 }
