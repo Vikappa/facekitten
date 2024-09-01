@@ -4,26 +4,59 @@ import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../
 import { useEffect, useState } from "react";
 import RoundGreyBorderLess from "./RoundActivableButton";
 import { FaChevronDown } from "react-icons/fa6";
+import { storageData } from "../utils/StorageDataTypes";
+import DeskTopProfileDropdown from "../components/DesktopProfileDropdown";
 
-const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: boolean; handleProfileButtonButton(selected:boolean):void }) => {
+const ProfileRoundButton = (
+    {selected, handleProfileButtonButton, storageData }:
+    { selected: boolean; handleProfileButtonButton():void; storageData:storageData}) => {
 
     const [randomProfilepictureUrl, setRandomProfilePictureUrl]= useState<string>('')
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
+    const [storageDataState, setStorageDataState] = useState<storageData>(storageData)
+
+    const handleClick = () => {
+        handleProfileButtonButton()
+        setShowDropDown(!showDropDown)
+    }
+
     useEffect(() => {
-        fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
-        .then(data => {
-            setRandomProfilePictureUrl(data)
-        })
-    }, [])
+        if(!selected){
+            setShowDropDown(false)
+        }
+    }, [selected])
+    
+
+    useEffect(() => {
+        if (storageData.userDetails.profilepicture === '') {
+            fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
+                .then(data => {
+                    setRandomProfilePictureUrl(data);
+                    console.log(data)
+                    const updatedData = {
+                        ...storageData,
+                        userDetails: {
+                            ...storageData.userDetails,
+                            profilepicture: data
+                        }
+                    };
+                    setStorageDataState(updatedData);
+                    localStorage.setItem('facekittenData', JSON.stringify(updatedData));
+                })
+                .catch(error => {
+                    console.error("Errore nel fetch della foto del profilo:", error);
+                });
+        } else {
+            setRandomProfilePictureUrl(storageData.userDetails.profilepicture)
+        }
+    }, [storageData]);
     
 
     return (
 
         <div className="p-0 m-0 position-relative">
         <Button 
-        onClick={function (): void {
-            setShowDropDown(!showDropDown)
-        } }
+        onClick={handleClick}
         size="lg"
         className={`
         border-0
@@ -56,11 +89,10 @@ const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: b
             iconSelected={<FaChevronDown />} 
             iconUnselected={<FaChevronDown />} 
             selected={showDropDown}
-            onClick={function (): void {
-                    setShowDropDown(!showDropDown)
-                } } size={0}        
+            onClick={handleClick} size={0}        
         />
         </div>
+        <DeskTopProfileDropdown show={showDropDown} />
         </div>
     )
 }

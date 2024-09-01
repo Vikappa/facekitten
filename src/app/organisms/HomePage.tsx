@@ -10,7 +10,7 @@ const HomePage = (
     const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false)
     return (
         <div>
-            <NavBar navbarPage={navbarPage} setNavbarPage={setNavbarPage} showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
+            <NavBar storageData={data} navbarPage={navbarPage} setNavbarPage={setNavbarPage} showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
         </div>
     )
 }
