@@ -1,12 +1,19 @@
 'use client'
-import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap"
-import { getProfilePicture } from "../utils/Various";
+import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../utils/Various";
+import { useEffect, useState } from "react";
 
 const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: boolean; handleProfileButtonButton(selected:boolean):void }) => {
 
-    const  randomProfilepictureUrl = getProfilePicture()
-    console.log(randomProfilepictureUrl)
+    const [randomProfilepictureUrl, setRandomProfilePictureUrl]= useState<string>('')
+
+    useEffect(() => {
+        fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
+        .then(data => {
+            setRandomProfilePictureUrl(data)
+        })
+    }, [])
+    
     const showDropdownUserDesktop = () => {
         
     }
@@ -16,6 +23,7 @@ const ProfileRoundButton = ({selected, handleProfileButtonButton }:{ selected: b
         <div className="p-0 m-0">
         <Button 
         onClick={showDropdownUserDesktop}
+        size="lg"
         className={`
         border-0
         d-flex justify-content-center align-items-center
