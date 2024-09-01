@@ -11,28 +11,26 @@ const ProfileRoundButton = (
     {selected, handleProfileButtonButton, storageData }:
     { selected: boolean; handleProfileButtonButton():void; storageData:storageData}) => {
 
-    const [randomProfilepictureUrl, setRandomProfilePictureUrl]= useState<string>('')
-    const [showDropDown, setShowDropDown] = useState<boolean>(false)
-    const [storageDataState, setStorageDataState] = useState<storageData>(storageData)
+    const [randomProfilepictureUrl, setRandomProfilePictureUrl] = useState<string>(storageData.userDetails.profilepicture || '');
+    const [showDropDown, setShowDropDown] = useState<boolean>(false);
+    const [storageDataState, setStorageDataState] = useState<storageData>(storageData);
 
     const handleClick = () => {
-        handleProfileButtonButton()
-        setShowDropDown(!showDropDown)
+        handleProfileButtonButton();
+        setShowDropDown(!showDropDown);
     }
 
     useEffect(() => {
         if(!selected){
-            setShowDropDown(false)
+            setShowDropDown(false);
         }
-    }, [selected])
-    
+    }, [selected]);
 
     useEffect(() => {
         if (storageData.userDetails.profilepicture === '') {
             fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
                 .then(data => {
                     setRandomProfilePictureUrl(data);
-                    console.log(data)
                     const updatedData = {
                         ...storageData,
                         userDetails: {
@@ -47,54 +45,51 @@ const ProfileRoundButton = (
                     console.error("Errore nel fetch della foto del profilo:", error);
                 });
         } else {
-            setRandomProfilePictureUrl(storageData.userDetails.profilepicture)
+            setRandomProfilePictureUrl(storageData.userDetails.profilepicture);
         }
     }, [storageData]);
-    
 
     return (
-
         <div className="p-0 m-0 position-relative">
-        <Button 
-        onClick={handleClick}
-        size="lg"
-        className={`
-        border-0
-        d-flex justify-content-center align-items-center
-        rounded-circle
-        background
-        d-none d-sm-block        
-        fs-2
-        `
-        }
-    style={{
-        backgroundImage:`url(${randomProfilepictureUrl})`,
-        backgroundSize: 'cover', 
-        backgroundPosition: 'center', 
-        width: '40px', 
-        height: '40px', 
-        minWidth: '40px', 
-        minHeight: '40px', 
-        borderRadius: '50%',
-    }}
-        >
-        </Button>
-        <div 
-        className="position-absolute top-0 right-0"
-        style={{transform: 'translate(30%, 30%) scale(0.4)'}}
-        >
-            <RoundGreyBorderLess 
-            bgSelected={"bg-primary"} 
-            bgNotSelected={"bg-grayBg"} 
-            iconSelected={<FaChevronDown />} 
-            iconUnselected={<FaChevronDown />} 
-            selected={showDropDown}
-            onClick={handleClick} size={0}        
-        />
-        </div>
-        <DeskTopProfileDropdown show={showDropDown} storageData={storageData} />
+            <Button 
+                onClick={handleClick}
+                size="lg"
+                className={`
+                    border-0
+                    d-flex justify-content-center align-items-center
+                    rounded-circle
+                    background
+                    d-none d-sm-block        
+                    fs-2
+                `}
+                style={{
+                    backgroundImage: `url(${randomProfilepictureUrl})`,
+                    backgroundSize: 'cover', 
+                    backgroundPosition: 'center', 
+                    width: '40px', 
+                    height: '40px', 
+                    minWidth: '40px', 
+                    minHeight: '40px', 
+                    borderRadius: '50%',
+                }}
+            >
+            </Button>
+            <div 
+                className="position-absolute top-0 right-0"
+                style={{transform: 'translate(30%, 30%) scale(0.4)'}}
+            >
+                <RoundGreyBorderLess 
+                    bgSelected={"bg-primary"} 
+                    bgNotSelected={"bg-grayBg"} 
+                    iconSelected={<FaChevronDown />} 
+                    iconUnselected={<FaChevronDown />} 
+                    selected={showDropDown}
+                    onClick={handleClick} size={0}        
+                />
+            </div>
+            <DeskTopProfileDropdown show={showDropDown} storageData={storageDataState} />
         </div>
     )
 }
 
-export default ProfileRoundButton
+export default ProfileRoundButton;
