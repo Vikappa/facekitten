@@ -20,11 +20,16 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
         }
     }, [storageData.userDetails.profilepicture]);
 
+    const logOutFunction = () => {
+        localStorage.removeItem('facekittenData')
+        window.location.reload();
+    }
+
     if (!show) return null;
 
     return (
         <ListGroup className='position-absolute end-0 bg-white shadow fw-bold' style={{ minWidth: '25vw' }}>
-            <ListGroup.Item className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect'>
+            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect '>
                 {profileImage && 
                     <Image 
                         src={profileImage} 
@@ -38,7 +43,7 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                 </div>
             </ListGroup.Item>
 
-            <ListGroup.Item className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect'>
+            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1  rounded-2 border-0 liHoverEffect cursor-pointer'>
                 <div style={{ transform: 'scale(0.7)', position: 'absolute' }}>
                     <RoundGreyBorderLess
                         bgSelected={'bg-grayBg'}
@@ -51,7 +56,7 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                 </div>
                 <p className='p-0 m-0 ps-5'>Settings and privacy</p>
             </ListGroup.Item>
-            <ListGroup.Item className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect'>
+            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1  rounded-2 border-0 liHoverEffect'>
                 <div style={{ transform: 'scale(0.7)', position: 'absolute' }}>
                     <RoundGreyBorderLess
                         bgSelected={'bg-grayBg'}
@@ -64,7 +69,7 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                 </div>
                 <p className='p-0 m-0 ps-5'>Help and support!</p>
             </ListGroup.Item>
-            <ListGroup.Item className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect'>
+            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1  rounded-2 border-0 liHoverEffect'>
                 <div style={{ transform: 'scale(0.7)', position: 'absolute' }}>
                     <RoundGreyBorderLess
                         bgSelected={'bg-grayBg'}
@@ -77,7 +82,7 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                 </div>
                 <p className='p-0 m-0 ps-5'>Give Feedback</p>
             </ListGroup.Item>
-            <ListGroup.Item className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect'>
+            <ListGroup.Item style={{cursor:'pointer'}} onClick={logOutFunction} className='d-flex align-content-center align-items-center gap-2 m-1  rounded-2 border-0 liHoverEffect'>
                 <div style={{ transform: 'scale(0.7)', position: 'absolute' }}>
                     <RoundGreyBorderLess
                         bgSelected={'bg-grayBg'}
@@ -85,7 +90,7 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                         iconSelected={<IoLogOutSharp />}
                         iconUnselected={<IoLogOutSharp />}
                         selected={false}
-                        onClick={function (): void { }}
+                        onClick={logOutFunction}
                         size={8} />
                 </div>
                 <p className='p-0 m-0 ps-5'>LogOut</p>
