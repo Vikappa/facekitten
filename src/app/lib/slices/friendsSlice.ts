@@ -1,12 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-
 interface FriendListState {
-    friends: string[];
+  friends: string[];
 }
 
 const initialState: FriendListState = {
-    friends: [],
+  friends: [],
 };
 
 const friendsSlice = createSlice({
@@ -14,10 +13,13 @@ const friendsSlice = createSlice({
   initialState,
   reducers: {
     addFriend: (state, action: PayloadAction<string>) => {
-        state.friends.push(action.payload);
-      }
-    }
+      state.friends.push(action.payload);
+    },
+    initializeFriendsSlice: (state, action: PayloadAction<string[]>) => {
+      state.friends = action.payload;
+    },
+  },
 });
 
-export const { addFriend } = friendsSlice.actions;
+export const { addFriend, initializeFriendsSlice } = friendsSlice.actions;
 export default friendsSlice.reducer;

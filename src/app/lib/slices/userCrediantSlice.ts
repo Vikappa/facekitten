@@ -2,33 +2,33 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
 interface UserCredentialsState {
-    email: string;
-    phone: string;
-    password: string;
+    userName:string;
+    profilepictureUrl: string;
 }
 
 const initialState: UserCredentialsState = {
-    email: '',
-    phone: '',
-    password: ''
+  userName: '',
+  profilepictureUrl: ''
 };
 
 const userCredentialsSlice = createSlice({
   name: 'userCredentials',
   initialState,
   reducers: {
-    setPhone: (state, action: PayloadAction<string>) => {
-      state.phone = action.payload;
+    setUserNameState:
+    (state, action:PayloadAction<string>) => {
+      state.userName = action.payload
     },
-    setEmail: (state, action: PayloadAction<string>) => {
-      state.email = action.payload;
+    setProfilepicture:
+    (state, action:PayloadAction<string>) => {
+      state.profilepictureUrl = action.payload
     },
-    setPassword:
-    (state, action: PayloadAction<string>) => {
-        state.password = action.payload;
-      },
+    initializeUserCredentialSlice: (state, action: PayloadAction<{ userName: string; profilepictureUrl: string }>) => {
+      state.userName = action.payload.userName;
+      state.profilepictureUrl = action.payload.profilepictureUrl;
+    }
   },
 });
 
-export const { setPhone, setEmail, setPassword } = userCredentialsSlice.actions;
+export const { setUserNameState, setProfilepicture, initializeUserCredentialSlice } = userCredentialsSlice.actions;
 export default userCredentialsSlice.reducer;

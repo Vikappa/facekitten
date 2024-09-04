@@ -5,15 +5,24 @@ import MidNavBar from "./MidNavBar"
 import DesktopProfileSection from "./DesktopProfileSection"
 import MobileProfileSection from "./MobileProfileSection"
 import { storageData } from "../utils/StorageDataTypes"
-
+import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks"
+import { setNavbarPage } from '../lib/slices/appStateSlice'
 const NavBar = (
-    {navbarPage, setNavbarPage,showMobileSearch,setShowMobileSearch, storageData}: 
-    {navbarPage:number; 
-        setNavbarPage(navbarPage:number): void; 
+    {showMobileSearch,setShowMobileSearch}: 
+    {
         showMobileSearch:boolean; 
         setShowMobileSearch(mobileSearch:boolean):void
-        storageData: storageData
     }) => {
+        
+
+        const dispatch = useAppDispatch();
+
+        const setNavbarPageOnClick = (page: number) => {
+            dispatch(setNavbarPage(page));
+        }
+        
+
+        const navbarPage = useAppSelector(state => state.status.shownpage)
 
     return(
     <div className="d-flex justify-content-between align-items-center bg-white shadow-sm p-1 px-3">
@@ -22,7 +31,7 @@ const NavBar = (
 
         <MidNavBar navbarPage={navbarPage} setNavbarPage={setNavbarPage}/>
 
-        <DesktopProfileSection selected={navbarPage} setSelected={setNavbarPage} storageData={storageData}/>
+        <DesktopProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick} />
         <MobileProfileSection showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} selected={navbarPage} setSelected={setNavbarPage}/>
     </div>
     )

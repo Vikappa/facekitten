@@ -9,16 +9,19 @@ import { MdContactSupport } from "react-icons/md";
 import { TbZoomExclamationFilled } from "react-icons/tb";
 import { IoLogOutSharp } from "react-icons/io5";
 import { IoLogoOctocat } from "react-icons/io";
+import { useAppSelector } from '../lib/hooks';
 
-const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageData: storageData }) => {
+const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     
-    const [profileImage, setProfileImage] = useState(storageData.userDetails.profilepicture);
+    const storageData = useAppSelector(state => state)
+    const [profileImage, setProfileImage] = useState(storageData.userCredentials.profilepictureUrl);
+    const [userName, setUserName] = useState(storageData.userCredentials.userName);
 
     useEffect(() => {
-        if (storageData.userDetails.profilepicture) {
-            setProfileImage(storageData.userDetails.profilepicture);
+        if (storageData.userCredentials.profilepictureUrl) {
+            setProfileImage(storageData.userCredentials.profilepictureUrl);
         }
-    }, [storageData.userDetails.profilepicture]);
+    }, [storageData.userCredentials.profilepictureUrl]);
 
     const logOutFunction = () => {
         localStorage.removeItem('facekittenData')
@@ -33,13 +36,13 @@ const DeskTopProfileDropdown = ({ show, storageData }: { show: boolean; storageD
                 {profileImage && 
                     <Image 
                         src={profileImage} 
-                        alt={storageData.userDetails.name} 
+                        alt={userName} 
                         height={35} 
                         width={35} 
                         className='rounded-circle'
                     />}
                 <div>
-                    <p className="m-0">{storageData.userDetails.name}</p>
+                    <p className="m-0">{storageData.userCredentials.userName}</p>
                 </div>
             </ListGroup.Item>
 

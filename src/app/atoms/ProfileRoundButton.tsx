@@ -1,19 +1,17 @@
 'use client'
 import { Button } from "react-bootstrap"
-import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../utils/Various";
 import { useEffect, useState } from "react";
 import RoundGreyBorderLess from "./RoundActivableButton";
 import { FaChevronDown } from "react-icons/fa6";
-import { storageData } from "../utils/StorageDataTypes";
 import DeskTopProfileDropdown from "../components/DesktopProfileDropdown";
+import { useAppSelector } from "../lib/hooks";
 
 const ProfileRoundButton = (
-    {selected, handleProfileButtonButton, storageData }:
-    { selected: boolean; handleProfileButtonButton():void; storageData:storageData}) => {
+    {selected, handleProfileButtonButton }:
+    { selected: boolean; handleProfileButtonButton():void}) => {
 
-    const [randomProfilepictureUrl, setRandomProfilePictureUrl] = useState<string>(storageData.userDetails.profilepicture || '');
-    const [showDropDown, setShowDropDown] = useState<boolean>(false);
-    const [storageDataState, setStorageDataState] = useState<storageData>(storageData);
+        const [showDropDown, setShowDropDown] = useState<boolean>(false);
+        const storageData = useAppSelector(state => state)
 
     const handleClick = () => {
         handleProfileButtonButton();
@@ -26,28 +24,28 @@ const ProfileRoundButton = (
         }
     }, [selected]);
 
-    useEffect(() => {
-        if (storageData.userDetails.profilepicture === '') {
-            fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
-                .then(data => {
-                    setRandomProfilePictureUrl(data);
-                    const updatedData = {
-                        ...storageData,
-                        userDetails: {
-                            ...storageData.userDetails,
-                            profilepicture: data
-                        }
-                    };
-                    setStorageDataState(updatedData);
-                    localStorage.setItem('facekittenData', JSON.stringify(updatedData));
-                })
-                .catch(error => {
-                    console.error("Errore nel fetch della foto del profilo:", error);
-                });
-        } else {
-            setRandomProfilePictureUrl(storageData.userDetails.profilepicture);
-        }
-    }, [storageData]);
+    // useEffect(() => {
+    //     if(storageData.userCredentials.profilepictureUrl === ''){
+    //         fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
+    //         .then(data => {
+    //             dispatch(setProfilepicture(data))
+    //             const updatedData = {
+    //                 ...storageData,
+    //                 userDetails: {
+    //                     ...storageData.userCredentials,
+    //                     profilepicture: data
+    //                 }
+                    
+    //             };
+    //             localStorage.setItem('facekittenData', JSON.stringify(updatedData));
+    //         })
+    //         .catch(error => {
+    //             console.error("Errore nel fetch della foto del profilo:", error);
+    //         });       
+    //  }
+    // }, [dispatch, storageData])
+    
+
 
     return (
         <div className="p-0 m-0 position-relative">
@@ -63,7 +61,7 @@ const ProfileRoundButton = (
                     fs-2
                 `}
                 style={{
-                    backgroundImage: `url(${randomProfilepictureUrl})`,
+                    backgroundImage: `url(${storageData.userCredentials.profilepictureUrl})`,
                     backgroundSize: 'cover', 
                     backgroundPosition: 'center', 
                     width: '40px', 
@@ -87,7 +85,7 @@ const ProfileRoundButton = (
                     onClick={handleClick} size={0}        
                 />
             </div>
-            <DeskTopProfileDropdown show={showDropDown} storageData={storageDataState} />
+            <DeskTopProfileDropdown show={showDropDown} />
         </div>
     )
 }

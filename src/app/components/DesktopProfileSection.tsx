@@ -1,4 +1,3 @@
-import { useState } from "react";
 import RoundGreyBorderLess from "../atoms/RoundActivableButton"
 import { PiSquaresFourThin } from "react-icons/pi";
 import { PiSquaresFourFill } from "react-icons/pi";
@@ -7,9 +6,9 @@ import { RiMessengerLine } from "react-icons/ri";
 import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
-import { storageData } from "../utils/StorageDataTypes";
 
-const DesktopProfileSection = ({selected, setSelected, storageData}: {selected: number; setSelected(selected:number): void; storageData: storageData}) => {
+
+const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void;}) => {
 
     const handleFirstButton = () => {
         if(selected === 5){
@@ -79,7 +78,6 @@ const DesktopProfileSection = ({selected, setSelected, storageData}: {selected: 
             <ProfileRoundButton 
             selected={(selected === 8)} 
             handleProfileButtonButton={handleProfileButtonButton}
-            storageData={storageData}
             />
 
         </div>

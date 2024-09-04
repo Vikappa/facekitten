@@ -6,17 +6,18 @@ import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { stringify } from "querystring";
 import { storageData } from "../utils/StorageDataTypes";
+import { setProfilepicture, setUserNameState } from "../lib/slices/userCrediantSlice";
+import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../utils/Various";
   
 const LoginPage: React.FC = () => {
-    const [email, setEmail] = useState('');
+    const [userName, setUserName] = useState('');
     const [password, setPassword] = useState(''); 
     const [maskedPassword, setMaskedPassword] = useState(''); 
     const dispatch = useAppDispatch();
 
-const handleEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => {
-  setEmail(e.target.value); 
+const handleUserNameChange = (e: { target: { value: SetStateAction<string>; }; }) => {
+  setUserName(e.target.value); 
 };
 
 const handlePasswordChange = (e: { target: { value: any; }; }) => {
@@ -33,15 +34,16 @@ const handlePasswordChange = (e: { target: { value: any; }; }) => {
 };
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  const initialData: storageData = {
-    friends: [],
-    chats: [],
-    userDetails: {
-      name:email,
-      profilepicture:''
-    }
-  }
-  localStorage.setItem('facekittenData', JSON.stringify(initialData));
+  e.preventDefault()
+  fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
+  .then(data => {
+    dispatch(setProfilepicture(data))
+    dispatch(setUserNameState(userName))
+  })
+  .catch(error => {
+      console.error("Errore nel fetch della foto del profilo:", error);
+  });       
+
 };
 
 const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
@@ -70,8 +72,8 @@ const [showModaleCreaAccount, setShowModaleCreaAccount] = useState(false);
               className="p-3"
               type="text" 
               placeholder="Digita il tuo nome" 
-              value={email} 
-              onChange={handleEmailChange} 
+              value={userName} 
+              onChange={handleUserNameChange} 
               style={{fontSize:'1rem'}} 
             />
           </Form.Group>

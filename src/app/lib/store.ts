@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userCredentialsSlice from './slices/userCrediantSlice'
 import friendsSlice from './slices/friendsSlice'
+import appStateSlice from './slices/appStateSlice'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       userCredentials: userCredentialsSlice,
-      friendList: friendsSlice
+      friendList: friendsSlice,
+      status: appStateSlice
     }
   })
 }

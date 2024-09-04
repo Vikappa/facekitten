@@ -14,7 +14,7 @@ export interface Friend {
 }
 
 export interface UserDetails{
-    name: string;
+    userName: string;
     profilepicture:string
 }
 

@@ -1,37 +1,29 @@
 'use client'
-
 import React, { useEffect, useState } from 'react';
 import HomePage from './organisms/HomePage';
 import LoginPage from './organisms/LoginPage';
-import { storageData } from './utils/StorageDataTypes';
+import NavBar from "./components/NavBar"
 import './style.css';
+import { useAppSelector } from './lib/hooks';
 
 export default function Home() {
-  const [localStorageData, setLocalStorageData] = useState<storageData | undefined>(undefined);
+  const userCredentials = useAppSelector(state => state.userCredentials); 
+  const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false)
 
-  useEffect(() => {
-    try {
-      const data = localStorage.getItem('facekittenData');
-      if (data) {
-        const parsedData: storageData = JSON.parse(data);
-        setLocalStorageData(parsedData);
-      }
-    } catch (error) {
-      console.log("LocalStorage non trovato, presento LoginPage");
-      console.log(error)
-    }
-    
-  }, []);
 
-  if (!localStorageData) {
+
+  if (userCredentials.userName === '') {
     return (
       <main className={'container py-5 bg-grayBg'}>
         <LoginPage />
       </main>
-    );
+    )
   } else {
     return (
-      <HomePage data={localStorageData} />
+      <>
+      <NavBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
+      <HomePage />
+      </>
     );
   }
 }

@@ -2,6 +2,9 @@
 import { useRef } from 'react'
 import { Provider } from 'react-redux'
 import { makeStore, AppStore } from './lib/store'
+import { initializeFriendsSlice } from './lib/slices/friendsSlice'
+import { initializeAppGlobalStatus } from './lib/slices/appStateSlice'
+import {initializeUserCredentialSlice} from './lib/slices/userCrediantSlice'
 
 export default function StoreProvider({
   children
@@ -10,8 +13,11 @@ export default function StoreProvider({
 }) {
   const storeRef = useRef<AppStore>()
   if (!storeRef.current) {
-    // Create the store instance the first time this renders
     storeRef.current = makeStore()
+
+    storeRef.current.dispatch(initializeUserCredentialSlice({ userName: '', profilepictureUrl: '' }))
+    storeRef.current.dispatch(initializeFriendsSlice(['Alice', 'Bob']))
+    storeRef.current.dispatch(initializeAppGlobalStatus(1))
   }
 
   return <Provider store={storeRef.current}>{children}</Provider>
