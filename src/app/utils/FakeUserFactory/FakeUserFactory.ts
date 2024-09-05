@@ -42,8 +42,8 @@ const createRandomUserName = () => {
         "Micio", "Luna", "Felix", "Tigro", "Leo", "Nina", "Oscar", "Zoe", "Salem", "Mila", 
         "Oliver", "Simba", "Cleo", "Bella", "Charlie", "Sophie", "Jasper", "Maya", "Oreo", "Misty", 
         "Loki", "Chloe", "Ginger", "Lily", "Shadow", "Bernardo", "Muffin", "Smokey", "Max", "Sasha", "Pepper", 
-        "Molly", "Tom", "Daisy", "Toby", "Fluffy", "Thor", "Fiona", "Snowball", "Whiskers", "Pippo", 
-        "Socks", "Rusty", "Juno", "Blanca", "Marmalade", "Gatto", "Lupo", "Dante", "Sabrina", "Tiger"
+        "Molly", "Tom", "Daisy", "Toby", "Fluffy", "Thor", "Fiona", "Milo", "Luna", "Gizmo", "Lola",
+        "Socks", "Rusty", "Juno",  "Gatto",  "Dante", "Sabrina", "Tiger", "Mirtilla", "Margherita", "Bianca"
     ];
 
     const surnames = [

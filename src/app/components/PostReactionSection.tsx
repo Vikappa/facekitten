@@ -5,11 +5,11 @@ import { FaRegComment } from "react-icons/fa";
 import { RiShareForwardLine } from "react-icons/ri";
 
 
-const PostReactionSection = () => {
+const PostReactionSection = ({setShowCommentSection}:{setShowCommentSection:React.Dispatch<React.SetStateAction<boolean>>}) => {
 
     const fakeFuncton = () => {
-
     }
+    
 
     return(
     <>
@@ -27,7 +27,7 @@ const PostReactionSection = () => {
             <ReactionSectionButton 
             icon={<FaRegComment />} 
             testo={"Commenta"} 
-            funzione={fakeFuncton}        
+            funzione={() => setShowCommentSection(true)}        
             />
         </div>
 

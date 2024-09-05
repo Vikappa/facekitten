@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { storageData } from "../utils/StorageDataTypes";
 import { setProfilepicture, setUserNameState } from "../lib/slices/userCrediantSlice";
 import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../utils/Various";
+import { initializeSessionGeneratedAccountSlice } from "../lib/slices/sessionGeneratedAccountsSlice";
   
 const LoginPage: React.FC = () => {
     const [userName, setUserName] = useState('');
@@ -37,12 +38,14 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
   fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
   .then(data => {
+    dispatch(initializeSessionGeneratedAccountSlice())
     dispatch(setProfilepicture(data))
     dispatch(setUserNameState(userName))
   })
   .catch(error => {
       console.error("Errore nel fetch della foto del profilo:", error);
-  });       
+  });
+
 
 };
 

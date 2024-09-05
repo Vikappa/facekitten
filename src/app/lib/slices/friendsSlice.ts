@@ -15,8 +15,8 @@ const friendsSlice = createSlice({
     addFriend: (state, action: PayloadAction<string>) => {
       state.friends.push(action.payload);
     },
-    initializeFriendsSlice: (state, action: PayloadAction<string[]>) => {
-      state.friends = action.payload;
+    initializeFriendsSlice: (state) => {
+      state.friends = [];
     },
   },
 });

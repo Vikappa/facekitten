@@ -24,7 +24,7 @@ export default function Home() {
       <>
       <NavBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
       <HomePage />
-      <StoreMonitor/>
+      {/* <StoreMonitor/> */}
       </>
     );
   }

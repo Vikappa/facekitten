@@ -1,15 +1,22 @@
+import { Dispatch } from "@reduxjs/toolkit";
 import PostCommentForm from "../atoms/PostCommentForm"
 import PostCommentsList from "../atoms/PostCommentsList"
-import { PostComment } from "../utils/StorageDataTypes"
+import { Post } from "../utils/StorageDataTypes"
+import { SetStateAction } from "react";
 
-const PostComments = ({comments}:{comments:PostComment[]|undefined}) => {
+const PostComments = (
+    {post,showCommentSection}:
+    {post:Post|undefined; showCommentSection:boolean; }
+) => {
 
-    return(
-        <div className="flex flex-column">
-            <PostCommentForm/>
-            <PostCommentsList/>
-        </div>
-    )
+    if(showCommentSection){
+        return(
+            <div className="p-2">
+                <PostCommentForm post={post}/>
+                <PostCommentsList post={post}/>
+            </div>
+        )
+    }
 }
 
 export default PostComments

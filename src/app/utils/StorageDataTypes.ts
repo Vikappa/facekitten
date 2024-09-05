@@ -3,14 +3,17 @@ export interface FriendList {
 }
 
 export interface Post {
+    id: number;
     author: UserDetails;
     body: string;
     image: string;
     comments: PostComment[];
-    created_at: Date;
+    created_at: string;
+    likes: number;
 }
 
 export interface PostComment {
+    id:number;
     author: UserDetails;
     body: string
 }
@@ -24,6 +27,13 @@ export interface Friend {
     lastMessage: string;
     lastMessageTime: string;
     lastMessageStatus: string;
+    posts: Post[]
+}
+
+export interface CasualUser {
+    name: string;
+    profilePic: string;
+    posts: Post[]
 }
 
 export interface UserDetails{
@@ -66,6 +76,7 @@ export interface storageData {
     chats: ChatList[];
     posts: Post[]
     userDetails: UserDetails
+    sessionGeneratedAccounts: CasualUser[]
 }
 
 export interface pexelPayload {

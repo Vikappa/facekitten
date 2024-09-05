@@ -5,10 +5,12 @@ import { FaUserFriends } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoCloseOutline } from "react-icons/io5";
 
-const PostHeader = ({user, time}: {user:UserDetails|undefined; time:Date|undefined}) => {
+const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undefined}) => {
 
     const timeDifference = ():string => {
-        const timeDifference = new Date().getTime() - time!.getTime();
+        if (!time) return "Adesso";
+        console.log(new Date().getTime() - new Date(time).getTime())
+        const timeDifference = new Date().getTime() - new Date(time).getTime();
         const seconds = Math.floor(timeDifference / 1000);
         const minutes = Math.floor(seconds / 60);
         const hours = Math.floor(minutes / 60);
@@ -19,20 +21,16 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:Date|undefin
         if(seconds < 60){
             return "Adesso";
         }
-        else
-        if(minutes < 60){
+        else if(minutes < 60){
             return `${minutes}m`;
         }
-        else
-        if(hours < 24){
+        else if(hours < 24){
             return `${hours}o`;
         }
-        else
-        if(days < 30){
+        else if(days < 30){
             return `${days}g`;
         }
-        else
-        if(months < 12){
+        else if(months < 12){
             return `${months}m`;
         }
         else{
