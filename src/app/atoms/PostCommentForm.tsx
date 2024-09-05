@@ -6,7 +6,6 @@ import { useState } from "react"
 import { FiSend } from "react-icons/fi";
 import { Post } from "../utils/StorageDataTypes"
 import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
-import { profile } from "console"
 
 const PostCommentForm = ({post}: {post: Post|undefined}) => {
     const [commentValue, setCommentValue] = useState<string>() 
@@ -26,6 +25,7 @@ const PostCommentForm = ({post}: {post: Post|undefined}) => {
                 }
             }))
         }
+        setCommentValue('')
     }
 
     return(

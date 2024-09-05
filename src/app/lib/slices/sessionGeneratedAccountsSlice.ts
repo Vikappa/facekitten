@@ -27,19 +27,17 @@ const userCredentialsSlice = createSlice({
       action: PayloadAction<{ post: Post, commentValue: string, author: UserDetails }>
     ) => {
       const { post, commentValue, author } = action.payload;
-      if (post) {
-        state.acc
-          .find(account => account.name === post.author.userName && account.profilePic === post.author.profilepicture)
-          ?.posts
-          .find((p) => p.id === post.id)
-          ?.comments.push({
-            id: post.comments.length + 1,
-            author: author,
-            body: commentValue
-          });
+      const targetPost = state.acc.find(user => user.name === post.author.userName)?.posts.find(p => p.id === post.id);
+      if (targetPost) {
+        targetPost.comments = targetPost.comments || [];
+        targetPost.comments.push({
+          id: targetPost.comments.length + 1,
+          author: author,
+          body: commentValue
+        });
       }
-    }
-  },
+    } 
+ },
   extraReducers: (builder) => {
     builder.addCase(initializeSessionGeneratedAccountSlice.fulfilled, (state, action) => {
       state.acc = action.payload;

@@ -1,7 +1,7 @@
 import { CreateFakeUser } from "../FakeUserFactory/FakeUserFactory"
 import { Post, PostComment, UserDetails } from "../StorageDataTypes"
 
-export const FakePostFactory = async (time: Date, author:UserDetails): Promise<Post> => {
+export const FakePostFactory = async (time: Date, author:UserDetails, num:number): Promise<Post> => {
     let fakePostText = ""
     const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
         'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *'
@@ -13,7 +13,7 @@ export const FakePostFactory = async (time: Date, author:UserDetails): Promise<P
     const fakePostComments:PostComment[] = []
 
     return {
-        id:0,
+        id:num,
         author,
         body: fakePostText,
         image: '',

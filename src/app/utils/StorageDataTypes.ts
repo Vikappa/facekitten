@@ -15,7 +15,7 @@ export interface Post {
 export interface PostComment {
     id:number;
     author: UserDetails;
-    body: string
+    body: string;
 }
 
 export interface Friend {
