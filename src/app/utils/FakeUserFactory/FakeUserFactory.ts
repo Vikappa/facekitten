@@ -40,16 +40,16 @@ const fetchRandomPictureCat = async (query: string): Promise<string> => {
 const createRandomUserName = () => {
     const names = [
         "Micio", "Luna", "Felix", "Tigro", "Leo", "Nina", "Vladdalo", "Zoe", "Salem", "Mila", 
-        "Oliver", "Simba", "Cleo", "Bella", "Charlie", "Sophie", "Jasper", "Maya", "Oreo", "Misty", 
+        "Oliver", "Simba", "Miciomicio", "Bella", "Charlie", "Sophie", "Jasper", "Maya", "Oreo", "Misty", 
         "Loki", "Chloe", "Ginger", "Lily", "Shadow", "Bernardo", "Muffin", "Smokey", "Max", "Sasha", "Pepper", 
         "Molly", "Tom", "Daisy", "Toby", "Fluffy", "Thor", "Fiona", "Milo", "Luna", "Gizmo", "Lola",
-        "Socks", "Rusty", "Juno",  "Gatto",  "Dante", "Sabrina", "Tiger", "Mirtilla", "Margherita", "Bianca"
+        "Socks", "Rusty", "Juno",  "Gatto",  "Dante", "Leomawrdo", "Tiger", "Mirtilla", "Margherita", "Bianca"
     ];
 
     const surnames = [
-        "Rossi", "Neri", "Bianchi", "Grigi", "Tigrato", "Maculato", "Silvestri", "Marroni", "Pallido", "Striato", 
+        "Rossi", "Neri", "Bianchi", "Grigi", "Tigrato", "Maculato", "Silvestri", "DiCaprio", "Pallido", "Striato", 
         "Criminale di Guerra", "Balzano", "Veloce", "Zampadoro", "CodaLunga", "Zampini", "Sonnacchioso", "Furtivo", "Silenzioso", "Elegante", "Notturno", 
-        "Sbuffante", "Brillanti", "Agile", "Sornione", "Lucente", "Panciuto", "Vagabondo", "Guizzante", "Pennellato", "Vistoso", 
+        "Sbuffante", "Miaomiao", "Agile", "Sornione", "Lucente", "Panciuto", "Vagabondo", "Guizzante", "Pennellato", "Vistoso", 
         "Sospetto", "Nebuloso", "Vibrisse", "Calzato", "Sfuggente", "Ramingo", "Screziato", "Zampone", "Stravagante", "Occhioni", 
         "Fuggente", "Guardingo", "Accorto", "Scattante", "Misterioso", "Serafico", "Saltatore", "Indomito", "Vispo", "Cauto"
     ];
