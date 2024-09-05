@@ -29,10 +29,10 @@ const NavBar = (
         <DesktopSearchbar/>
         <MobileSearchBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} setSelected={setNavbarPage}/>
 
-        <MidNavBar navbarPage={navbarPage} setNavbarPage={setNavbarPage}/>
+        <MidNavBar navbarPage={navbarPage} setNavbarPage={setNavbarPageOnClick}/>
 
         <DesktopProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick} />
-        <MobileProfileSection showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} selected={navbarPage} setSelected={setNavbarPage}/>
+        <MobileProfileSection showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} selected={navbarPage} setSelected={setNavbarPageOnClick}/>
     </div>
     )
 }
