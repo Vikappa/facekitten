@@ -13,7 +13,7 @@ const PostCardComponent = ({post}:{post:Post}) => {
 
     return(
     <div className="
-        bg-white p-3 my-2 m-sm-2 rounded-3 shadow-sm 
+        bg-white p-3 rounded-3 shadow-sm w-100
         ">
         <PostHeader user={post?.author} time={post?.created_at}/>
         <PostBody bodyPost={post?.body} postImage={post?.image} />

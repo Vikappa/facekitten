@@ -9,7 +9,6 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undef
 
     const timeDifference = ():string => {
         if (!time) return "Adesso";
-        console.log(new Date().getTime() - new Date(time).getTime())
         const timeDifference = new Date().getTime() - new Date(time).getTime();
         const seconds = Math.floor(timeDifference / 1000);
         const minutes = Math.floor(seconds / 60);
