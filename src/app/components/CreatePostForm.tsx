@@ -24,7 +24,7 @@ const CreateFormPost = () =>{
             <div className="d-flex justify-content-evenly align-items-center w-100">
             <button className="border-0 bg-transparent" >Live Video</button>
             <button className="border-0 bg-transparent" >Photo/Video</button>
-            <button className="border-0 bg-transparent" >Feeling/Activity</button>
+            <button className="d-none d-sm-block border-0 bg-transparent" >Feeling/Activity</button>
             </div>
         </div>
 
