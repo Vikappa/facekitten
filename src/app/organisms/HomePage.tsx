@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useAppSelector } from "../lib/hooks";
 import PostCardComponent from "../components/PostCardComponent";
+import PostCardSpinnerGroup from "../spinners/PostCardSpinnerGroup";
 
 const HomePage = () => {
   const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
@@ -16,7 +17,7 @@ const HomePage = () => {
       <div className="col-lg-3"></div>
       <div className="col-12 col-md-9 col-lg-6 p-3">
         {postArray.length === 0 ? (
-          `carico`
+          <PostCardSpinnerGroup/>
         ) : (
           postArray.map((post) => (
             <PostCardComponent key={post.id} post={post} />
@@ -27,5 +28,4 @@ const HomePage = () => {
     </div>
   );
 };
-
 export default HomePage;
