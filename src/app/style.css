@@ -12687,4 +12687,8 @@ textarea.form-control-lg {
 
 .liHoverEffect:hover {
   background-color: var(--bs-grayBg) !important;
+}
+
+.commentSectionButton:hover {
+  background-color: var(--bs-grayBg) !important;
 }/*# sourceMappingURL=style.css.map */

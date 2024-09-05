@@ -4,7 +4,6 @@ import MobileSearchBar from "./MobileSearchBar"
 import MidNavBar from "./MidNavBar"
 import DesktopProfileSection from "./DesktopProfileSection"
 import MobileProfileSection from "./MobileProfileSection"
-import { storageData } from "../utils/StorageDataTypes"
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks"
 import { setNavbarPage } from '../lib/slices/appStateSlice'
 const NavBar = (

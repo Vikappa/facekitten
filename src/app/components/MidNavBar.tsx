@@ -4,17 +4,29 @@ import GamesSquaredButton from "../atoms/GamesSquaredButton"
 import GroupSquaredButton from "../atoms/GroupsSquaredButton"
 import HomeSquaredButton from "../atoms/HomeSquaredButton"
 import MarketSquaredButton from "../atoms/MarketSquaredButton"
+import { useRouter } from "next/navigation"
 
 const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPage(navbBarPage:number):void}) => {
 
+    const router = useRouter()
+
+    const setPage1 = () => {
+        router.push('/')
+        setNavbarPage(1)
+    }
+
+    const setPage2 = () => {
+        router.push('/marketplace')
+        setNavbarPage(2)
+    }
 
     return (
     <div className="d-none d-md-flex align-items-center justify-content-center">
-        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={() => setNavbarPage(1)}>
+        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={setPage1}>
         <HomeSquaredButton selected={(1===navbarPage)}/>
         {(1===navbarPage) && <hr className="text-primary p-0 m-0 thicker-hr"/>}
         </button>
-        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={() => setNavbarPage(2)} >
+        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={setPage2} >
         <MarketSquaredButton selected={(2===navbarPage)}/>
         {(2===navbarPage) && <hr className="text-primary p-0 m-0 thicker-hr"/>}
         </button>

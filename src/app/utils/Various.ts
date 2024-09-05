@@ -10,7 +10,7 @@ export const sortRandomProfilePictureQuery = () => {
     }
 
     const sortRandomCatColor = (): string => {
-        const catColors = ['black', 'white', 'orange', 'gray', 'spotted', '']
+        const catColors = ['black', 'white', 'orange', 'gray','grey', 'spotted', '']
         const randomIndex = Math.floor(Math.random() * catColors.length)
         return catColors[randomIndex]
     }

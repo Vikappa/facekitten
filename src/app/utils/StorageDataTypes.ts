@@ -2,6 +2,19 @@ export interface FriendList {
     id: number;
 }
 
+export interface Post {
+    author: UserDetails;
+    body: string;
+    image: string;
+    comments: PostComment[];
+    created_at: Date;
+}
+
+export interface PostComment {
+    author: UserDetails;
+    body: string
+}
+
 export interface Friend {
     id: number;
     name: string;
@@ -51,6 +64,7 @@ export interface ChatList {
 export interface storageData {
     friends: FriendList[];
     chats: ChatList[];
+    posts: Post[]
     userDetails: UserDetails
 }
 
