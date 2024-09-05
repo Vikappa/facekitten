@@ -15,7 +15,7 @@ export default function Home() {
 
   if (userCredentials.userName === '') {
     return (
-      <main className={'container py-5 bg-grayBg'}>
+      <main className={'container py-5 bg-grayBg'} style={{maxWidth:'100vw'}}>
         <LoginPage />
       </main>
     )
@@ -23,7 +23,7 @@ export default function Home() {
     return (
       <>
       <NavBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
-      <HomePage />
+      <HomePage  />
       {/* <StoreMonitor/> */}
       </>
     );

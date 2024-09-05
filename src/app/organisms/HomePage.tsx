@@ -13,9 +13,9 @@ const HomePage = () => {
   }, [accountsFromRedux]);
 
   return (
-    <div className="row">
+    <div className="row" style={{maxWidth:'100vw'}}>
       <div className="col-lg-3"></div>
-      <div className="col-12 col-md-9 col-lg-6 p-3">
+      <div className="col-12 col-md-9 col-lg-6 py-3 d-flex flex-column justify-content-center align-items-center" style={{maxWidth:'100vw'}}>
         {postArray.length === 0 ? (
           <PostCardSpinnerGroup/>
         ) : (
