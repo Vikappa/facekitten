@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { postImgIndexes } from '../../../../public/storedcatphotos/imgs/postimgindexer';
+import { postImgIndexes } from '../../../../public/storedcatphotos/imgs/postImgIndexes';
 
 export const dynamic = 'force-dynamic';
 
