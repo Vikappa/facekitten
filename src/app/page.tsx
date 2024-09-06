@@ -9,7 +9,6 @@ import StoreMonitor from './utils/StoreMonitorComponent';
 
 export default function Home() {
   const userCredentials = useAppSelector(state => state.userCredentials); 
-  const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false)
 
 
 
@@ -22,7 +21,7 @@ export default function Home() {
   } else {
     return (
       <>
-      <NavBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
+      <NavBar/>
       <HomePage  />
       {/* <StoreMonitor/> */}
       </>

@@ -6,13 +6,7 @@ import DesktopProfileSection from "./DesktopProfileSection"
 import MobileProfileSection from "./MobileProfileSection"
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks"
 import { setNavbarPage } from '../lib/slices/appStateSlice'
-const NavBar = (
-    {showMobileSearch,setShowMobileSearch}: 
-    {
-        showMobileSearch:boolean; 
-        setShowMobileSearch(mobileSearch:boolean):void
-    }) => {
-        
+const NavBar = () => {
 
         const dispatch = useAppDispatch();
 
@@ -26,12 +20,12 @@ const NavBar = (
     return(
     <div className="d-flex justify-content-between align-items-center bg-white shadow-sm p-1 px-3">
         <DesktopSearchbar/>
-        <MobileSearchBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} setSelected={setNavbarPage}/>
+        <MobileSearchBar setSelected={setNavbarPage}/>
 
         <MidNavBar navbarPage={navbarPage} setNavbarPage={setNavbarPageOnClick}/>
 
         <DesktopProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick} />
-        <MobileProfileSection showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch} selected={navbarPage} setSelected={setNavbarPageOnClick}/>
+        <MobileProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick}/>
     </div>
     )
 }

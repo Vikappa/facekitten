@@ -5,15 +5,24 @@ import { CiSearch } from "react-icons/ci";
 import Image from "next/image";
 import RoundActivableButton from '../atoms/RoundActivableButton'
 import { GoArrowLeft } from "react-icons/go";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
+import { setShowMobileSearch } from "../lib/slices/appStateSlice";
 
 const MobileSearchBar = (
-    {showMobileSearch, setShowMobileSearch, setSelected }:
-    {showMobileSearch:boolean;
-    setShowMobileSearch(showMobileSearch:boolean):void;
+    {setSelected }:
+    {
     setSelected(selected:number):void
     }) => {
 
     const [searchValue, setSearchValue] = useState('')
+    const showMobileSearch = useAppSelector(state => state.status.showMobileSearch)
+    const dispatch = useAppDispatch()
+
+    const handleShowMobileSearch = () => {
+        dispatch(setShowMobileSearch(!showMobileSearch))
+    }
+
+
     useEffect(() => {
         setSelected(0)
     }, [showMobileSearch, setSelected])
@@ -29,7 +38,7 @@ const MobileSearchBar = (
                     iconSelected={<GoArrowLeft />}
                     iconUnselected={<GoArrowLeft />}
                     selected={false}
-                    onClick={() => {setShowMobileSearch(false)}}
+                    onClick={handleShowMobileSearch}
                     bgSelected={'bg-grayBg'}
                     bgNotSelected={'bg-grayBg'}
                     size={22}
@@ -47,7 +56,7 @@ const MobileSearchBar = (
                     :
                     <>
                     <Image src={'/img/facekittenlogo.png'} alt="Logo" width={42} height={42}/>
-                    <RoundActivableButton bgSelected={'bg-grayBg'} bgNotSelected={'bg-grayBg'} iconSelected={<CiSearch/>} iconUnselected={<CiSearch/>} selected={false} onClick={() => setShowMobileSearch(true)} size={24}/>
+                    <RoundActivableButton bgSelected={'bg-grayBg'} bgNotSelected={'bg-grayBg'} iconSelected={<CiSearch/>} iconUnselected={<CiSearch/>} selected={false} onClick={() => dispatch(setShowMobileSearch(!showMobileSearch))} size={24}/>
                     </>
                 }
 
