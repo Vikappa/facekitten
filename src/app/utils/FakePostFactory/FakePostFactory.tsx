@@ -4,9 +4,9 @@ import { Post, PostComment, UserDetails } from "../StorageDataTypes"
 export const FakePostFactory = async (time: Date, author:UserDetails, num:number): Promise<Post> => {
     let fakePostText = ""
     const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
-        'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *'
+        'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *', '*sniff sniff*', '(si lecca)'
     ]
-    const numberOfWords = Math.floor(Math.random() * 60)
+    const numberOfWords = Math.round(Math.random() * 60)
     for (let index = 0; index < numberOfWords; index++) {
         fakePostText += fakePostSortWords[Math.round(Math.random() * fakePostSortWords.length)] + ' '
     }   

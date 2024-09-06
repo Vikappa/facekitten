@@ -69,7 +69,7 @@ const createRandomUserName = () => {
         "Criminale di Guerra", "Balzano", "Veloce", "Zampadoro", "CodaLunga", "Zampini", "Sonnacchioso", "Furtivo", "Silenzioso", "McCodino", "Notturno", 
         "Sbuffante", "Miaomiao", "Agile", "Sornione", "Lucente", "Panciuto", "Vagabondo", "Guizzante", "Pennellato", "Artiglio", 
         "Sospetto", "Nebuloso", "Vibrisse", "Calzato", "Sfuggente", "Ramingo", "Screziato", "Zampone", "Stravagante", "Occhioni", 
-        "Fuggente", "Guardingo", "Accorto", "Scattante", "Misterioso", "Serafico", "Saltatore", "Indomito", "Vispo", "Cauto"
+        "Fuggente", "Guardingo", "McFurr", "Scattante", "Misterioso", "Serafico", "Saltatore", "Indomito", "Vispo", "Cauto"
     ];
 
     const randomName = names[Math.floor(Math.random() * names.length)];
