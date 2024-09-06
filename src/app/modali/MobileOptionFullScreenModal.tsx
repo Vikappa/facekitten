@@ -41,7 +41,7 @@ const MobileOptionFullScreenModal = () => {
         </Modal.Header>
         <Modal.Body 
         className="bg-grayBg
-        d-flex flex-column align-items-center justify-content-center p-0
+        d-flex flex-column align-items-center justify-content-center p-3
         ">
           <MobileOptProfileRectangle/>
           <TastieraFunzioni/>
