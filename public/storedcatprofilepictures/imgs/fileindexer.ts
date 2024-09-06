@@ -1,4 +1,4 @@
-export const postImgIndexes = [
+export const picIndexes = [
     '/storedcatprofilepictures/imgs/Cute_grey_kitten-3770308734.jpg',
     '/storedcatprofilepictures/imgs/propic n (1).gif',
     '/storedcatprofilepictures/imgs/propic n (1).jpg',
