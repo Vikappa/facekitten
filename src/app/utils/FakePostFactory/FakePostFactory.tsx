@@ -7,7 +7,7 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
     ]
     const numberOfWords = Math.round(Math.random() * 60)
     for (let index = 0; index < numberOfWords; index++) {
-        fakePostText += fakePostSortWords[Math.round(Math.random() * fakePostSortWords.length)] + ' '
+        fakePostText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)+1] + ' '
     }   
     const fakePostComments:PostComment[] = []
     const random = Math.round(Math.random()*100)
