@@ -10,7 +10,7 @@ const MarketplacePage = () => {
 
     return(
     <>
-      <NavBar showMobileSearch={showMobileSearch} setShowMobileSearch={setShowMobileSearch}/>
+      <NavBar />
       <StoreMonitor/>
       </>
     )
