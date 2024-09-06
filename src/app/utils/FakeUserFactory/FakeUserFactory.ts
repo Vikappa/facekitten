@@ -20,8 +20,26 @@ export const sortRandomAccountPictureQuery = () => {
     return randomCatQuery
 }
 
-const fetchRandomPictureCat = async (query: string): Promise<string> => {
-    const queryUrl = `/api/pexelprofilepicture?query=${query}`; 
+// const fetchRandomPictureCat = async (query: string): Promise<string> => {
+//     const queryUrl = `/api/pexelprofilepicture?query=${query}`; 
+  
+//     try {
+//       const response = await fetch(queryUrl);
+//       if (!response.ok) {
+//         throw new Error('Errore nella fetch della nuova profile picture casuale');
+//       }
+//       const data = await response.json();
+//       const index = Math.floor(Math.random() * data.photos.length) 
+//       return data.photos[index].src.tiny;
+//     } catch (error) {
+//       console.error(error);
+//       // Immagine di fallback in caso di errore
+//       return 'https://images.pexels.com/photos/3974516/pexels-photo-3974516.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280';
+//     }
+// }
+
+export const fetchRandomPictureCat = async (): Promise<string> => {
+    const queryUrl = `/api/storedcatprofilepictures`; 
   
     try {
       const response = await fetch(queryUrl);
@@ -29,14 +47,14 @@ const fetchRandomPictureCat = async (query: string): Promise<string> => {
         throw new Error('Errore nella fetch della nuova profile picture casuale');
       }
       const data = await response.json();
-      const index = Math.floor(Math.random() * data.photos.length) 
-      return data.photos[index].src.tiny;
+      return data
     } catch (error) {
       console.error(error);
       // Immagine di fallback in caso di errore
       return 'https://images.pexels.com/photos/3974516/pexels-photo-3974516.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280';
     }
 }
+
 const createRandomUserName = () => {
     const names = [
         "Micio", "Luna", "Felix", "Tigro", "Leo", "Nina", "Vladdalo", "Zoe", "Salem", "Mila", 
@@ -63,7 +81,7 @@ const createRandomUserName = () => {
 
 export const CreateFakeUser = async (): Promise<UserDetails> => {
     const userName = createRandomUserName();
-    const profilepicture = await fetchRandomPictureCat(sortRandomAccountPictureQuery());
+    const profilepicture = await fetchRandomPictureCat();
     return {
         userName: userName,
         profilepicture: profilepicture

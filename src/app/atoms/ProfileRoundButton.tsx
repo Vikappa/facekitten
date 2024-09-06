@@ -11,7 +11,7 @@ const ProfileRoundButton = (
     { selected: boolean; handleProfileButtonButton():void}) => {
 
         const [showDropDown, setShowDropDown] = useState<boolean>(false);
-        const storageData = useAppSelector(state => state)
+        const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
 
     const handleClick = () => {
         handleProfileButtonButton();
@@ -23,29 +23,6 @@ const ProfileRoundButton = (
             setShowDropDown(false);
         }
     }, [selected]);
-
-    // useEffect(() => {
-    //     if(storageData.userCredentials.profilepictureUrl === ''){
-    //         fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
-    //         .then(data => {
-    //             dispatch(setProfilepicture(data))
-    //             const updatedData = {
-    //                 ...storageData,
-    //                 userDetails: {
-    //                     ...storageData.userCredentials,
-    //                     profilepicture: data
-    //                 }
-                    
-    //             };
-    //             localStorage.setItem('facekittenData', JSON.stringify(updatedData));
-    //         })
-    //         .catch(error => {
-    //             console.error("Errore nel fetch della foto del profilo:", error);
-    //         });       
-    //  }
-    // }, [dispatch, storageData])
-    
-
 
     return (
         <div className="p-0 m-0 position-relative">
@@ -61,7 +38,7 @@ const ProfileRoundButton = (
                     fs-2
                 `}
                 style={{
-                    backgroundImage: `url(${storageData.userCredentials.profilepictureUrl})`,
+                    backgroundImage: `url("${profilepictureUrl}")`,
                     backgroundSize: 'cover', 
                     backgroundPosition: 'center', 
                     width: '40px', 

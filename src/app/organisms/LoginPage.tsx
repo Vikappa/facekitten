@@ -6,10 +6,9 @@ import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { storageData } from "../utils/StorageDataTypes";
 import { setProfilepicture, setUserNameState } from "../lib/slices/userCrediantSlice";
-import { fetchRandomProfilePictureCat, sortRandomProfilePictureQuery } from "../utils/Various";
 import { initializeSessionGeneratedAccountSlice } from "../lib/slices/sessionGeneratedAccountsSlice";
+import { fetchRandomPictureCat } from "../utils/FakeUserFactory/FakeUserFactory";
   
 const LoginPage: React.FC = () => {
     const [userName, setUserName] = useState('');
@@ -36,7 +35,7 @@ const handlePasswordChange = (e: { target: { value: any; }; }) => {
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()
-  fetchRandomProfilePictureCat(sortRandomProfilePictureQuery())
+  fetchRandomPictureCat()
   .then(data => {
     dispatch(initializeSessionGeneratedAccountSlice())
     dispatch(setProfilepicture(data))
