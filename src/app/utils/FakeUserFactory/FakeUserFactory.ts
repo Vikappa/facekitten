@@ -48,8 +48,8 @@ const createRandomUserName = () => {
 
     const surnames = [
         "Rossi", "Neri", "Bianchi", "Grigi", "Tigrato", "Maculato", "Silvestri", "DiCaprio", "Pallido", "Striato", 
-        "Criminale di Guerra", "Balzano", "Veloce", "Zampadoro", "CodaLunga", "Zampini", "Sonnacchioso", "Furtivo", "Silenzioso", "Elegante", "Notturno", 
-        "Sbuffante", "Miaomiao", "Agile", "Sornione", "Lucente", "Panciuto", "Vagabondo", "Guizzante", "Pennellato", "Vistoso", 
+        "Criminale di Guerra", "Balzano", "Veloce", "Zampadoro", "CodaLunga", "Zampini", "Sonnacchioso", "Furtivo", "Silenzioso", "McCodino", "Notturno", 
+        "Sbuffante", "Miaomiao", "Agile", "Sornione", "Lucente", "Panciuto", "Vagabondo", "Guizzante", "Pennellato", "Artiglio", 
         "Sospetto", "Nebuloso", "Vibrisse", "Calzato", "Sfuggente", "Ramingo", "Screziato", "Zampone", "Stravagante", "Occhioni", 
         "Fuggente", "Guardingo", "Accorto", "Scattante", "Misterioso", "Serafico", "Saltatore", "Indomito", "Vispo", "Cauto"
     ];
