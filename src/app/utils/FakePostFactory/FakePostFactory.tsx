@@ -1,4 +1,3 @@
-import { CreateFakeUser } from "../FakeUserFactory/FakeUserFactory"
 import { Post, PostComment, UserDetails } from "../StorageDataTypes"
 
 export const FakePostFactory = async (time: Date, author:UserDetails, num:number): Promise<Post> => {
@@ -25,6 +24,18 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
         created_at: time.toISOString(),
         likes: 0
     }
+}
+
+export const fakePostCommentFactory = (commentAuthor:UserDetails, commentedPost:Post, commented_at:string, commentText:string): PostComment => {
+
+  const postId = commentedPost.comments.length + 1
+
+  return {
+    id: postId,
+    author: commentAuthor,
+    body: commentText,
+    commented_at: commented_at
+  }
 }
 
 export const fetchRandomPostFoto = async (): Promise<string> => {

@@ -16,6 +16,7 @@ export interface PostComment {
     id:number;
     author: UserDetails;
     body: string;
+    commented_at: string;
 }
 
 export interface Friend {

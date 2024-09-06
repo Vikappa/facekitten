@@ -33,7 +33,8 @@ const userCredentialsSlice = createSlice({
         targetPost.comments.push({
           id: targetPost.comments.length + 1,
           author: author,
-          body: commentValue
+          body: commentValue,
+          commented_at: new Date().toISOString()
         });
       }
     } 
