@@ -4,8 +4,7 @@ import { picIndexes } from '../../../../public/storedcatprofilepictures/imgs/fil
 
 export function GET() {
 
-    const randomIndex = Math.floor(Math.random() * picIndexes.length)
-    const randomPic = picIndexes[randomIndex]
+    const randomPic = picIndexes[Math.floor(Math.random() * picIndexes.length)]
 
     return NextResponse.json(randomPic)
 }
