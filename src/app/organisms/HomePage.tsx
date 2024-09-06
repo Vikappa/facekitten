@@ -6,12 +6,13 @@ import CreateFormPost from "../components/CreatePostForm";
 
 const HomePage = () => {
   const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
-
+  const userpost = useAppSelector( state => state.posts.userPosts)
   const postArray = useMemo(() => {
     const returnArray = accountsFromRedux.flatMap(accounts => accounts.posts)
+    returnArray.push(...userpost)
     returnArray.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     return returnArray
-  }, [accountsFromRedux]);
+  }, [accountsFromRedux, userpost]);
 
   return (
     <div className="container-fluid">

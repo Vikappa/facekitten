@@ -13,7 +13,7 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
     const fakePostComments:PostComment[] = []
     const random = Math.round(Math.random()*100)
     let imageString = ''
-    if (random > 50) {
+    if (random < 20) {
         imageString = await fetchRandomPostFoto()
     }
     return {
