@@ -11,14 +11,35 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
         fakePostText += fakePostSortWords[Math.round(Math.random() * fakePostSortWords.length)] + ' '
     }   
     const fakePostComments:PostComment[] = []
-
+    const random = Math.round(Math.random()*100)
+    let imageString = ''
+    if (random > 50) {
+        imageString = await fetchRandomPostFoto()
+    }
     return {
         id:num,
         author,
         body: fakePostText,
-        image: '',
+        image: imageString,
         comments: fakePostComments,
         created_at: time.toISOString(),
         likes: 0
+    }
+}
+
+export const fetchRandomPostFoto = async (): Promise<string> => {
+    const queryUrl = `/api/storedcatphotos`; 
+  
+    try {
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        throw new Error('Errore nella fetch della picture casuale');
+      }
+      const data = await response.json();
+      return data
+    } catch (error) {
+      console.error(error);
+      // Stringa di fallback in caso di errore
+      return '';
     }
 }

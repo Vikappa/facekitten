@@ -1,11 +1,34 @@
 'use client'
 import Image from "next/image"
-import { useAppSelector } from "../lib/hooks"
+import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { Form } from "react-bootstrap"
+import { useState } from "react"
+import { addPost } from "../lib/slices/userPostsSlice"
+import { fetchRandomPostFoto } from "../utils/FakePostFactory/FakePostFactory"
 
 const CreateFormPost = () =>{
 
+    const dispatch = useAppDispatch()
     const userDetails = useAppSelector(state => state.userCredentials)
+    const [postText, setPostText] = useState<string>("")
+    const postnumber = useAppSelector(state => state.posts.userPosts.length)
+
+    const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        dispatch(addPost({
+            id: 0,
+            author: {
+                userName: "",
+                profilepicture: ""
+            },
+            body: postText,
+            image: '',
+            comments: [],
+            created_at: new Date().toISOString(),
+            likes: 0
+        }))
+
+    }
 
     return(
         <div className="d-flex flex-column w-100 bg-white rounded-4 p-3 w-100">
@@ -13,9 +36,9 @@ const CreateFormPost = () =>{
 
         <div className="d-flex justify-content-start align-items-center w-100 gap-2">
             <Image src={userDetails.profilepictureUrl} alt={userDetails.userName} width={34} height={34} className="rounded-circle" />
-            <Form className="d-flex flex-column w-100">
+            <Form className="d-flex flex-column w-100" onSubmit={inviaPost}>
                 <Form.Group className="d-flex flex-column w-100">
-                    <Form.Control type="text" placeholder={`A cosa stai pensando, ${userDetails.userName}?`} className="bg-grayBg border-0 rounded-4 p-3 py-2 w-100" />
+                    <Form.Control type="text" placeholder={`A cosa stai pensando, ${userDetails.userName}?`} value={postText} onChange={(e) => {setPostText(e.target.value)}} className="bg-grayBg border-0 rounded-4 p-3 py-2 w-100" />
                 </Form.Group>
             </Form>
         </div>

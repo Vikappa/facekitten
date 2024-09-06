@@ -1,4 +1,5 @@
-export const picIndexes = [
+export const postImgIndexes = [
+    '/storedcatprofilepictures/imgs/Cute_grey_kitten-3770308734.jpg',
     '/storedcatprofilepictures/imgs/propic n (1).gif',
     '/storedcatprofilepictures/imgs/propic n (1).jpg',
     '/storedcatprofilepictures/imgs/propic n (1).webp',
@@ -9,7 +10,6 @@ export const picIndexes = [
     '/storedcatprofilepictures/imgs/propic n (14).jpg',
     '/storedcatprofilepictures/imgs/propic n (15).jpg',
     '/storedcatprofilepictures/imgs/propic n (16).jpg',
-    '/storedcatprofilepictures/imgs/propic n (17).jpg',
     '/storedcatprofilepictures/imgs/propic n (17).jpg',
     '/storedcatprofilepictures/imgs/propic n (18).jpg',
     '/storedcatprofilepictures/imgs/propic n (19).jpg',
@@ -40,8 +40,8 @@ export const picIndexes = [
     '/storedcatprofilepictures/imgs/propic n (38).jpg',
     '/storedcatprofilepictures/imgs/propic n (39).jpg',
     '/storedcatprofilepictures/imgs/propic n (4).jpg',
-    '/storedcatprofilepictures/imgs/propic n (41).jpg',
     '/storedcatprofilepictures/imgs/propic n (40).jpg',
+    '/storedcatprofilepictures/imgs/propic n (41).jpg',
     '/storedcatprofilepictures/imgs/propic n (42).jpg',
     '/storedcatprofilepictures/imgs/propic n (43).jpg',
     '/storedcatprofilepictures/imgs/propic n (44).jpg',
@@ -53,5 +53,4 @@ export const picIndexes = [
     '/storedcatprofilepictures/imgs/propic n (7).jpg',
     '/storedcatprofilepictures/imgs/propic n (8).jpg',
     '/storedcatprofilepictures/imgs/propic n (9).jpg',
-    
-]
+];
