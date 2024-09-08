@@ -1,16 +1,12 @@
 'use client'
 import Image from "next/image"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form } from "react-bootstrap"
 import { CiSearch } from "react-icons/ci";
 
 const DesktopSearchbar = () => {
 
     const [searchValue, setSearchValue] = useState('')
-
-    useEffect(() => {
-        console.log(searchValue)
-    }, [searchValue])
     
 
     return(
