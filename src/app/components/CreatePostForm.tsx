@@ -1,10 +1,10 @@
 'use client'
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
-import { Button, Form } from "react-bootstrap"
-import { useState } from "react"
-import { addPost } from "../lib/slices/userPostsSlice"
-import { fetchRandomPostFoto } from "../utils/FakePostFactory/FakePostFactory"
+import { useEffect, useState } from "react"
+import { addPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
+import { Form } from "react-bootstrap"
+import { UserDetails } from "../utils/StorageDataTypes"
 
 const CreateFormPost = () =>{
 
@@ -12,12 +12,14 @@ const CreateFormPost = () =>{
     const userDetails = useAppSelector(state => state.userCredentials)
     const [postText, setPostText] = useState<string>("")
     const postnumber = useAppSelector(state => state.posts.userPosts.length)
+    const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
+    const [triggerRandomComment, setTriggerRandomComment] = useState<boolean>(false)
 
     const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-
-        if(postText.length>0){
-            dispatch(addPost({
+    
+        if(postText.length > 0) {
+                dispatch(addPost({
                 id: postnumber,
                 author: {
                     userName: userDetails.userName,
@@ -28,10 +30,26 @@ const CreateFormPost = () =>{
                 comments: [],
                 created_at: new Date().toISOString(),
                 likes: 0
-            }))
+            }));
+    
+            setPostText('');
+            setTriggerRandomComment(true)
+    
+            setTimeout(() => {
+                const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
+                dispatch(randomCommentToUserPost({
+                    postNumber: postnumber, 
+                    commentAuthorDetails: {
+                        userName: randomAuthor.name,
+                        profilepicture: randomAuthor.profilePic
+                    }
+                }));
+            }, Math.round(Math.random() * 11900+100))
         }
+    };
+    
 
-    }
+    
 
     return(
         

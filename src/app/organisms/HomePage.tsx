@@ -21,8 +21,8 @@ const HomePage = () => {
       <MobileOptionFullScreenModal/>
       <div className="row justify-content-center">
         <div className="col-12 col-md-9 col-lg-6 py-3 d-flex flex-column align-items-center justify-content-center gap-2">
-          {postArray.length === 0 ? '' : <CreateFormPost/>}
-          {postArray.length === 0 ? (
+          {postArray && postArray.length === 0 ? '' : <CreateFormPost/>}
+          {postArray && postArray.length === 0 ? (
             <PostCardSpinnerGroup/>
           ) : (
             <>

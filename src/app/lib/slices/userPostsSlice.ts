@@ -1,5 +1,7 @@
-import { Post } from '@/app/utils/StorageDataTypes';
+import { Post, PostComment } from '@/app/utils/StorageDataTypes';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { UserDetails } from "@/app/utils/StorageDataTypes"
+import { FakePostTextFactory } from '@/app/utils/FakePostFactory/FakePostFactory';
 
 
 interface UserPostsState {
@@ -25,9 +27,39 @@ const userPostsSlice = createSlice({
     },
     initializeUserCredentialSlice: (state) => {
       state.userPosts = []
-    }
+    },
+    randomCommentToUserPost: (state, action: PayloadAction<{ postNumber: number, commentAuthorDetails: UserDetails }>) => {
+      const { postNumber, commentAuthorDetails } = action.payload;      
+      const post = state.userPosts.find(userPost => userPost.id === postNumber);
+  
+      if (post) {
+          const randomComment: PostComment = {
+              id: post.comments.length+1,  
+              author: commentAuthorDetails,
+              body: FakePostTextFactory(),
+              commented_at: new Date().toISOString()
+          }
+
+          post.comments.push(randomComment)
+
+      } 
+  }, addCommentToUserPost: (state, action: PayloadAction<{ postNumber: number, commentValue:string, commentAuthorDetails: UserDetails }>) => {
+    const { postNumber, commentValue, commentAuthorDetails } = action.payload;      
+    const post = state.userPosts.find(userPost => userPost.id === postNumber);
+
+    if (post) {
+        const randomComment: PostComment = {
+            id: post.comments.length+1,  
+            author: commentAuthorDetails,
+            body: commentValue,
+            commented_at: new Date().toISOString()
+        }
+
+        post.comments.push(randomComment)
+
+    } 
+  }
   },
 });
-
-export const { addPost, deletePost, initializeUserCredentialSlice } = userPostsSlice.actions;
+export const { addPost, deletePost, initializeUserCredentialSlice,randomCommentToUserPost,addCommentToUserPost } = userPostsSlice.actions;
 export default userPostsSlice.reducer;

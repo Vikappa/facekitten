@@ -11,6 +11,14 @@ const PostCardComponent = ({post}:{post:Post}) => {
 
     const [showCommentSection, setShowCommentSection] = useState<boolean>(false)
 
+    const handleShowCommentSection = () =>  {
+        if(showCommentSection || (post.comments.length > 0)){
+            return true
+        } else {
+            return false
+        }
+    }
+
     return(
     <div className="
         bg-white p-3 rounded-3 shadow-sm w-100
@@ -18,7 +26,7 @@ const PostCardComponent = ({post}:{post:Post}) => {
         <PostHeader user={post?.author} time={post?.created_at}/>
         <PostBody bodyPost={post?.body} postImage={post?.image} />
         <PostReactionSection setShowCommentSection={setShowCommentSection} />
-        <PostComments showCommentSection={showCommentSection}  post={post}/>
+        <PostComments showCommentSection={handleShowCommentSection()}  post={post}/>
     </div>
 )
 }

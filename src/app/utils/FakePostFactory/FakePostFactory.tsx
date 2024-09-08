@@ -1,11 +1,23 @@
 import { Post, PostComment, UserDetails } from "../StorageDataTypes"
 
+export const FakePostCommentTextFactory = () => {
+  let fakePostCommentText = ""
+  const fakePostSortWords = ['*blinks*', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
+      'meeeooow', 'frrr', 'frrrrrr', 'frau', 'mieo', ' * fugge *', 
+  ]
+  const numberOfWords = Math.round(Math.random() * 10)
+  for (let index = 0; index < numberOfWords; index++) {
+      fakePostCommentText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
+  }   
+  return fakePostCommentText
+}
+
 export const FakePostTextFactory = () => {
   let fakePostText = ""
   const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
       'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *', '*sniff sniff*', '(si lecca)'
   ]
-  const numberOfWords = Math.round(Math.random() * 60)
+  const numberOfWords = Math.round(Math.random() * 50)
   for (let index = 0; index < numberOfWords; index++) {
       fakePostText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
   }   
@@ -22,7 +34,7 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
         imageString = await fetchRandomPostFoto()
     }
     return {
-        id:num,
+        id:num+1,
         author,
         body: fakePostText,
         image: imageString,

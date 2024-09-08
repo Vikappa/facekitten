@@ -9,7 +9,7 @@ const PostComments = (
     {post:Post|undefined; showCommentSection:boolean; }
 ) => {
 
-    if(showCommentSection){
+    if(showCommentSection && post){
         return(
             <div className="p-2">
                 <PostCommentForm post={post}/>

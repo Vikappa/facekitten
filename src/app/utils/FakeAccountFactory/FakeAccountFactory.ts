@@ -18,12 +18,10 @@ export const MakeFakeAccount = async (): Promise<CasualUser> => {
 
     for (let index = 0; index < postsNumber; index++) {
         const randomInterval = generateRandomInterval(minIntervalInHours * 1000, maxIntervalInDays * 86400000);
-        if (index === 0) {
-            fakeAccountsPosts.push(await FakePostFactory(new Date(randomInterval), fakeCredential, index));        
-        } else {
+        if (index !== 0) {
             lastPostTime -= randomInterval;
-            fakeAccountsPosts.push(await FakePostFactory(new Date(lastPostTime), fakeCredential, index));
         }
+        fakeAccountsPosts.push(await FakePostFactory(new Date(randomInterval), fakeCredential, index));        
     }
 
     return {
