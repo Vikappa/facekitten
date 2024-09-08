@@ -25,7 +25,7 @@ const HomePage = () => {
             <PostCardSpinnerGroup/>
            : 
             postArray.map((post) => (
-              <PostCardComponent key={post.id} post={post} />
+              <PostCardComponent key={post.id+post.author.userName} post={post} />
             )
           )}
         </div>
