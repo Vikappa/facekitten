@@ -1,6 +1,7 @@
 'use client'
 
 import PostCardSpinner from "./PostCardSpinner"
+import ThreeDotSpinner from "./ThreeDotSpinner"
 
 const PostCardSpinnerGroup = () => {
     return(
@@ -12,6 +13,7 @@ const PostCardSpinnerGroup = () => {
         <PostCardSpinner/>
         <PostCardSpinner/>
         <PostCardSpinner/>
+        <ThreeDotSpinner/>
     </div>
     )
 }
