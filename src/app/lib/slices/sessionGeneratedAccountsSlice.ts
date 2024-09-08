@@ -1,4 +1,5 @@
 import { CreateInitialCluster } from '@/app/utils/FakeAccountsClusterFactory/FakeAccountsClusterFactory';
+import { FakeTextPostFactory, fetchRandomPostFoto } from '@/app/utils/FakePostFactory/FakePostFactory';
 import { CasualUser, Post, PostComment, UserDetails } from '@/app/utils/StorageDataTypes';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -37,8 +38,47 @@ const userCredentialsSlice = createSlice({
           commented_at: new Date().toISOString()
         });
       }
-    } 
- },
+    },
+    addPostToAccount: (state, action: PayloadAction<{editedAccount:CasualUser}>) => {
+      const account = state.acc.find(user => user.name === action.payload.editedAccount.name);
+      const randomAuthor = state.acc[Math.floor(Math.random() * state.acc.length)]
+      const imgPossibility = Math.round(Math.random() * 100)
+      if(account){
+      const newRandomPost: Post = {
+        id: account?.posts.length,
+        author: {
+          userName: randomAuthor.name,
+          profilepicture: randomAuthor.profilePic
+        },
+        body: FakeTextPostFactory(),
+        image: imgPossibility < 20 ? '' : '',
+        comments: [],
+        created_at: new Date().toISOString(),
+        likes: Math.floor(Math.random() * 10)
+      }
+      account.posts = [...account.posts, newRandomPost];
+    }
+    },
+    randomCommentsOnExistingPost: (state, action: PayloadAction<{editedAccount:CasualUser, editedPost:Post}>) => {
+      const { editedAccount, editedPost } = action.payload;
+      const targetAccount = state.acc.find(user => user.name === editedAccount.name);
+      if (targetAccount) {
+        const randomAuthor = state.acc[Math.floor(Math.random() * state.acc.length)]
+        const imgPossibility = Math.round(Math.random() * 100)
+        const newRandomComment: PostComment = {
+          id: targetAccount.posts.length,
+          author: {
+            userName: randomAuthor.name,
+            profilepicture: randomAuthor.profilePic
+          },
+          body: FakeTextPostFactory(),
+          commented_at: new Date().toISOString()
+        }
+        const targetPost = targetAccount.posts.find(p => p.id === editedPost.id);
+
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(initializeSessionGeneratedAccountSlice.fulfilled, (state, action) => {
       state.acc = action.payload;
@@ -46,5 +86,5 @@ const userCredentialsSlice = createSlice({
   }
 });
 
-export const { addCommentToPost } = userCredentialsSlice.actions;
+export const { addCommentToPost, addPostToAccount, randomCommentsOnExistingPost } = userCredentialsSlice.actions;
 export default userCredentialsSlice.reducer;
