@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
-import { Form } from "react-bootstrap"
+import { Button, Form } from "react-bootstrap"
 import { useState } from "react"
 import { addPost } from "../lib/slices/userPostsSlice"
 import { fetchRandomPostFoto } from "../utils/FakePostFactory/FakePostFactory"
@@ -15,18 +15,21 @@ const CreateFormPost = () =>{
 
     const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        dispatch(addPost({
-            id: 0,
-            author: {
-                userName: "",
-                profilepicture: ""
-            },
-            body: postText,
-            image: '',
-            comments: [],
-            created_at: new Date().toISOString(),
-            likes: 0
-        }))
+
+        if(postText.length>0){
+            dispatch(addPost({
+                id: postnumber,
+                author: {
+                    userName: userDetails.userName,
+                    profilepicture: userDetails.profilepictureUrl
+                },
+                body: postText,
+                image: '',
+                comments: [],
+                created_at: new Date().toISOString(),
+                likes: 0
+            }))
+        }
 
     }
 
@@ -41,6 +44,7 @@ const CreateFormPost = () =>{
                 <Form.Group className="d-flex flex-column w-100">
                     <Form.Control type="text" placeholder={`A cosa stai pensando, ${userDetails.userName}?`} value={postText} onChange={(e) => {setPostText(e.target.value)}} className="bg-grayBg border-0 rounded-4 p-3 py-2 w-100" />
                 </Form.Group>
+            <Button type="submit" className="d-none d-sm-block border-0 bg-transparent">Post</Button>
             </Form>
         </div>
 
