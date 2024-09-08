@@ -1,8 +1,5 @@
-import { useAppDispatch, useAppSelector } from "@/app/lib/hooks"
 import { MakeFakeAccount } from "../FakeAccountFactory/FakeAccountFactory"
-import { CasualUser, Post } from "../StorageDataTypes"
-import { FakePostFactory, FakeTextPostFactory, fetchRandomPostFoto } from "../FakePostFactory/FakePostFactory"
-import { addPostToAccount, randomCommentsOnExistingPost } from "@/app/lib/slices/sessionGeneratedAccountsSlice"
+import { CasualUser } from "../StorageDataTypes"
 
 export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     const fakeAccounts: CasualUser[] = []

@@ -140,28 +140,3 @@ $shadows: (
   }
 }
 
-.threeDotLoader {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 32px 0 #fff, -32px 0 #fff;
-  position: relative;
-  animation: threeDotAnimation 0.5s ease-out infinite alternate;
-}
-
-@keyframes threeDotAnimation{
-  0% {
-    background-color: #FFF2;
-    box-shadow: 32px 0 #FFF2, -32px 0 #FFF;
-  }
-  50% {
-    background-color: #FFF;
-    box-shadow: 32px 0 #FFF2, -32px 0 #FFF2;
-  }
-  100% {
-    background-color: #FFF2;
-    box-shadow: 32px 0 #FFF, -32px 0 #FFF2;
-  }
-}
-      

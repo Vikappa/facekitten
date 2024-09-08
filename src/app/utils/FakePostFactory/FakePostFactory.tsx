@@ -1,25 +1,14 @@
 import { Post, PostComment, UserDetails } from "../StorageDataTypes"
 
-export const FakeTextPostFactory = ():string => {
-
-  let returnString = ""
-
-  const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
-      'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *', '*sniff sniff*', '(si lecca)'
-  ]
-
-  const numberOfWords = Math.round(Math.random() * 60)
-  for (let index = 0; index < numberOfWords; index++) {
-    returnString += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
-  }   
-
-  return returnString
-}
-
 export const FakePostFactory = async (time: Date, author:UserDetails, num:number): Promise<Post> => {
-
-  let fakePostText = FakeTextPostFactory()
-
+    let fakePostText = ""
+    const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
+        'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *', '*sniff sniff*', '(si lecca)'
+    ]
+    const numberOfWords = Math.round(Math.random() * 60)
+    for (let index = 0; index < numberOfWords; index++) {
+        fakePostText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
+    }   
     const fakePostComments:PostComment[] = []
     const random = Math.round(Math.random()*100)
     let imageString = ''

@@ -12726,28 +12726,4 @@ textarea.form-control-lg {
   100% {
     background-position: 150% 0, 0 0, 70px 5px, 70px 38px, 0px 66px;
   }
-}
-.threeDotLoader {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 32px 0 #fff, -32px 0 #fff;
-  position: relative;
-  animation: threeDotAnimation 0.5s ease-out infinite alternate;
-}
-
-@keyframes threeDotAnimation {
-  0% {
-    background-color: rgba(255, 255, 255, 0.1333333333);
-    box-shadow: 32px 0 rgba(255, 255, 255, 0.1333333333), -32px 0 #FFF;
-  }
-  50% {
-    background-color: #FFF;
-    box-shadow: 32px 0 rgba(255, 255, 255, 0.1333333333), -32px 0 rgba(255, 255, 255, 0.1333333333);
-  }
-  100% {
-    background-color: rgba(255, 255, 255, 0.1333333333);
-    box-shadow: 32px 0 #FFF, -32px 0 rgba(255, 255, 255, 0.1333333333);
-  }
 }/*# sourceMappingURL=style.css.map */
