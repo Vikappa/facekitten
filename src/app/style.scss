@@ -144,8 +144,8 @@ $shadows: (
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 32px 0 #fff, -32px 0 #fff;
+  background-color: gray;
+  box-shadow: 32px 0 gray, -32px 0 gray;
   position: relative;
   animation: threeDotSpinnerAnimation 0.5s ease-out infinite alternate;
 }
@@ -153,15 +153,15 @@ $shadows: (
 @keyframes threeDotSpinnerAnimation {
   0% {
     background-color: #FFF2;
-    box-shadow: 32px 0 #FFF2, -32px 0 #FFF;
+    box-shadow: 32px 0 #FFF2, -32px 0 gray;
   }
   50% {
-    background-color: #FFF;
+    background-color: gray;
     box-shadow: 32px 0 #FFF2, -32px 0 #FFF2;
   }
   100% {
     background-color: #FFF2;
-    box-shadow: 32px 0 #FFF, -32px 0 #FFF2;
+    box-shadow: 32px 0 gray, -32px 0 #FFF2;
   }
 }
       

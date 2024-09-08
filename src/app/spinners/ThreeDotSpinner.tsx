@@ -1,5 +1,7 @@
 const ThreeDotSpinner = () => {
   return (
-<span className="threeDotSpinner"></span>
+<span className="threeDotSpinner m-4"></span>
   );
 };
+
+export default ThreeDotSpinner

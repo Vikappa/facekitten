@@ -12731,8 +12731,8 @@ textarea.form-control-lg {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #fff;
-  box-shadow: 32px 0 #fff, -32px 0 #fff;
+  background-color: gray;
+  box-shadow: 32px 0 gray, -32px 0 gray;
   position: relative;
   animation: threeDotSpinnerAnimation 0.5s ease-out infinite alternate;
 }
@@ -12740,14 +12740,14 @@ textarea.form-control-lg {
 @keyframes threeDotSpinnerAnimation {
   0% {
     background-color: rgba(255, 255, 255, 0.1333333333);
-    box-shadow: 32px 0 rgba(255, 255, 255, 0.1333333333), -32px 0 #FFF;
+    box-shadow: 32px 0 rgba(255, 255, 255, 0.1333333333), -32px 0 gray;
   }
   50% {
-    background-color: #FFF;
+    background-color: gray;
     box-shadow: 32px 0 rgba(255, 255, 255, 0.1333333333), -32px 0 rgba(255, 255, 255, 0.1333333333);
   }
   100% {
     background-color: rgba(255, 255, 255, 0.1333333333);
-    box-shadow: 32px 0 #FFF, -32px 0 rgba(255, 255, 255, 0.1333333333);
+    box-shadow: 32px 0 gray, -32px 0 rgba(255, 255, 255, 0.1333333333);
   }
 }/*# sourceMappingURL=style.css.map */
