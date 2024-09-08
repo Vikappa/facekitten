@@ -44,7 +44,6 @@ const CreateFormPost = () =>{
                 <Form.Group className="d-flex flex-column w-100">
                     <Form.Control type="text" placeholder={`A cosa stai pensando, ${userDetails.userName}?`} value={postText} onChange={(e) => {setPostText(e.target.value)}} className="bg-grayBg border-0 rounded-4 p-3 py-2 w-100" />
                 </Form.Group>
-            <Button type="submit" className="d-none d-sm-block border-0 bg-transparent">Post</Button>
             </Form>
         </div>
 
