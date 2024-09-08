@@ -12,16 +12,9 @@ import { IoLogoOctocat } from "react-icons/io";
 import { useAppSelector } from '../lib/hooks';
 
 const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
-    
-    const storageData = useAppSelector(state => state)
-    const [profileImage, setProfileImage] = useState(storageData.userCredentials.profilepictureUrl);
-    const [userName, setUserName] = useState(storageData.userCredentials.userName);
+    const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
+    const profileUserName = useAppSelector( state => state.userCredentials.userName)
 
-    useEffect(() => {
-        if (storageData.userCredentials.profilepictureUrl) {
-            setProfileImage(storageData.userCredentials.profilepictureUrl);
-        }
-    }, [storageData.userCredentials.profilepictureUrl]);
 
     const logOutFunction = () => {
         localStorage.removeItem('facekittenData')
@@ -33,16 +26,16 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     return (
         <ListGroup className='position-absolute end-0 bg-white shadow fw-bold' style={{ minWidth: '25vw' }}>
             <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect '>
-                {profileImage && 
+                {profilepictureUrl && 
                     <Image 
-                        src={profileImage} 
-                        alt={userName} 
+                        src={profilepictureUrl} 
+                        alt={profileUserName} 
                         height={35} 
                         width={35} 
                         className='rounded-circle'
                     />}
                 <div>
-                    <p className="m-0">{storageData.userCredentials.userName}</p>
+                    <p className="m-0">{profileUserName}</p>
                 </div>
             </ListGroup.Item>
 
