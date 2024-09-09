@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(prompt);
-        console.log(result.response.text());
+        //console.log(result.response.text());
         return new NextResponse(
             JSON.stringify({ message: result.response.text() }),
             {
