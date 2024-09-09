@@ -164,4 +164,16 @@ $shadows: (
     box-shadow: 32px 0 gray, -32px 0 #FFF2;
   }
 }
+
+.liNotificationElement{
+  cursor: pointer; 
+}
+
+.liNotificationElement:hover{
+  background-color: var(--bs-grayBg) !important;
+}
+.liNotificationElement:active{
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-grayBg)
+}
       

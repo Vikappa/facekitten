@@ -10,8 +10,7 @@ const NotificationLi = (
         //PostCommentNotificationType
         const notifBody: PostCommentNotificationType = notification.body as PostCommentNotificationType;
         return(
-            <li 
-            className="d-flex p-0 py-2 m-0 gap-2"
+            <li className="d-flex p-0 py-2 m-0 gap-2 w-100 liNotificationElement"
             >
                 <Image src={notification.body.commentAuthor.profilepicture} alt={notifBody.commentAuthor.userName} className="rounded-circle" width={20} height={20} />{
                 notifBody.commentAuthor.userName} ha commentato il tuo post
@@ -23,8 +22,7 @@ const NotificationLi = (
         //PostCommentNotificationType
         const notifBody: CommentReplyNotificationType = notification.body as CommentReplyNotificationType;
         return(
-            <li 
-            className="d-flex py-2 m-0 gap-2"
+            <li className="d-flex p-0 py-2 m-0 gap-2 w-100 liNotificationElement"
             >
                 <Image src={notification.body.commentAuthor.profilepicture} alt={notifBody.commentAuthor.userName} className="rounded-circle" width={20} height={20} />
                 {notifBody.commentAuthor.userName} ha rispost al tuo commento {
