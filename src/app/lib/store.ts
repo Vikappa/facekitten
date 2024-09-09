@@ -4,6 +4,7 @@ import friendsSlice from './slices/friendsSlice'
 import appStateSlice from './slices/appStateSlice'
 import sessionGeneratedAccountsSlice from './slices/sessionGeneratedAccountsSlice'
 import userPostsSlice from './slices/userPostsSlice'
+import notificationSlice from './slices/notificationSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -12,7 +13,8 @@ export const makeStore = () => {
       friendList: friendsSlice,
       sessionGeneratedAccounts: sessionGeneratedAccountsSlice,
       status: appStateSlice,
-      posts: userPostsSlice
+      posts: userPostsSlice,
+      notifications: notificationSlice
     }
   })
 }
