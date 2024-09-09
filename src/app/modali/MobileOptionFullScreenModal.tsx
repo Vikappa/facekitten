@@ -26,11 +26,11 @@ const MobileOptionFullScreenModal = () => {
         <Modal.Header className="p-2 px-3 bg-grayBg d-flex justify-content-between">
           <div className="d-flex justify-content-between align-items-center w-100 bg-grayBg">
             <div className="d-flex align-items-center justify-content-center gap-3">
-            <FaArrowLeft onClick={() => {
+            <FaArrowLeft size={25} onClick={() => {
           dispatch(setNavbarPage(0))
           dispatch(hideOptionsModal())
         }}/>
-            <Modal.Title className="bg-grayBg" style={{fontSize:'1rem', fontWeight:'bold'}}>Menu</Modal.Title>
+            <Modal.Title className="bg-grayBg" style={{fontSize:'1.5rem', fontWeight:'bold'}}>Menu</Modal.Title>
             </div>
           <FaSearch onClick={() => {
           dispatch(setNavbarPage(0))

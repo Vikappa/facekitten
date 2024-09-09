@@ -33,7 +33,7 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     if (!show) return null;
 
     return (
-        <ListGroup className='position-absolute end-0 bg-white shadow fw-bold' style={{ minWidth: '25vw' }}>
+        <ListGroup className='position-absolute end-0 bg-white shadow fw-bold z-3' style={{ minWidth: '25vw' }}>
             <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect' onClick={handleClickProfileLink}>
                 {profilepictureUrl && 
                     <Image 
