@@ -1,14 +1,24 @@
 'use client'
-import { useAppSelector } from "@/app/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
+import { updateShowOptionsModal } from "@/app/lib/slices/appStateSlice";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const MobileOptProfileRectangle = () => {
-    const userName = useAppSelector(state => state.userCredentials.userName)
-    const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl
 
-    )
+    const router = useRouter()
+    const dispatch = useAppDispatch()
+    const userName = useAppSelector(state => state.userCredentials.userName)
+    const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
+
+    const handleClick = () => {
+        dispatch(updateShowOptionsModal())
+        router.push('/userprofile')
+    }
+
     return(
     <div 
+    onClick={handleClick}
     className="
     bg-white w-100 p-2 px-3 d-flex align-items-center gap-3
     rounded-3 

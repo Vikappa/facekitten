@@ -1,6 +1,8 @@
 'use client'
 import Image from "next/image"
 import { useAppSelector } from "../lib/hooks"
+import ProfileImageResponsiveComponent from "../atoms/ProfileImageResponsiveComponent"
+import UserProfilePostRenderer from "../components/UserProfilePostRenderer"
 
 const UserProfileRenderer = () => {
     const coverPhoto = useAppSelector(state => state.userCredentials.coverPhotoUrl)
@@ -11,14 +13,15 @@ const UserProfileRenderer = () => {
     if(coverPhoto && profilePicture && userName){
         return(
             <div 
-            className="d-flex flex-column align-items-center justify-content-center bg-white"
-            style={{minHeight: '20vh', background: 'linear-gradient(to top, var(--bs-grayBg), grey)' // dal bianco (#ffffff) al blu (#0000ff)e0e0e0
+            className="d-flex flex-column align-items-center justify-content-start bg-white shadow-sm"
+            style={{minHeight: '50vh', background: 'linear-gradient(to top, white 40%, grey 80%)'
             }}
             >
-                <div className="col-sm-8">
-                <Image src={coverPhoto} alt="Cover Photo" className="w-100 rounded-bottom-3" width={400} height={180}/> 
+                <div className="col-sm-9">
+                <Image src={coverPhoto} alt="Cover Photo" className="w-100 rounded-bottom-3" width={400} height={280}/> 
+                <ProfileImageResponsiveComponent/>
+                <UserProfilePostRenderer/>
                 </div>
-                
             </div>
         )
     } else {
