@@ -1,3 +1,4 @@
+'use client'
 import RoundGreyBorderLess from "../atoms/RoundActivableButton"
 import { PiSquaresFourThin } from "react-icons/pi";
 import { PiSquaresFourFill } from "react-icons/pi";
@@ -6,9 +7,14 @@ import { RiMessengerLine } from "react-icons/ri";
 import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
+import { setShowDropDownNotification } from "../lib/slices/appStateSlice";
 
 
 const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void;}) => {
+
+    const dispatch = useAppDispatch()
+    const showNotificationDropDown = useAppSelector( state => state.status.showNotificationDropDown)
 
     const handleFirstButton = () => {
         if(selected === 5){
@@ -26,11 +32,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
         }
     }
     const handleThirdButtonButton = () => {
-        if(selected === 7){
-            setSelected(0)
-        } else {
-            setSelected(7)
-        }
+        dispatch(setShowDropDownNotification(!showNotificationDropDown))
     }
 
     const handleProfileButtonButton = () => {
@@ -68,7 +70,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             <RoundGreyBorderLess 
             iconSelected={<IoIosNotifications/>} 
             iconUnselected={<IoIosNotificationsOutline  />} 
-            selected={(selected === 7)} 
+            selected={showNotificationDropDown} 
             onClick={handleThirdButtonButton}
             bgSelected="bg-quinary"
             bgNotSelected="bg-grayBg"

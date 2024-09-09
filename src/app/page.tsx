@@ -5,7 +5,6 @@ import LoginPage from './organisms/LoginPage';
 import NavBar from "./components/NavBar"
 import './style.css';
 import { useAppSelector } from './lib/hooks';
-import StoreMonitor from './utils/StoreMonitorComponent';
 
 export default function Home() {
   const userCredentials = useAppSelector(state => state.userCredentials); 

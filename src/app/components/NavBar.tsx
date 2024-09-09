@@ -6,19 +6,20 @@ import DesktopProfileSection from "./DesktopProfileSection"
 import MobileProfileSection from "./MobileProfileSection"
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks"
 import { setNavbarPage } from '../lib/slices/appStateSlice'
+import MobileOptNavbar from "./MobileOptNavbar"
 const NavBar = () => {
 
         const dispatch = useAppDispatch();
+        const navbarPage = useAppSelector(state => state.status.shownpage)
 
         const setNavbarPageOnClick = (page: number) => {
             dispatch(setNavbarPage(page));
         }
-        
-
-        const navbarPage = useAppSelector(state => state.status.shownpage)
 
     return(
-    <div className="d-flex justify-content-between align-items-center bg-white shadow-sm p-1 px-3">
+    <div className="d-flex flex-column justify-content-center align-items-center bg-white shadow-sm p-1 px-3 w-100">
+
+    <div className="d-flex justify-content-between align-items-center bg-white shadow-sm p-1 px-3 w-100">
         <DesktopSearchbar/>
         <MobileSearchBar setSelected={setNavbarPage}/>
 
@@ -27,6 +28,13 @@ const NavBar = () => {
         <DesktopProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick} />
         <MobileProfileSection selected={navbarPage} setSelected={setNavbarPageOnClick}/>
     </div>
+
+    <div className="d-sm-none">
+        <MobileOptNavbar />
+    </div>
+
+    </div>
+
     )
 }
 

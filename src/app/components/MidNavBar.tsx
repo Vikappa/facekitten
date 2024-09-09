@@ -19,6 +19,14 @@ const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPag
         router.push('/marketplace')
         setNavbarPage(2)
     }
+    const setPage3 = () => {
+        router.push('/gruppi')
+       setNavbarPage(3)
+    }
+    const setPage4 = () => {
+        router.push('/games')
+       setNavbarPage(4)
+    }
 
     return (
     <div className="d-none d-md-flex align-items-center justify-content-center">
@@ -30,11 +38,11 @@ const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPag
         <MarketSquaredButton selected={(2===navbarPage)}/>
         {(2===navbarPage) && <hr className="text-primary p-0 m-0 thicker-hr"/>}
         </button>
-        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={() => setNavbarPage(3)}>
+        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={setPage3}>
         <GroupSquaredButton selected={(3===navbarPage)}/>
         {(3===navbarPage) && <hr className="text-primary p-0 m-0 thicker-hr"/>}
         </button>
-        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={() => setNavbarPage(4)}>
+        <button className={`bg-transparent border-0 p-0 m-0 bg-transparent midNavBarButton`} onClick={setPage4}>
         <GamesSquaredButton selected={(4===navbarPage)}/>
         {(4===navbarPage) && <hr className="text-primary p-0 m-0 thicker-hr"/>}
         </button>
