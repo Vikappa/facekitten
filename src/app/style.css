@@ -12767,4 +12767,13 @@ textarea.form-control-lg {
 .liNotificationElement:active {
   background-color: var(--bs-primary) !important;
   color: var(--bs-grayBg);
+}
+
+.liSideElement:hover {
+  background-color: lightgray !important;
+}
+
+.liSideElement:active {
+  background-color: var(--bs-primary) !important;
+  color: lightgray;
 }/*# sourceMappingURL=style.css.map */
