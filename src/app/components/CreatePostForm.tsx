@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { addPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
 import { Form } from "react-bootstrap"
 import { UserDetails } from "../utils/StorageDataTypes"
+import { createNotification } from "../lib/slices/notificationSlice"
 
 const CreateFormPost = () =>{
 
@@ -43,7 +44,17 @@ const CreateFormPost = () =>{
                         userName: randomAuthor.name,
                         profilepicture: randomAuthor.profilePic
                     }
-                }));
+                }))
+                dispatch(createNotification({
+                    notificationTypeNumber: 1,
+                    notificationBody: {
+                        postId: postnumber,
+                        commentAuthor: {
+                            userName: randomAuthor.name,
+                            profilepicture: randomAuthor.profilePic
+                        },
+                    }
+                }))
             }, Math.round(Math.random() * 11900+100))
         }
     };

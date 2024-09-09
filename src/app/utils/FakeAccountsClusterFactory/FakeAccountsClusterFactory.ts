@@ -3,8 +3,7 @@ import { CasualUser } from "../StorageDataTypes"
 
 export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     const fakeAccounts: CasualUser[] = []
-    const fakeAccountsNumber = Math.round(Math.random() * 50)
-    for (let index = 0; index < fakeAccountsNumber; index++) {
+    for (let index = 0; index < 12; index++) {
         fakeAccounts.push(await MakeFakeAccount())
     }
     return fakeAccounts

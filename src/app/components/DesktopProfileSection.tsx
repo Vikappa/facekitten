@@ -9,6 +9,7 @@ import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { setShowDropDownNotification, setShowProfileDropDown } from "../lib/slices/appStateSlice";
+import NotificationButton from "../atoms/NotificationButton";
 
 
 const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void;}) => {
@@ -36,6 +37,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             setSelected(6)
         }
     }
+    
     const handleThirdButtonButton = () => {
         dispatch(setShowDropDownNotification(!showNotificationDropDown))
         dispatch(setShowProfileDropDown(false))
@@ -73,10 +75,9 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             />
 
             
-            <RoundGreyBorderLess 
+            <NotificationButton 
             iconSelected={<IoIosNotifications/>} 
             iconUnselected={<IoIosNotificationsOutline  />} 
-            selected={showNotificationDropDown} 
             onClick={handleThirdButtonButton}
             bgSelected="bg-quinary"
             bgNotSelected="bg-grayBg"

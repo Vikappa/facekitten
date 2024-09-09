@@ -6,7 +6,6 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import { IoCloseOutline } from "react-icons/io5";
 
 const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undefined}) => {
-
     const timeDifference = ():string => {
         if (!time) return "Adesso";
         const timeDifference = new Date().getTime() - new Date(time).getTime();
@@ -21,19 +20,19 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undef
             return "Adesso";
         }
         else if(minutes < 60){
-            return `${minutes}m`;
+            return `${minutes}minuti fa`;
         }
         else if(hours < 24){
-            return `${hours}o`;
+            return `${hours}ore fa`;
         }
         else if(days < 30){
-            return `${days}g`;
+            return `${days}giorni fa`;
         }
         else if(months < 12){
-            return `${months}m`;
+            return `${months}mesi fa`;
         }
         else{
-            return `${years}a`;
+            return `${years}anni fa`;
         }
     }
 

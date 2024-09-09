@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     return new NextResponse(
-        JSON.stringify({ error: "API key not found" }),
+        JSON.stringify({ error: "Generation error" }),
         {
             status: 500,
             headers: {
