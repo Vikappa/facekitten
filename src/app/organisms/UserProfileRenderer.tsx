@@ -3,6 +3,7 @@ import Image from "next/image"
 import { useAppSelector } from "../lib/hooks"
 import ProfileImageResponsiveComponent from "../atoms/ProfileImageResponsiveComponent"
 import UserProfilePostRenderer from "../components/UserProfilePostRenderer"
+import CreateFormPost from "../components/CreatePostForm"
 
 const UserProfileRenderer = () => {
     const coverPhoto = useAppSelector(state => state.userCredentials.coverPhotoUrl)
@@ -14,7 +15,7 @@ const UserProfileRenderer = () => {
         return(
             <>
             <div 
-            className="d-flex flex-column align-items-center justify-content-start"
+            className="d-flex flex-column align-items-center justify-content-start mb-3 shadow"
             style={{minHeight: '50vh', background: 'linear-gradient(to top, white 40%, grey 80%)'
             }}
             >
@@ -23,6 +24,9 @@ const UserProfileRenderer = () => {
                 <ProfileImageResponsiveComponent/>
                 </div>
                 
+            </div>
+            <div className="p-2">
+            <CreateFormPost/>
             </div>
                 <UserProfilePostRenderer/>
                 </>
