@@ -8,15 +8,18 @@ import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setShowDropDownNotification } from "../lib/slices/appStateSlice";
+import { setShowDropDownNotification, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 
 
 const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void;}) => {
 
     const dispatch = useAppDispatch()
     const showNotificationDropDown = useAppSelector( state => state.status.showNotificationDropDown)
+    const showProfileDropDown = useAppSelector (state => state.status.showNotificationDropDown)
 
     const handleFirstButton = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(!showProfileDropDown))
         if(selected === 5){
             setSelected(0)
         } else {
@@ -25,6 +28,8 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
     }
 
     const handleSecondButton = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(false))
         if(selected === 6){
             setSelected(0)
         } else {
@@ -33,6 +38,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
     }
     const handleThirdButtonButton = () => {
         dispatch(setShowDropDownNotification(!showNotificationDropDown))
+        dispatch(setShowProfileDropDown(false))
     }
 
     const handleProfileButtonButton = () => {
@@ -77,10 +83,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             size={30}
             />
 
-            <ProfileRoundButton 
-            selected={(selected === 8)} 
-            handleProfileButtonButton={handleProfileButtonButton}
-            />
+            <ProfileRoundButton />
 
         </div>
     )

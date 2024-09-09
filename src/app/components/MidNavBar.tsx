@@ -5,25 +5,37 @@ import GroupSquaredButton from "../atoms/GroupsSquaredButton"
 import HomeSquaredButton from "../atoms/HomeSquaredButton"
 import MarketSquaredButton from "../atoms/MarketSquaredButton"
 import { useRouter } from "next/navigation"
+import { useAppDispatch, useAppSelector } from "../lib/hooks"
+import { setShowDropDownNotification, setShowProfileDropDown } from "../lib/slices/appStateSlice"
 
 const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPage(navbBarPage:number):void}) => {
 
     const router = useRouter()
+    const dispatch = useAppDispatch()
+    const showNotificationDropDown = useAppSelector( state => state.status.showNotificationDropDown)
 
     const setPage1 = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(false))
         router.push('/')
         setNavbarPage(1)
     }
 
     const setPage2 = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(false))
         router.push('/marketplace')
         setNavbarPage(2)
     }
     const setPage3 = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(false))
         router.push('/gruppi')
        setNavbarPage(3)
     }
     const setPage4 = () => {
+        dispatch(setShowDropDownNotification(false))
+        dispatch(setShowProfileDropDown(false))
         router.push('/games')
        setNavbarPage(4)
     }

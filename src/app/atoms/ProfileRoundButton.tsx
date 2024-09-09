@@ -4,25 +4,19 @@ import { useEffect, useState } from "react";
 import RoundGreyBorderLess from "./RoundActivableButton";
 import { FaChevronDown } from "react-icons/fa6";
 import DeskTopProfileDropdown from "../components/DesktopProfileDropdown";
-import { useAppSelector } from "../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
+import { setShowDropDownNotification, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 
-const ProfileRoundButton = (
-    {selected, handleProfileButtonButton }:
-    { selected: boolean; handleProfileButtonButton():void}) => {
-
-        const [showDropDown, setShowDropDown] = useState<boolean>(false);
+const ProfileRoundButton = () => {
+        const dispatch = useAppDispatch()
+        const showDropDown = useAppSelector(state => state.status.showProfileDropDown)
         const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
 
     const handleClick = () => {
-        handleProfileButtonButton();
-        setShowDropDown(!showDropDown);
+        dispatch(setShowProfileDropDown(!showDropDown))
+        dispatch(setShowDropDownNotification(false))
     }
 
-    useEffect(() => {
-        if(!selected){
-            setShowDropDown(false);
-        }
-    }, [selected]);
 
     return (
         <div className="p-0 m-0 position-relative">
