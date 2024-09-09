@@ -1,6 +1,6 @@
 'use client'
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks";
-import { updateShowOptionsModal } from "@/app/lib/slices/appStateSlice";
+import { setNavbarPage, updateShowOptionsModal } from "@/app/lib/slices/appStateSlice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +12,7 @@ const MobileOptProfileRectangle = () => {
     const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
 
     const handleClick = () => {
+        dispatch(setNavbarPage(11))
         dispatch(updateShowOptionsModal())
         router.push('/userprofile')
     }
