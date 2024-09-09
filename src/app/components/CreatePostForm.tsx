@@ -53,10 +53,13 @@ const CreateFormPost = () =>{
                             userName: randomAuthor.name,
                             profilepicture: randomAuthor.profilePic
                         },
+                        postAuthor: {
+                            userName: userDetails.userName,
+                            profilepicture: userDetails.profilepictureUrl
+                        }
                     }
                 }))
-            }, Math.round(Math.random() * 11900+100))
-        }
+            }, Math.round(Math.random() * 11900+100))        }
     };
     
 
