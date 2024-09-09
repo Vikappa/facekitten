@@ -89,6 +89,11 @@ $shadows: (
   background-color: var(--bs-grayBg) !important;
 }
 
+.liHoverEffect:active{
+  background-color: var(--bs-primary) !important;
+  color: var(--bs-grayBg);
+}
+
 .commentSectionButton:hover{
   background-color: var(--bs-grayBg) !important;
 }
