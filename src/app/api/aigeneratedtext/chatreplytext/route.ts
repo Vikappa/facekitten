@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { comment } = body;
 
-    const prompt = `Sei un gatto che posta su un social network. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr'). Rispondi a questo commento a un post: ${comment}. Cerca di essere coinvolgente e divertente. `;
+    const prompt = `Sei un gatto iscritto su un social network. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr'). Rispondi a questo messaggi che è arrivato in chat: ${comment}. Cerca di essere coinvolgente e divertente. `;
 
     console.log(comment)
     if(apiKey){
