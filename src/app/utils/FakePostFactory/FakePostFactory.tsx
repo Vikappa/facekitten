@@ -6,7 +6,7 @@ export const FakePostCommentTextFactory = () => {
   const fakePostSortWords = ['*blinks*', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
       'meeeooow', 'frrr', 'frrrrrr', 'frau', 'mieo', ' * fugge *', 
   ]
-  const numberOfWords = Math.round(Math.random() * 10)
+  const numberOfWords = Math.round(Math.random() * 9+1)
   for (let index = 0; index < numberOfWords; index++) {
       fakePostCommentText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
   }   
