@@ -14,6 +14,7 @@ import { PiVideoFill } from "react-icons/pi";
 import { PiVideoLight } from "react-icons/pi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { IoMdNotifications } from "react-icons/io";
+import NotificationRedDotMobileVersion from "../atoms/NotificationRedDotMobileVersion";
 
 const MobileOptNavbar = () => {
     const dispatch = useAppDispatch()
@@ -43,7 +44,7 @@ const MobileOptNavbar = () => {
     }
 
     return (
-        <div className="w-100 d-flex justify-content-evenly gap-2">
+        <div className="w-100 d-flex justify-content-evenly gap-2 position-relative">
             {/* casa */}
             <MobileOptSquaredButton iconSelected={<IoHomeSharp />} iconUnselected={<IoHomeOutline />} selected={(currentNavbarPage===1)} onClick={setPage1} size={0} />
             {/* amici */}
@@ -53,9 +54,12 @@ const MobileOptNavbar = () => {
             {/* video */}
             <MobileOptSquaredButton iconSelected={<PiVideoFill />} iconUnselected={<PiVideoLight />} selected={(currentNavbarPage===10)} onClick={setPage10} size={0} />
             {/* notification */}
+            <div className="position-relative p-0 m-0">
             <MobileOptSquaredButton iconSelected={<IoMdNotifications />} iconUnselected={<IoIosNotificationsOutline />} selected={showNotificationDropDown} onClick={function (): void {
                 dispatch(setShowDropDownNotification(!showNotificationDropDown))
             } } size={0} />
+            <NotificationRedDotMobileVersion/>
+            </div>
             {/* marketplaceOutline */}
             <MobileOptSquaredButton iconSelected={<FaShop />} iconUnselected={<FaShop />} selected={(currentNavbarPage===2)} onClick={setPage2} size={0} />
         </div>

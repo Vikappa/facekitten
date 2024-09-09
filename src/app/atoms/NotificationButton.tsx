@@ -3,6 +3,7 @@ import { Button } from "react-bootstrap";
 import { useAppSelector } from "../lib/hooks";
 import { useEffect, useRef, useState } from "react";
 import NotificationDropDown from "../components/NotificationDropDown";
+import NotificationRedDot from "./NotificationRedDot";
 
 const NotificationButton = (
     { iconSelected, iconUnselected, onClick, bgSelected, bgNotSelected, size }: 
@@ -13,7 +14,7 @@ const NotificationButton = (
 
 
     return (
-        <div className="p-relative">
+        <div className="position-relative">
             <Button 
             onClick={onClick}
             className={`
@@ -28,7 +29,7 @@ const NotificationButton = (
             >
                 {showNotificationDropDown ? iconSelected : iconUnselected}
             </Button>
-            <NotificationDropDown/>
+            <NotificationRedDot/>
         </div>
     );
 }
