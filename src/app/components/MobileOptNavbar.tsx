@@ -4,7 +4,7 @@ import { IoHomeSharp } from "react-icons/io5";
 import { useRouter } from "next/navigation"
 import MobileOptSquaredButton from "../atoms/MobileOptSquaredButton"
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setNavbarPage, setShowDropDownNotification, setShowNotificationModal } from "../lib/slices/appStateSlice";
+import { setNavbarPage, setShowDropDownNotification, setShowNotificationModal, updateShowNotificationModal } from "../lib/slices/appStateSlice";
 import { FaShop } from "react-icons/fa6";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { HiUsers } from "react-icons/hi2";
@@ -62,7 +62,7 @@ const MobileOptNavbar = () => {
             <div className="position-relative p-0 m-0">
             <MobileOptSquaredButton iconSelected={<IoMdNotifications />} iconUnselected={<IoIosNotificationsOutline />} selected={showNotificationDropDown} onClick={function (): void {
                 dispatch(setShowDropDownNotification(false))
-                dispatch(setShowNotificationModal(true))
+                dispatch(updateShowNotificationModal())
             } } size={0} />
             <NotificationRedDotMobileVersion/>
             </div>
