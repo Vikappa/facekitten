@@ -4,11 +4,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface UserCredentialsState {
     userName:string;
     profilepictureUrl: string;
+    coverPhotoUrl: string;
 }
 
 const initialState: UserCredentialsState = {
   userName: '',
-  profilepictureUrl: ''
+  profilepictureUrl: '',
+  coverPhotoUrl: ''
 };
 
 const userCredentialsSlice = createSlice({
@@ -23,12 +25,17 @@ const userCredentialsSlice = createSlice({
     (state, action:PayloadAction<string>) => {
       state.profilepictureUrl = action.payload
     },
-    initializeUserCredentialSlice: (state, action: PayloadAction<{ userName: string; profilepictureUrl: string }>) => {
+    setCoverPhotoUrl:
+    (state, action:PayloadAction<string>) => {
+      state.coverPhotoUrl = action.payload
+    },
+    initializeUserCredentialSlice: (state, action: PayloadAction<{ userName: string; profilepictureUrl: string; coverPhotoUrl:string }>) => {
       state.userName = action.payload.userName;
       state.profilepictureUrl = action.payload.profilepictureUrl;
+      state.coverPhotoUrl = action.payload.coverPhotoUrl;
     }
   },
 });
 
-export const { setUserNameState, setProfilepicture, initializeUserCredentialSlice } = userCredentialsSlice.actions;
+export const { setUserNameState, setProfilepicture, setCoverPhotoUrl, initializeUserCredentialSlice } = userCredentialsSlice.actions;
 export default userCredentialsSlice.reducer;

@@ -87,3 +87,21 @@ export const CreateFakeUser = async (): Promise<UserDetails> => {
         profilepicture: profilepicture
     };
 }
+
+
+export const fetchRandomCoverPhoto = async (): Promise<string> => {
+    const queryUrl = `/api/storedcatcoverphoto`; 
+  
+    try {
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        throw new Error('Errore nella fetch della nuova cover photo casuale');
+      }
+      const data = await response.json();
+      return data
+    } catch (error) {
+      console.error(error);
+      // Immagine di fallback in caso di errore
+      return 'https://images.pexels.com/photos/3974516/pexels-photo-3974516.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280';
+    }
+}

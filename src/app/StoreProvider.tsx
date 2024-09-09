@@ -16,7 +16,10 @@ export default function StoreProvider({
   if (!storeRef.current) {
     storeRef.current = makeStore()
 
-    storeRef.current.dispatch(initializeUserCredentialSlice({ userName: '', profilepictureUrl: '' }))
+    storeRef.current.dispatch(initializeUserCredentialSlice({
+      userName: '', profilepictureUrl: '',
+      coverPhotoUrl: ''
+    }))
     storeRef.current.dispatch(initializeFriendsSlice())
     storeRef.current.dispatch(initializeAppGlobalStatus(1))
     storeRef.current.dispatch(initializeNotification())

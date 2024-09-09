@@ -6,9 +6,9 @@ import { Button, Form } from "react-bootstrap";
 import { IoLogoOctocat } from "react-icons/io";
 import CreaNuovoAccountModale from "../modali/CreaNuovoAccountModale";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setProfilepicture, setUserNameState } from "../lib/slices/userCrediantSlice";
+import { setCoverPhotoUrl, setProfilepicture, setUserNameState } from "../lib/slices/userCrediantSlice";
 import { initializeSessionGeneratedAccountSlice } from "../lib/slices/sessionGeneratedAccountsSlice";
-import { fetchRandomPictureCat } from "../utils/FakeUserFactory/FakeUserFactory";
+import { fetchRandomCoverPhoto, fetchRandomPictureCat } from "../utils/FakeUserFactory/FakeUserFactory";
   
 const LoginPage: React.FC = () => {
     const [userName, setUserName] = useState('');
@@ -45,6 +45,13 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       console.error("Errore nel fetch della foto del profilo:", error);
   });
 
+  fetchRandomCoverPhoto()
+  .then(data => {
+    dispatch(setCoverPhotoUrl(data))
+  })
+  .catch(error => {
+      console.error("Errore nel fetch della foto di copertina:", error);
+  });
 
 };
 

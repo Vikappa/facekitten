@@ -9,23 +9,32 @@ import { MdContactSupport } from "react-icons/md";
 import { TbZoomExclamationFilled } from "react-icons/tb";
 import { IoLogOutSharp } from "react-icons/io5";
 import { IoLogoOctocat } from "react-icons/io";
-import { useAppSelector } from '../lib/hooks';
+import { useAppDispatch, useAppSelector } from '../lib/hooks';
+import { setNavbarPage, setShowProfileDropDown } from '../lib/slices/appStateSlice';
+import { useRouter } from 'next/navigation';
 
 const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     const profilepictureUrl = useAppSelector(state => state.userCredentials.profilepictureUrl)
     const profileUserName = useAppSelector( state => state.userCredentials.userName)
-
+    const dispatch = useAppDispatch()
+    const router = useRouter()
 
     const logOutFunction = () => {
         localStorage.removeItem('facekittenData')
         window.location.reload();
     }
 
+    const handleClickProfileLink = (e: React.MouseEvent<HTMLDivElement>) => {
+        dispatch(setNavbarPage(11))
+        dispatch(setShowProfileDropDown(false))
+        router.push('/userprofile')
+    }
+
     if (!show) return null;
 
     return (
         <ListGroup className='position-absolute end-0 bg-white shadow fw-bold' style={{ minWidth: '25vw' }}>
-            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect '>
+            <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1 rounded-2 border-0 liHoverEffect' onClick={handleClickProfileLink}>
                 {profilepictureUrl && 
                     <Image 
                         src={profilepictureUrl} 
