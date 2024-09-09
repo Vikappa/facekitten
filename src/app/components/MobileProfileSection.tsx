@@ -1,7 +1,7 @@
 import RoundGreyBorderLess from "../atoms/RoundActivableButton";
 import { IoMdMenu } from "react-icons/io";
 import { useAppDispatch } from "../lib/hooks";
-import { updateShowOptionsModal } from "../lib/slices/appStateSlice";
+import { setShowNotificationModal, updateShowOptionsModal } from "../lib/slices/appStateSlice";
 
 const MobileProfileSection = ({
      selected, setSelected
@@ -9,11 +9,11 @@ const MobileProfileSection = ({
         selected:number;
         setSelected(selected:number):void
     }) => {
-
         const dispatch = useAppDispatch()
         const handleSelectedMobileMenu = () => {
             setSelected(8)
             dispatch(updateShowOptionsModal())
+            dispatch(setShowNotificationModal(false))
         }
 
         return(

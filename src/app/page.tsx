@@ -5,6 +5,7 @@ import LoginPage from './organisms/LoginPage';
 import NavBar from "./components/NavBar"
 import './style.css';
 import { useAppSelector } from './lib/hooks';
+import ModaleNotificationMobileModale from './modali/ModaleNotificationMobileModale';
 
 export default function Home() {
   const userCredentials = useAppSelector(state => state.userCredentials); 
@@ -21,6 +22,7 @@ export default function Home() {
     return (
       <>
       <NavBar/>
+      <ModaleNotificationMobileModale/>
       <HomePage  />
       </>
     );

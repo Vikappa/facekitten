@@ -8,7 +8,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setShowDropDownNotification, setShowProfileDropDown } from "../lib/slices/appStateSlice";
+import { setShowDropDownNotification, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 import NotificationButton from "../atoms/NotificationButton";
 
 
@@ -41,6 +41,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
     const handleThirdButtonButton = () => {
         dispatch(setShowDropDownNotification(!showNotificationDropDown))
         dispatch(setShowProfileDropDown(false))
+        dispatch(setShowNotificationModal(false))
     }
 
     const handleProfileButtonButton = () => {

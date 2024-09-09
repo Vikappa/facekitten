@@ -6,14 +6,16 @@ interface AppStatusState {
   showMobileSearch: boolean;
   showNotificationDropDown: boolean;
   showProfileDropDown: boolean;
+  showNotificationModal: boolean
 }
 
 const initialState: AppStatusState = {
-  shownpage: 0,
+  shownpage: 1,
   showMobileOptModal: false,
   showMobileSearch: false,
   showNotificationDropDown: false,
-  showProfileDropDown: false
+  showProfileDropDown: false,
+  showNotificationModal:false,
 };
 
 const appStatusSlice = createSlice({
@@ -24,7 +26,7 @@ const appStatusSlice = createSlice({
       state.shownpage = action.payload;
     },
     initializeAppGlobalStatus: (state, action: PayloadAction<number>) => {
-      state.shownpage = action.payload;
+      state = initialState
     },
     updateShowOptionsModal: (state) => {
       state.showMobileOptModal = !state.showMobileOptModal
@@ -44,8 +46,17 @@ const appStatusSlice = createSlice({
      setShowProfileDropDown: (state, action: PayloadAction<boolean>) => {
       state.showProfileDropDown = action.payload;
      },
+     setShowNotificationModal: (state, action: PayloadAction<boolean>) => {
+      state.showNotificationModal = action.payload;
+     },
+     updateShowNotificationModal: (state) => {
+      state.showNotificationModal = !state.showNotificationModal
+     }
     }
 });
 
-export const { setNavbarPage, initializeAppGlobalStatus, updateShowOptionsModal, hideOptionsModal, setShowMobileSearch, setShowMobileSearchFalse, setShowDropDownNotification, setShowProfileDropDown } = appStatusSlice.actions;
+export const { setNavbarPage, initializeAppGlobalStatus, 
+  updateShowOptionsModal, hideOptionsModal, setShowMobileSearch, 
+  setShowMobileSearchFalse, setShowDropDownNotification, setShowProfileDropDown,
+  setShowNotificationModal, updateShowNotificationModal } = appStatusSlice.actions;
 export default appStatusSlice.reducer;

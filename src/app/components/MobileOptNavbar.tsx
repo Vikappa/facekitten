@@ -4,7 +4,7 @@ import { IoHomeSharp } from "react-icons/io5";
 import { useRouter } from "next/navigation"
 import MobileOptSquaredButton from "../atoms/MobileOptSquaredButton"
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setNavbarPage, setShowDropDownNotification } from "../lib/slices/appStateSlice";
+import { setNavbarPage, setShowDropDownNotification, setShowNotificationModal } from "../lib/slices/appStateSlice";
 import { FaShop } from "react-icons/fa6";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { HiUsers } from "react-icons/hi2";
@@ -20,27 +20,32 @@ const MobileOptNavbar = () => {
     const dispatch = useAppDispatch()
     const currentNavbarPage = useAppSelector(state => state.status.shownpage)
     const router = useRouter()
-    const showNotificationDropDown = useAppSelector(state => state.status.showNotificationDropDown)
+    const showNotificationDropDown = useAppSelector(state => state.status.showNotificationModal)
 
     const setPage1 = () => {
         router.push('/')
         dispatch(setNavbarPage(1))
+        dispatch(setShowNotificationModal(false))
     }
     const setPage2 = () => {
         router.push('/marketplace')
         dispatch(setNavbarPage(2))
+        dispatch(setShowNotificationModal(false))
     }
     const setPage3 = () => {
         router.push('/gruppi')
        dispatch(setNavbarPage(3))
+       dispatch(setShowNotificationModal(false))
     }
     const setPage10 = () => {
         router.push('/reels')
        dispatch(setNavbarPage(10))
+       dispatch(setShowNotificationModal(false))
     }
     const setPage9 = () => {
         router.push('/messenger')
        dispatch(setNavbarPage(9))
+       dispatch(setShowNotificationModal(false))
     }
 
     return (
@@ -56,7 +61,8 @@ const MobileOptNavbar = () => {
             {/* notification */}
             <div className="position-relative p-0 m-0">
             <MobileOptSquaredButton iconSelected={<IoMdNotifications />} iconUnselected={<IoIosNotificationsOutline />} selected={showNotificationDropDown} onClick={function (): void {
-                dispatch(setShowDropDownNotification(!showNotificationDropDown))
+                dispatch(setShowDropDownNotification(false))
+                dispatch(setShowNotificationModal(true))
             } } size={0} />
             <NotificationRedDotMobileVersion/>
             </div>
