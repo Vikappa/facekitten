@@ -78,7 +78,26 @@ export interface storageData {
     posts: Post[]
     userDetails: UserDetails
     sessionGeneratedAccounts: CasualUser[]
+    notifications: NotificationType[];
 }
+
+export interface NotificationType {
+    id: number;
+    type: number;
+    seen:boolean;
+    body: PostCommentNotificationType | CommentReplyNotificationType
+}
+
+export interface PostCommentNotificationType {
+    postId: number;
+    commentAuthor: UserDetails;
+}
+
+export interface CommentReplyNotificationType {
+    postAuthor: UserDetails;
+    commentAuthor: UserDetails;
+}
+
 
 export interface pexelPayload {
     page:          number;
