@@ -90,6 +90,7 @@ export interface NotificationType {
 
 export interface PostCommentNotificationType {
     postId: number;
+    postAuthor: UserDetails;
     commentAuthor: UserDetails;
 }
 

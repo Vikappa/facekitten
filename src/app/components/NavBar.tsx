@@ -7,11 +7,8 @@ import MobileProfileSection from "./MobileProfileSection"
 import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks"
 import { setNavbarPage } from '../lib/slices/appStateSlice'
 import MobileOptNavbar from "./MobileOptNavbar"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 const NavBar = () => {
-
-    const notificationLength = useAppSelector(state => state.notifications.notifications.flatMap(notification => notification.seen));
-        const [prevLength, setPrevLength] = useState(notificationLength.length);
 
         const audioRef1 = useRef<HTMLAudioElement>(null);
         const audioRef2 = useRef<HTMLAudioElement>(null);
@@ -23,12 +20,6 @@ const NavBar = () => {
             dispatch(setNavbarPage(page));
         }
 
-        useEffect(() => {
-            if (notificationLength.length > prevLength) {
-                audioRef1.current?.play();
-            }
-            setPrevLength(notificationLength.length);
-        }, [notificationLength.length, prevLength]);
 
     return(
     <div className="d-flex flex-column justify-content-center align-items-center bg-white shadow-sm w-100">

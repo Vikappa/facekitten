@@ -4,10 +4,11 @@ import { Form } from "react-bootstrap"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { useState } from "react"
 import { FiSend } from "react-icons/fi";
-import { Post } from "../utils/StorageDataTypes"
+import { Post, PostCommentNotificationType } from "../utils/StorageDataTypes"
 import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
 import { addCommentToUserPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
 import { FakePostCommentTextFactory } from "../utils/FakePostFactory/FakePostFactory"
+import { createNotification } from "../lib/slices/notificationSlice"
 
 const PostCommentForm = ({post}: {post: Post}) => {
     const [commentValue, setCommentValue] = useState<string>() 
@@ -41,9 +42,21 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             profilepicture: randomAuthor.profilePic
                         }
                     }))
-                
+                    dispatch(createNotification({
+                        notificationTypeNumber: 2,
+                        notificationBody: {
+                            postId: post.id,
+                            commentAuthor: {
+                                userName: randomAuthor.name,
+                                profilepicture: randomAuthor.profilePic
+                            },
+                            postAuthor: {
+                                userName: post.author.userName,
+                                profilepicture: post.author.profilepicture
+                            }
+                        }
+                    }))
                 }, Math.round(Math.random() * 11900+100))
-
             } else  {
                 dispatch(addCommentToPost({
                     post,
@@ -71,7 +84,22 @@ const PostCommentForm = ({post}: {post: Post}) => {
                                 userName: randomAuthor.name,
                                 profilepicture: randomAuthor.profilePic
                             }
-                        }));
+                        }))
+                        const notifBody:PostCommentNotificationType= {
+                            postId: post.id,
+                            commentAuthor: {
+                                userName: randomAuthor.name,
+                                profilepicture: randomAuthor.profilePic
+                            },
+                            postAuthor: {
+                                userName: post.author.userName,
+                                profilepicture: post.author.profilepicture
+                            }
+                        }
+                        dispatch(createNotification({
+                            notificationTypeNumber: 2,
+                            notificationBody: notifBody
+                        }))
                     }
                 }, Math.round(Math.random() * 11900 + 100));            
             }
