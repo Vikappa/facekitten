@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     const prompt = `Sei un gatto che posta su un social network. Esprimiti solo con variegati versi di gatti ('meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
@@ -21,29 +22,17 @@ export async function GET(req: NextRequest) {
                     "Content-Type": "application/json",
                 },
             }
+        )
+    } else {
+        return new NextResponse(
+            JSON.stringify({ error: "Generation error" }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
         );
-    return new NextResponse(
-        JSON.stringify({ error: "Generation error" }),
-        {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
-} else {
-    return new NextResponse(
-        JSON.stringify({ error: "Generation error" }),
-        {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        }
-    );
-}
-
-
-
+    }
 
 }
