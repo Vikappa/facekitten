@@ -16,6 +16,7 @@ import { FaShop } from "react-icons/fa6";
 import { SiFeedly } from "react-icons/si";
 import { setShowDropDownNotification, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 import { useRouter } from "next/navigation";
+import ContactUl from "../components/ContactUl";
 
 const HomePage = () => {
   const dispatch = useAppDispatch()
@@ -78,13 +79,8 @@ const HomePage = () => {
             <li>
               Birthdays
             </li>
-
-            <ul>
-              <li>
-                Contacts
-              </li>
-            </ul>
           </ul>
+          <ContactUl/>
         </div>
 
       </div>

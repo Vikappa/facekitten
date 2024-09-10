@@ -101,6 +101,11 @@ export interface CommentReplyNotificationType {
     commentAuthor: UserDetails;
 }
 
+export interface LikeNotificationType {
+    likedPost: Post;
+    likeAuthor: UserDetails;
+}
+
 
 export interface pexelPayload {
     page:          number;
