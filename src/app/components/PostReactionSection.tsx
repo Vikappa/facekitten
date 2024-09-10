@@ -57,14 +57,6 @@ const PostReactionSection = ({setShowCommentSection, post}:{setShowCommentSectio
                 />
             </div>
         }
-        <div className="d-flex align-baseline justify-content-evenly">
-            <ReactionSectionButton
-            color={''} 
-            icon={<AiOutlineLike />} 
-            testo={"Mi piace"} 
-            funzione={fakeFuncton}        
-            />
-        </div>
 
         <div className="d-flex align-baseline justify-content-evenly">
             <ReactionSectionButton
