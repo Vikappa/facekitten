@@ -182,11 +182,27 @@ $shadows: (
   color: var(--bs-grayBg)
 }
 
+.liSideElement{
+  cursor: pointer;
+}
   
 .liSideElement:hover{
   background-color: lightgray !important;
 }
 .liSideElement:active{
+  background-color: var(--bs-primary) !important;
+  color: lightgray
+}
+
+.sideLiUser{
+  cursor: pointer;
+}
+
+.sideLiUser:hover{
+  background-color: lightgray !important;
+}
+
+.sideLiUser:active{
   background-color: var(--bs-primary) !important;
   color: lightgray
 }
