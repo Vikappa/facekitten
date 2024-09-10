@@ -4,6 +4,7 @@ import { Accordion, Card, Button } from 'react-bootstrap';
 import { useState } from 'react';
 import { Chat } from '../utils/StorageDataTypes';
 import ChatForm from './ChatWindowParts/ChatForm';
+import { RxCross2 } from "react-icons/rx";
 
 const ChatWindowDesktop = (
     {chat}: 
@@ -18,35 +19,26 @@ const ChatWindowDesktop = (
 
     if(!isOpen){
         return (
-            <button
+            <div
             style={{
                 marginTop:'auto',
                 width:'20vw',
                 backgroundColor:'var(--bs-primary)',
                 color:'white',
-                border:'1px solid black',
-                zIndex:'2000'
+                zIndex:'2000',
+                borderTopRightRadius:'5px',
+                borderTopLeftRadius:'5px'
             }}
-            onClick={setOpen}
+            className='
+            d-flex align-items-center justify-content-between
+            px-2 py-1
+            '
             >
-                {chat.chatWith.userName}
-            </button>
+                <p className='m-0 fs-5'>{chat.chatWith.userName}</p>
+                <RxCross2 color='white' size={25} />
+            </div>
             );
-    } else {
-        <button
-        style={{
-            marginTop:'auto',
-            width:'20vw',
-            backgroundColor:'var(--bs-primary)',
-            color:'white',
-            border:'1px solid black',
-            zIndex:'2000'
-        }}
-        onClick={setOpen}
-        >
-            {chat.chatWith.userName}
-        </button>
-        }
+    } 
 }
 
 export default ChatWindowDesktop;
