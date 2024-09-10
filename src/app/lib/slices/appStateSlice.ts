@@ -1,3 +1,4 @@
+import { Chat, UserDetails } from '@/app/utils/StorageDataTypes';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface AppStatusState {
@@ -7,7 +8,6 @@ interface AppStatusState {
   showNotificationDropDown: boolean;
   showProfileDropDown: boolean;
   showNotificationModal: boolean;
-  openedChats: number[];
 }
 
 const initialState: AppStatusState = {
@@ -17,7 +17,6 @@ const initialState: AppStatusState = {
   showNotificationDropDown: false,
   showProfileDropDown: false,
   showNotificationModal:false,
-  openedChats: [],
 }
 
 const appStatusSlice = createSlice({
@@ -53,12 +52,6 @@ const appStatusSlice = createSlice({
      },
      updateShowNotificationModal: (state) => {
       state.showNotificationModal = !state.showNotificationModal
-     },
-     openChat: (state, action: PayloadAction<number>) => {
-      state.openedChats.push(action.payload);
-     },
-     closeChat: (state, action: PayloadAction<number>) => {
-      state.openedChats = state.openedChats.filter(chatId => chatId !== action.payload);
      }
     }
 });

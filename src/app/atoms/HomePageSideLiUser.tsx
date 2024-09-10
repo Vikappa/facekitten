@@ -2,8 +2,8 @@
 
 import Image from "next/image"
 import { UserDetails } from "../utils/StorageDataTypes"
-import { useAppDispatch } from "../lib/hooks"
-import { createChat } from "../lib/slices/userChatsSlice"
+import { useAppDispatch, useAppSelector } from "../lib/hooks"
+import { createChat, openChatWithUser } from "../lib/slices/userChatsSlice"
 
 const HomePageSideLiUser = (
     {user}:
@@ -11,9 +11,11 @@ const HomePageSideLiUser = (
 ) => {
 
     const dispatch = useAppDispatch()
+
     const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
         dispatch(createChat({chatWith:user}))
     }
+
 
     if(user){
         return(

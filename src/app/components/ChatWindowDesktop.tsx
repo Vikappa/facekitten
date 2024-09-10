@@ -1,21 +1,31 @@
 'use client'
 
 import { Accordion, Card, Button } from 'react-bootstrap';
-import { useState } from 'react';
-import { Chat } from '../utils/StorageDataTypes';
+import { useEffect, useMemo, useState } from 'react';
+import { Chat, UserDetails } from '../utils/StorageDataTypes';
 import ChatForm from './ChatWindowParts/ChatForm';
 import { RxCross2 } from "react-icons/rx";
+import { useAppDispatch, useAppSelector } from '../lib/hooks';
+import { closeChatWithUser } from '../lib/slices/userChatsSlice';
 
 const ChatWindowDesktop = (
-    {chat}: 
-    {chat:Chat}
+    {chat, index}: 
+    {chat:Chat; index:number}
 ) => {
 
+    const dispatch = useAppDispatch()
+    const [isOpen, setIsOpen] = useState(false)
+    const openedChats = useAppSelector(state => state.chats.openedChats)
     const setOpen = () =>{
-        setIsOpen(true);
+        setIsOpen(true)
     }
 
-    const [isOpen, setIsOpen] = useState(false);
+    useEffect(() => {
+        
+    }, [openedChats])
+    
+
+
 
     if(!isOpen){
         return (
@@ -35,10 +45,12 @@ const ChatWindowDesktop = (
             '
             >
                 <p className='m-0 fs-5'>{chat.chatWith.userName}</p>
-                <RxCross2 color='white' size={25} />
+                <RxCross2 color='white' style={{cursor:'pointer'}} onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
+                    userName: chat.chatWith.userName,
+                    profilepicture: chat.chatWith.profilepicture
+                }))} size={25} />
             </div>
-            );
+            )
     } 
 }
-
-export default ChatWindowDesktop;
+export default ChatWindowDesktop

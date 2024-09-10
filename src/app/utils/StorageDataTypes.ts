@@ -61,20 +61,9 @@ export interface Chat {
     messages: Message[];
 }
 
-export interface ChatList {
-    id: number;
-    name: string;
-    surname: string;
-    profilePic: string;
-    lastMessage: string;
-    lastMessageTime: string;
-    lastMessageStatus: string;
-    messages: Message[];
-}
 
 export interface storageData {
     friends: FriendList[];
-    chats: ChatList[];
     posts: Post[]
     userDetails: UserDetails
     sessionGeneratedAccounts: CasualUser[]
