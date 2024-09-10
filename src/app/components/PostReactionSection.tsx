@@ -6,6 +6,7 @@ import { RiShareForwardLine } from "react-icons/ri";
 import { Post } from "../utils/StorageDataTypes";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { dislikeToUserPost, likeToUserPost } from "../lib/slices/userPostsSlice";
+import { userDisliked, userLiked } from "../lib/slices/sessionGeneratedAccountsSlice";
 
 
 const PostReactionSection = ({setShowCommentSection, post}:{setShowCommentSection:React.Dispatch<React.SetStateAction<boolean>>; post:Post}) => {
@@ -17,20 +18,18 @@ const PostReactionSection = ({setShowCommentSection, post}:{setShowCommentSectio
     }
 
     const handleDislike = (post:Post) => {
-        console.log('handleDislike')
         if(post.author.userName === userName){
             dispatch(dislikeToUserPost({userPost:post}))
         } else {
-            // dispatch dislike at other post  
+            dispatch(userDisliked({post}))
         }
     }
     
     const handleLike = (post:Post) => {
-        console.log('handleLike')
         if(post.author.userName === userName){
             dispatch(likeToUserPost({usePost:post}))
         } else {
-            // dispatch like at other post  
+            dispatch(userLiked({post}))
         }
     }
 

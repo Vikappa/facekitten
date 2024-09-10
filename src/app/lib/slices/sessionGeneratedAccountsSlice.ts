@@ -1,6 +1,7 @@
 import { CreateInitialCluster } from '@/app/utils/FakeAccountsClusterFactory/FakeAccountsClusterFactory';
 import { CasualUser, Post, PostComment, UserDetails } from '@/app/utils/StorageDataTypes';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { use } from 'react';
 
 interface sessionGeneratedAccountsState {
     acc: CasualUser[];
@@ -37,7 +38,37 @@ const userCredentialsSlice = createSlice({
           commented_at: new Date().toISOString()
         });
       }
-    } 
+    },
+    userLiked: (state, action: PayloadAction<{ post: Post }>) => {
+      console.log('try user like');
+      const { post } = action.payload;
+    
+      // Debug: verifica lo stato degli utenti generati
+      console.log('Generated Accounts:', state.acc);
+    
+      const targetUser = state.acc.find(suser => suser.name === post.author.userName);
+      if (!targetUser) {
+        console.error(`User with name ${post.author.userName} not found`);
+        return;
+      }
+    
+      const targetPost = targetUser.posts.find(p => p.id === post.id);
+      if (!targetPost) {
+        console.error(`Post with id ${post.id} not found`);
+        return;
+      }
+    
+      targetPost.userliked = true;
+      targetPost.likes++;
+    },
+    userDisliked: (state, action: PayloadAction<{ post: Post }>) => {
+      const { post } = action.payload;
+      const targetPost = state.acc.find(suser => suser.name === post.author.userName)?.posts.find(p => p.id === post.id);
+      if (targetPost) {
+        targetPost.userliked = false;
+        targetPost.likes--;
+      }
+    }
  },
   extraReducers: (builder) => {
     builder.addCase(initializeSessionGeneratedAccountSlice.fulfilled, (state, action) => {
@@ -46,5 +77,5 @@ const userCredentialsSlice = createSlice({
   }
 });
 
-export const { addCommentToPost } = userCredentialsSlice.actions;
+export const { addCommentToPost, userLiked, userDisliked } = userCredentialsSlice.actions;
 export default userCredentialsSlice.reducer;
