@@ -21,17 +21,19 @@ const CreateFormPost = () =>{
     
         if(postText.length > 0) {
                 dispatch(addPost({
-                id: postnumber,
-                author: {
-                    userName: userDetails.userName,
-                    profilepicture: userDetails.profilepictureUrl
-                },
-                body: postText,
-                image: '',
-                comments: [],
-                created_at: new Date().toISOString(),
-                likes: 0
-            }));
+                    id: postnumber,
+                    author: {
+                        userName: userDetails.userName,
+                        profilepicture: userDetails.profilepictureUrl
+                    },
+                    body: postText,
+                    image: '',
+                    comments: [],
+                    created_at: new Date().toISOString(),
+                    likes: 0,
+                    userliked: false,
+                    likeProfiles: []
+                }));
     
             setPostText('');
             setTriggerRandomComment(true)

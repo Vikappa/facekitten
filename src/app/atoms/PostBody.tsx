@@ -7,9 +7,9 @@ const PostBody = ({bodyPost, postImage, post}:{bodyPost:string|undefined; postIm
             <div className="p-1 py-3 position-relative">
             {postImage && <Image src={postImage} alt="Post image" width={200} height={200} className="w-100 h-auto p-3" onClick={() => {console.log('open image ', postImage)}}/>}
             <p>{bodyPost}</p>
-            <div className="position-absolute" style={{right:'0', bottom:'-1.5rem', fontSize:'0.8rem'}}>
+            <div className="position-absolute d-flex gap-2" style={{right:'0', bottom:'-1rem', fontSize:'0.8rem'}}>
             {post.likes>0 && <p>{post.likes} mi piace</p>}
-            {post.comments.length>0 && <p>{post.comments.length} commenti</p>}
+            {post.comments.length>0 && <p>{post.comments.length} comment{post.comments.length === 1 ? 'o':'i'}</p>}
         </div>
         </div>
     )

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import PostBody from "../atoms/PostBody"
 import PostComments from "./PostComments"
 import PostHeader from "../atoms/PostHeader"
-import { FakePostFactory } from "../utils/FakePostFactory/FakePostFactory"
 import { Post } from "../utils/StorageDataTypes"
 import PostReactionSection from "./PostReactionSection"
 
@@ -25,7 +24,7 @@ const PostCardComponent = ({post}:{post:Post}) => {
         ">
         <PostHeader user={post?.author} time={post?.created_at}/>
         <PostBody bodyPost={post?.body} postImage={post?.image} post={post} />
-        <PostReactionSection setShowCommentSection={setShowCommentSection} />
+        <PostReactionSection setShowCommentSection={setShowCommentSection} post={post} />
         <PostComments showCommentSection={handleShowCommentSection()}  post={post}/>
 
     </div>
