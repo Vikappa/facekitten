@@ -75,7 +75,7 @@ const HomePage = () => {
           )}
         </div>
 
-        <div className="col-0 col-lg-3 position-sticky sticky-top p-4">
+        <div className="col-0 col-lg-3 d-none d-lg-block position-sticky sticky-top p-4">
           <BirthdaysComponent/>
           <ContactUl/>
         </div>
