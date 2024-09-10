@@ -35,10 +35,10 @@ const BirthdaysComponent = () => {
             <p className="fs-5 list-unstyled py-0 my-0">Compleanni:</p>
             {
                 electedAccount.map((user, index) => (
-                    <li className="d-flex gap-2" key={index}>
+                    <div className="d-flex gap-2" key={index}>
                         <FaGifts color="darkblue" size={24}/>
                         <HomePageSideLiUser user={{profilepicture:user.profilePic, userName:user.name}}  />
-                    </li>
+                    </div>
                 ))
             }
         </div>
