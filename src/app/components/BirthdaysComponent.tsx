@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from "react"
 import { useAppSelector } from "../lib/hooks"
 import { CasualUser } from "../utils/StorageDataTypes"
 import HomePageSideLiUser from "../atoms/HomePageSideLiUser"
+import { FaGifts } from "react-icons/fa";
 
 const BirthdaysComponent = () => {
     const accounts = useAppSelector(state => state.sessionGeneratedAccounts.acc)
@@ -34,7 +35,10 @@ const BirthdaysComponent = () => {
             <p className="fs-5 list-unstyled py-0 my-0">Compleanni:</p>
             {
                 electedAccount.map((user, index) => (
-                    <HomePageSideLiUser key={index} user={{profilepicture:user.profilePic, userName:user.name}}  />
+                    <li className="d-flex gap-2" key={index}>
+                        <FaGifts color="darkblue" size={24}/>
+                        <HomePageSideLiUser user={{profilepicture:user.profilePic, userName:user.name}}  />
+                    </li>
                 ))
             }
         </div>
