@@ -10,7 +10,6 @@ interface UserPostsState {
 
 const initialState: UserPostsState = {
     userPosts: [],
-
 };
 
 const userPostsSlice = createSlice({

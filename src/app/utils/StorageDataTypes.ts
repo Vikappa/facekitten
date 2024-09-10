@@ -10,6 +10,7 @@ export interface Post {
     comments: PostComment[];
     created_at: string;
     likes: number;
+    userliked: boolean
 }
 
 export interface PostComment {

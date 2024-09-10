@@ -21,12 +21,13 @@ const PostCardComponent = ({post}:{post:Post}) => {
 
     return(
     <div className="
-        bg-white p-3 rounded-3 shadow-sm w-100
+        bg-white p-3 rounded-3 shadow-sm w-100 position-relative
         ">
         <PostHeader user={post?.author} time={post?.created_at}/>
-        <PostBody bodyPost={post?.body} postImage={post?.image} />
+        <PostBody bodyPost={post?.body} postImage={post?.image} post={post} />
         <PostReactionSection setShowCommentSection={setShowCommentSection} />
         <PostComments showCommentSection={handleShowCommentSection()}  post={post}/>
+
     </div>
 )
 }

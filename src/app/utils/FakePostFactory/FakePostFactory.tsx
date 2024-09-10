@@ -41,7 +41,8 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
         image: imageString,
         comments: fakePostComments,
         created_at: time.toISOString(),
-        likes: 0
+        likes: Math.floor(Math.random()*15),
+        userliked: false
     }
 }
 
