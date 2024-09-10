@@ -16,6 +16,9 @@ const userChatsSlice = createSlice({
     createChat:
     (state, action:PayloadAction<{chatWith:UserDetails}>) => {
         if(!state.chats.some((chat:Chat) => (chat.chatWith.userName === action.payload.chatWith.userName))) {
+            if(state.chats.length >= 4){
+                state.chats.shift()
+            }
             state.chats.push({
                 chatWith: action.payload.chatWith,
                 messages: [],

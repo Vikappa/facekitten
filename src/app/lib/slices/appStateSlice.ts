@@ -6,7 +6,8 @@ interface AppStatusState {
   showMobileSearch: boolean;
   showNotificationDropDown: boolean;
   showProfileDropDown: boolean;
-  showNotificationModal: boolean
+  showNotificationModal: boolean;
+  openedChats: number[];
 }
 
 const initialState: AppStatusState = {
@@ -16,7 +17,8 @@ const initialState: AppStatusState = {
   showNotificationDropDown: false,
   showProfileDropDown: false,
   showNotificationModal:false,
-};
+  openedChats: [],
+}
 
 const appStatusSlice = createSlice({
   name: 'appGlobalStatus',
@@ -51,6 +53,12 @@ const appStatusSlice = createSlice({
      },
      updateShowNotificationModal: (state) => {
       state.showNotificationModal = !state.showNotificationModal
+     },
+     openChat: (state, action: PayloadAction<number>) => {
+      state.openedChats.push(action.payload);
+     },
+     closeChat: (state, action: PayloadAction<number>) => {
+      state.openedChats = state.openedChats.filter(chatId => chatId !== action.payload);
      }
     }
 });
