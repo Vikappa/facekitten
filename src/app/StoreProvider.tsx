@@ -6,6 +6,7 @@ import { initializeFriendsSlice } from './lib/slices/friendsSlice'
 import { initializeAppGlobalStatus } from './lib/slices/appStateSlice'
 import {initializeUserCredentialSlice} from './lib/slices/userCrediantSlice'
 import { initializeNotification } from './lib/slices/notificationSlice'
+import { initializeUserChatsSlice } from './lib/slices/userChatsSlice'
 
 export default function StoreProvider({
   children
@@ -23,6 +24,7 @@ export default function StoreProvider({
     storeRef.current.dispatch(initializeFriendsSlice())
     storeRef.current.dispatch(initializeAppGlobalStatus(1))
     storeRef.current.dispatch(initializeNotification())
+    storeRef.current.dispatch(initializeUserChatsSlice())
   }
 
   return <Provider store={storeRef.current}>{children}</Provider>

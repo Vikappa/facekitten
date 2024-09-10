@@ -5,6 +5,7 @@ import appStateSlice from './slices/appStateSlice'
 import sessionGeneratedAccountsSlice from './slices/sessionGeneratedAccountsSlice'
 import userPostsSlice from './slices/userPostsSlice'
 import notificationSlice from './slices/notificationSlice'
+import userChatsSlice from './slices/userChatsSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -14,7 +15,8 @@ export const makeStore = () => {
       sessionGeneratedAccounts: sessionGeneratedAccountsSlice,
       status: appStateSlice,
       posts: userPostsSlice,
-      notifications: notificationSlice
+      notifications: notificationSlice,
+      chats: userChatsSlice
     }
   })
 }

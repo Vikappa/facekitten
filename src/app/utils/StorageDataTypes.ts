@@ -46,17 +46,15 @@ export interface UserDetails{
 
 export interface Message {
     id: number;
-    sender: string;
-    receiver: string;
+    sender: UserDetails;
+    receiver: UserDetails;
     message: string;
     timestamp: string;
-    status: string;
+    seen: boolean;
 }
 export interface Chat {
     id: number;
-    name: string;
-    surname: string;
-    profilePic: string;
+    chatWith: UserDetails;
     lastMessage: string;
     lastMessageTime: string;
     lastMessageStatus: string;
