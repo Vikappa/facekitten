@@ -17,6 +17,7 @@ import { SiFeedly } from "react-icons/si";
 import { setShowDropDownNotification, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 import { useRouter } from "next/navigation";
 import ContactUl from "../components/ContactUl";
+import BirthdaysComponent from "../components/BirthdaysComponent";
 
 const HomePage = () => {
   const dispatch = useAppDispatch()
@@ -42,7 +43,7 @@ const HomePage = () => {
   return (
     <div className="container-fluid">
       <MobileOptionFullScreenModal/>
-      <div className="row">
+      <div className="row position-relative">
         
         <div className="col-0 col-md-3 d-none d-md-block p-0 m-0 p-4">
           <ul className="p-0 m-0">
@@ -74,12 +75,8 @@ const HomePage = () => {
           )}
         </div>
 
-        <div className="col-0 col-lg-3">
-          <ul>
-            <li>
-              Birthdays
-            </li>
-          </ul>
+        <div className="col-0 col-lg-3 position-sticky sticky-top p-4">
+          <BirthdaysComponent/>
           <ContactUl/>
         </div>
 
