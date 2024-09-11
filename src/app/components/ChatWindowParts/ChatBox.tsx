@@ -2,16 +2,14 @@
 
 import { Chat } from "@/app/utils/StorageDataTypes"
 import MessageBoxLi from "./MessageBoxLi"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import StaScrivendo from "@/app/atoms/StaScrivendo"
 
 const ChatBox = (
-    {chat}: 
-    {chat:Chat}
+    {chat, staScrivendo}: 
+    {chat:Chat; staScrivendo:boolean}
 ) => {
 
-    useEffect(() => {
-      console.log(chat.messages)
-    }, [chat.messages])
     
 
     return(
@@ -24,6 +22,8 @@ const ChatBox = (
             {chat.messages.map((message, index) => (
                 <MessageBoxLi key={index} message={message} />
             ))}
+            
+            {staScrivendo && <StaScrivendo staScrivendo={staScrivendo} />}
         </div>
     )
 }

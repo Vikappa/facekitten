@@ -8,8 +8,8 @@ import { useState } from "react"
 import { Form } from "react-bootstrap"
 
 const ChatForm = (
-    {chat}: 
-    {chat:Chat}
+    {chat, staScrivendo}: 
+    {chat:Chat; staScrivendo:boolean}
 ) => {
     const dispatch = useAppDispatch()
     const [textValue, setTextValue] = useState("")
@@ -31,6 +31,10 @@ const ChatForm = (
         }
         dispatch(addMessageToChat({chat, message}))
         setTextValue("")
+
+        setTimeout( async () => {
+            
+        }, Math.floor(Math.random() * 2000) + 1000) 
     }
     return(
         <Form onSubmit={sendMessage}>
@@ -39,6 +43,8 @@ const ChatForm = (
           id="inputChatText"
           value={textValue}
           onChange={(e) =>  setTextValue(e.target.value)}
+          disabled={staScrivendo} 
+          autoComplete="off"
         />
         </Form>
        )

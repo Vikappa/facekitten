@@ -18,6 +18,7 @@ const ChatWindowDesktop = (
     const dispatch = useAppDispatch()
     const [isOpen, setIsOpen] = useState(true)
     const [ hasNewMessage, setHasNewMessage] = useState(false)
+    const [staScrivendo, setStaScrivendo] = useState(false)
 
     useEffect(() => {
         if(chat){
@@ -72,8 +73,8 @@ const ChatWindowDesktop = (
                     />
                 </div>
     
-                <ChatBox chat={chat} />
-                <ChatForm chat={chat} />
+                <ChatBox chat={chat} staScrivendo={staScrivendo} />
+                <ChatForm chat={chat} staScrivendo={staScrivendo} />
             </div>
         );
     } else {
