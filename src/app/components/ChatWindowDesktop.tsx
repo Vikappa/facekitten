@@ -15,17 +15,19 @@ const ChatWindowDesktop = (
 
     const dispatch = useAppDispatch()
     const [isOpen, setIsOpen] = useState(false)
-    const openedChats = useAppSelector(state => state.chats.openedChats)
-    const setOpen = () =>{
-        setIsOpen(true)
-    }
+    const [ hasNewMessage, setHasNewMessage] = useState(false)
 
     useEffect(() => {
-        
-    }, [openedChats])
-    
-
-
+        if(chat){
+            if(!(chat.messages.length === 0 ) ){
+                setHasNewMessage(true)
+            } else {
+                if(chat.messages[chat.messages.length - 1]?.seen){
+                    setHasNewMessage(true)
+                }
+            }
+        }
+    }, [chat])
 
     if(!isOpen){
         return (
@@ -33,8 +35,8 @@ const ChatWindowDesktop = (
             style={{
                 marginTop:'auto',
                 width:'20vw',
-                backgroundColor:'var(--bs-primary)',
-                color:'white',
+                backgroundColor:hasNewMessage?'var(--bs-primary)':'white',
+                color:hasNewMessage?'white':'black',
                 zIndex:'2000',
                 borderTopRightRadius:'5px',
                 borderTopLeftRadius:'5px'
@@ -45,7 +47,7 @@ const ChatWindowDesktop = (
             '
             >
                 <p className='m-0 fs-5'>{chat.chatWith.userName}</p>
-                <RxCross2 color='white' style={{cursor:'pointer'}} onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
+                <RxCross2 color={hasNewMessage?'white':'black'} style={{cursor:'pointer'}} onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
                     userName: chat.chatWith.userName,
                     profilepicture: chat.chatWith.profilepicture
                 }))} size={25} />
