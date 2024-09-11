@@ -7,7 +7,7 @@ import { FiSend } from "react-icons/fi";
 import { Post, PostCommentNotificationType } from "../utils/StorageDataTypes"
 import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
 import { addCommentToUserPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
-import { FakePostCommentTextFactory } from "../utils/FakePostFactory/FakePostFactory"
+import { FakePostCommentTextFactory, GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
 import { createNotification } from "../lib/slices/notificationSlice"
 
 const PostCommentForm = ({post}: {post: Post}) => {
@@ -32,15 +32,17 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     }
                 }))
 
-                setTimeout(() => {
+                setTimeout( async () => {
                     
                     const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
-                    dispatch(randomCommentToUserPost({
-                        postNumber: postIndex, 
+                    const newComment = await GenerateCommentText(post)
+                    dispatch(addCommentToUserPost({
+                        postNumber: postIndex,
                         commentAuthorDetails: {
                             userName: randomAuthor.name,
                             profilepicture: randomAuthor.profilePic
-                        }
+                        },
+                        commentValue: newComment
                     }))
                     dispatch(createNotification({
                         notificationTypeNumber: 2,
@@ -67,7 +69,7 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     }
                 }))
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     const randomChance = Math.floor(Math.random() * 100);
                     let randomAuthor;
                     if (randomChance > 80) {
@@ -77,9 +79,10 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     }
 
                     if (randomAuthor) {
+                        const generatedComment = await GenerateCommentText(post);
                         dispatch(addCommentToPost({
                             post: post,
-                            commentValue: FakePostCommentTextFactory(),
+                            commentValue: generatedComment,
                             author: {
                                 userName: randomAuthor.name,
                                 profilepicture: randomAuthor.profilePic
@@ -101,8 +104,7 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             notificationBody: notifBody
                         }))
                     }
-                }, Math.round(Math.random() * 11900 + 100));            
-            }
+                }, Math.round(Math.random() * 11900 + 100));                        }
 
             setCommentValue('')
         }

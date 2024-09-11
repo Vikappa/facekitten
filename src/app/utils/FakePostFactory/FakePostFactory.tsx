@@ -13,6 +13,27 @@ export const FakePostCommentTextFactory = () => {
   return fakePostCommentText
 }
 
+export const GenerateCommentText = async (post:Post):Promise<string> => {
+  let propArgumentString = 'Testo del post:' + post.body
+  for (let index = 0; index < post.comments.length; index++) {
+    propArgumentString += 'Autore:'+post.comments[index].author.userName+' Commento:' + post.comments[index].body+'\n'
+  }
+  try {
+    const response = await fetch('/api/aigeneratedtext/commentreply', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ comment: propArgumentString }),
+    });
+    const data = await response.json();
+    console.log(data.message);
+    return data.message;
+} catch (error) {
+    console.error('Error:', error);
+    return FakePostCommentTextFactory();
+}}
+
 export const FakePostTextFactory = () => {
   let fakePostText = ""
   const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
