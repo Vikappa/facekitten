@@ -8,6 +8,7 @@ import { RxCross2 } from "react-icons/rx";
 import { useAppDispatch, useAppSelector } from '../lib/hooks';
 import { closeChatWithUser } from '../lib/slices/userChatsSlice';
 import ChatBox from './ChatWindowParts/ChatBox';
+import Image from 'next/image';
 
 const ChatWindowDesktop = (
     {chat, index}: 
@@ -42,7 +43,7 @@ const ChatWindowDesktop = (
                     borderTopLeftRadius: '5px',
                     position: 'fixed',  
                     bottom: '0',        
-                    right: `${index * 22+3}vw`, 
+                    right: `${index * 23+5}vw`, 
                     height: 'auto',
                     maxHeight: '80vh',
                     overflowY: 'auto',
@@ -56,8 +57,10 @@ const ChatWindowDesktop = (
                 }}
                 onClick={() => setIsOpen(!isOpen)}
                 >
-                    <p className="m-0 fs-5">{chat.chatWith.userName}</p>
-                    <RxCross2
+                <div className='d-flex align-items-center gap-2'>
+                <Image src={chat.chatWith.profilepicture} alt="profile picture" width={25} height={25} className="rounded-circle" />
+                <p className="m-0 fs-5">{chat.chatWith.userName}</p>
+                </div>                    <RxCross2
                         color={hasNewMessage ? 'white' : 'black'}
                         style={{ cursor: 'pointer' }}
                         onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
@@ -68,8 +71,8 @@ const ChatWindowDesktop = (
                     />
                 </div>
     
-                <ChatBox />
-                <ChatForm />
+                <ChatBox chat={chat} />
+                <ChatForm chat={chat} />
             </div>
         );
     } else {
@@ -84,7 +87,7 @@ const ChatWindowDesktop = (
                     borderTopLeftRadius: '5px',
                     position: 'fixed', 
                     bottom: '0',    
-                    right: `${index * 22+3}vw`,  
+                    right: `${index * 23+5}vw`,  
                     height: 'auto',
                     maxHeight: '80vh',
                     border: '1px solid var(--bs-quaternary)',
@@ -93,7 +96,10 @@ const ChatWindowDesktop = (
                 className="d-flex align-items-center justify-content-between px-2 py-1"
                 onClick={() => setIsOpen(!isOpen)}
             >
+                <div className='d-flex align-items-center gap-2'>
+                <Image src={chat.chatWith.profilepicture} alt="profile picture" width={25} height={25} className="rounded-circle" />
                 <p className="m-0 fs-5">{chat.chatWith.userName}</p>
+                </div>
                 <RxCross2
                     color={hasNewMessage ? 'white' : 'black'}
                     style={{ cursor: 'pointer' }}

@@ -73,9 +73,31 @@ const userChatsSlice = createSlice({
         state.openedChats = state.openedChats.filter(
             chat => chat.chatWith.userName !== action.payload.userName
         )
+    },
+    addMessageToChat: (state, action: PayloadAction<{chat:Chat, message: Message}>) => {
+        const { chat, message } = action.payload
+        const target = state.chats.find((chat:Chat) => (chat.chatWith.userName === chat.chatWith.userName))
+        const openChat = state.openedChats.find((chat:Chat) => (chat.chatWith.userName === chat.chatWith.userName))
+        if(target && message) {
+            target.messages.push(message)
+        } else {
+            if(message){
+                state.chats.push({
+                    chatWith: chat.chatWith,
+                    messages: [message],
+                    id: state.chats.length + 1,
+                    lastMessage: message.message,
+                    lastMessageTime: message.timestamp,
+                    lastMessageStatus: ''
+                })
+            }
+        }
+        if(openChat && message){
+            openChat.messages.push(message)
+        }
     }
   },
 })
 
-export const { createChat, addCasualUserMessageFromUser, initializeUserChatsSlice, closeChatWithUser } = userChatsSlice.actions
+export const { createChat, addCasualUserMessageFromUser, initializeUserChatsSlice, closeChatWithUser, addMessageToChat } = userChatsSlice.actions
 export default userChatsSlice.reducer;
