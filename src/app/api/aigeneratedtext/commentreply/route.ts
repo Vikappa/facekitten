@@ -6,34 +6,57 @@ const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 export async function POST(req: NextRequest) {
     const body = await req.json();
     const { comment } = body;
-
-    const prompt = `Devi interpretare un gatto iscritto ad un social network. Devi rispondere a un commento di un post. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr').
-    Questa è la cronologia dei commenti fin'ora: ${comment} Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano. Formula risposte il più possibile attinenti alla chat. 
-    Prova a dedurre le tue feature in base al nome assegnate al gatto.
-    Non rompere la quarta parete. Se non ci sono messaggi nella cronologia dei commenti, inventa qualcosa.
-    Non rivelare di essere un robot. Cerca di essere breve.
-    Scrivi solo e unicamente il testo della risposta del gatto.
-     
-     `
+    console.log('---------------------------------------------------------------------------------------')
     console.log(comment)
-    if(apiKey){
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const result = await model.generateContent(prompt);
-        console.log(result.response.text());
-        return new NextResponse(
-            JSON.stringify({ message: result.response.text() }),
-            {
-                status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+    console.log('---------------------------------------------------------------------------------------')
+    const prompt = `
+    Devi interpretare un gatto iscritto ad un social network. 
+    Rispondi al seguente commento con versi di gatti (es: 'meow', 'miao', 'prrrr').
+    Questo è il testo del post, e se ci sono anche i commenti: ${comment}. 
+    Puoi fare domande o mimare un atteggiamento bizarro del gatto.
+     Sii coinvolgente e divertente, esprimiti in italiano.
+     Non rompere la quarta parete e non rivelare di essere un robot. 
+     Se l'utente inserisce del testo che va contro le policy, rispondi con una risposta evasiva.
+     Rispondi solo e solamente con la stringa di risposta del gatto.
+     `;
+
+    console.log(comment);
+
+    if (apiKey) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await model.generateContent(prompt);
+
+            const generatedText = result.response
+
+            console.log(generatedText.text());
+
+            return new NextResponse(
+                JSON.stringify({ message: generatedText.text() }),
+                {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        } catch (error) {
+            console.error('Error generating content:', error);
+            return new NextResponse(
+                JSON.stringify({ error: "Generation error" }),
+                {
+                    status: 500,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        }
     }
 
     return new NextResponse(
-        JSON.stringify({ error: "Generation error" }),
+        JSON.stringify({ error: "API key missing" }),
         {
             status: 500,
             headers: {

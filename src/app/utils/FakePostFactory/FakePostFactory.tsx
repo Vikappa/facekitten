@@ -26,9 +26,13 @@ export const GenerateCommentText = async (post:Post):Promise<string> => {
         },
         body: JSON.stringify({ comment: propArgumentString }),
     });
-    const data = await response.json();
-    console.log(data.message);
-    return data.message;
+    try {
+      const data = await response.json();
+      return data.message;
+    } catch (error) {
+      console.error('Error parsing json')
+      return FakePostCommentTextFactory();
+    }
 } catch (error) {
     console.error('Error:', error);
     return FakePostCommentTextFactory();

@@ -18,49 +18,39 @@ const CreateFormPost = () =>{
     const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
     const [currentTargetPostId, setCurrentTargetPostId] = useState<number>(-1)
     const allPosts = useAppSelector(state => state.posts.userPosts)
-    const currentTargetPost = useMemo(() => {
-        return allPosts.find(post => post.id === currentTargetPostId)
-    }, [allPosts, currentTargetPostId])
+
 
 
     const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-    
+        const newPost = {
+            id: postnumber,
+            author: {
+                userName: userDetails.userName,
+                profilepicture: userDetails.profilepictureUrl
+            },
+            body: postText,
+            image: '',
+            comments: [],
+            created_at: new Date().toISOString(),
+            likes: 0,
+            userliked: false,
+            likeProfiles: []
+        }
+
         if(postText.length > 0) {
-            setCurrentTargetPostId(postnumber)
-                dispatch(addPost({
-                    id: postnumber,
-                    author: {
-                        userName: userDetails.userName,
-                        profilepicture: userDetails.profilepictureUrl
-                    },
-                    body: postText,
-                    image: '',
-                    comments: [],
-                    created_at: new Date().toISOString(),
-                    likes: 0,
-                    userliked: false,
-                    likeProfiles: []
-                }));
+            
+            dispatch(addPost(newPost));
     
             setPostText('');
     
             setTimeout( async () => {
                 const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
-                if(currentTargetPost){
-                    const generatedText = await GenerateCommentText(currentTargetPost)
+                    const generatedText = await GenerateCommentText(newPost)
                     dispatch(addCommentToPost({
-                        post: currentTargetPost,
+                        post: newPost,
                         commentValue: generatedText,
                         author: {
-                            userName: randomAuthor.name,
-                            profilepicture: randomAuthor.profilePic
-                        }
-                    }))
-                } else {
-                    dispatch(randomCommentToUserPost({
-                        postNumber: postnumber, 
-                        commentAuthorDetails: {
                             userName: randomAuthor.name,
                             profilepicture: randomAuthor.profilePic
                         }
@@ -79,14 +69,11 @@ const CreateFormPost = () =>{
                             }
                         }
                     }))
-                }
+                
                 
             }, Math.round(Math.random() * 11900+100))        
         }
-    };
-    
-
-    
+    }
 
     return(
         
