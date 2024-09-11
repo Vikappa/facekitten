@@ -38,7 +38,20 @@ const ChatForm = (
                 userName: userName,
                 profilepicture: profilePic
             })
-
+        dispatch(addMessageToChat({chat, message: {
+            id: 0,
+            sender: {
+                userName: chat.chatWith.userName,
+                profilepicture: chat.chatWith.profilepicture
+            },
+            receiver: {
+                userName: userName,
+                profilepicture: profilePic
+            },
+            message: rispostaGatto,
+            timestamp: new Date().toISOString(),
+            seen: false
+        }}))
         }, Math.floor(Math.random() * 2000) + 1000) 
     }
     return(

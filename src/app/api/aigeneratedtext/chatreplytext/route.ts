@@ -4,10 +4,19 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
 export async function POST(req: NextRequest) {
+    console.log('Inizio esecuzione')
     const body = await req.json();
     const { comment } = body;
+    console.log(comment)
 
-    const prompt = `Sei un gatto iscritto su un social network. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr'). Rispondi a questo messaggi che è arrivato in chat: ${comment}. Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano`;
+    const prompt = `Devi interpretare un gatto iscritto ad un social network. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr').
+    Questa è la cronologia dei messaggi fin'ora: ${comment} Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano. Formula risposte il più possibile attinenti alla chat. 
+    Prova a dedurre le tue feature in base al nome assegnate al gatto.
+    Non rompere la quarta parete.
+    Non rivelare di essere un robot. Cerca di essere intrattenente. Manda avanti la conversazione e non ripeterti. Cerca di essere breve.
+    Scrivi e unicamente il testo della risposta del gatto.
+     
+     `
 
     console.log(comment)
     if(apiKey){

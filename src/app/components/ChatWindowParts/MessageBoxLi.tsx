@@ -35,7 +35,7 @@ const MessageBoxLi = (
             className="d-flex justify-content-start gap-2 py-1"
             >
                 
-                <p className="m-0 p-0 bg-white px-2 mx-2"
+                <p className="m-0 p-0 bg-quinary px-2 mx-2"
                 style={{
                     borderTopLeftRadius:'8px',
                     borderTopRightRadius:'8px',
