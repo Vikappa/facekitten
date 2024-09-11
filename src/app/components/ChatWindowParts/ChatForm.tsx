@@ -2,6 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks"
 import { addMessageToChat } from "@/app/lib/slices/userChatsSlice"
+import { fakeChatReplyText } from "@/app/utils/FakeChatReply/FakeChatReply"
 import { Chat } from "@/app/utils/StorageDataTypes"
 import { stat } from "fs"
 import { useState } from "react"
@@ -16,7 +17,7 @@ const ChatForm = (
     const userName = useAppSelector(state => state.userCredentials.userName)
     const profilePic = useAppSelector(state => state.userCredentials.profilepictureUrl)
 
-    const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+    const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const message = {
             message: textValue,
@@ -33,7 +34,11 @@ const ChatForm = (
         setTextValue("")
 
         setTimeout( async () => {
-            
+            const rispostaGatto = await fakeChatReplyText(chat, {
+                userName: userName,
+                profilepicture: profilePic
+            })
+
         }, Math.floor(Math.random() * 2000) + 1000) 
     }
     return(
