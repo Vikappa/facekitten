@@ -6,12 +6,12 @@ import { useState } from "react"
 import { FiSend } from "react-icons/fi";
 import { Post, PostCommentNotificationType } from "../utils/StorageDataTypes"
 import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
-import { addCommentToUserPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
-import { FakePostCommentTextFactory, GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
+import { addCommentToUserPost } from "../lib/slices/userPostsSlice"
+import { GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
 import { createNotification } from "../lib/slices/notificationSlice"
 
 const PostCommentForm = ({post}: {post: Post}) => {
-    const [commentValue, setCommentValue] = useState<string>() 
+    const [commentValue, setCommentValue] = useState<string>('') 
     const userDetails = useAppSelector((state) => state.userCredentials)
     const dispatch = useAppDispatch()
     const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
@@ -104,7 +104,8 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             notificationBody: notifBody
                         }))
                     }
-                }, Math.round(Math.random() * 11900 + 100));                        }
+                }, Math.round(Math.random() * 11900 + 100))
+            }
 
             setCommentValue('')
         }

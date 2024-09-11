@@ -27,15 +27,15 @@ export const GenerateCommentText = async (post:Post):Promise<string> => {
         body: JSON.stringify({ comment: propArgumentString }),
     });
     try {
-      const data = await response.json();
+      const data = await response.json()
       return data.message;
     } catch (error) {
       console.error('Error parsing json')
-      return FakePostCommentTextFactory();
+      return FakePostCommentTextFactory()
     }
 } catch (error) {
-    console.error('Error:', error);
-    return FakePostCommentTextFactory();
+    console.error('Error:', error)
+    return FakePostCommentTextFactory()
 }}
 
 export const FakePostTextFactory = () => {
@@ -96,7 +96,6 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
       return data
     } catch (error) {
       console.error(error);
-      // Stringa di fallback in caso di errore
       return '';
     }
 }
