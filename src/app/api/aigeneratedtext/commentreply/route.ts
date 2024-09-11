@@ -6,9 +6,6 @@ const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 export async function POST(req: NextRequest) {
     const body = await req.json();
     const { comment } = body;
-    console.log('---------------------------------------------------------------------------------------')
-    console.log(comment)
-    console.log('---------------------------------------------------------------------------------------')
     const prompt = `
     Devi interpretare un gatto iscritto ad un social network. 
     Rispondi al seguente commento con versi di gatti (es: 'meow', 'miao', 'prrrr').
