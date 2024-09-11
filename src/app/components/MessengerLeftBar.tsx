@@ -8,21 +8,22 @@ import MessengerLeftName from "../atoms/MessengerLeftName"
 import { SetStateAction } from "react"
 
 const MessengerLeftBar = (
-    {setSelectedUser}:
-    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>}
+    {setSelectedUser, navbarHeight}:
+    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>; navbarHeight: number}
 ) => {
 
-    const allUsers = useAppSelector(state => state.sessionGeneratedAccounts.acc)
+    const allUsers = useAppSelector(state => state.sessionGeneratedAccounts.acc);
 
     return (
-        <div className="col-3 d-flex flex-column bg-white min-h-90 max-h-90 shadow" >
+        <div className="col-3 d-flex flex-column bg-white shadow"
+             style={{
+                 height: `calc(100vh - ${navbarHeight}px)`,
+                 overflowY: 'auto',
+             }}
+        >
             <h3>Chats:</h3>
-
             <MessengerSearchBar/>
-            <div
-            style={{ height: '100vh', overflowY: 'auto' }}
-            className="d-flex flex-column justify-content-start"
-            >
+            <div className="d-flex flex-column justify-content-start">
                 {
                     allUsers.map((user, index) => (
                         <MessengerLeftName key={index} user={{
@@ -37,4 +38,6 @@ const MessengerLeftBar = (
     )
 }
 
-export default MessengerLeftBar
+export default MessengerLeftBar;
+
+

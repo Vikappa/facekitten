@@ -27,8 +27,8 @@ const BigChatBoxe = (
             style={{
                 backgroundColor: 'white',
                 overflowY: 'auto',
-                paddingBottom:'6px',
-                flexGrow: 3,
+                paddingBottom: '6px',
+                flexGrow: 1, // Riempie tutto lo spazio disponibile
             }}
         >
             {chat.messages.map((message, index) => (
@@ -41,3 +41,4 @@ const BigChatBoxe = (
 }
 
 export default BigChatBoxe;
+

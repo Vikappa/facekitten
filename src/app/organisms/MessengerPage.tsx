@@ -7,8 +7,7 @@ import { UserDetails } from "../utils/StorageDataTypes"
 import ChatForm from "../components/ChatWindowParts/ChatForm"
 import BigChatBoxe from "../components/BigChatBoxe"
 
-const MessengerPageOrg = () => {
-
+const MessengerPageOrg = ({ navbarHeight }: { navbarHeight: number }) => {
     const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null);
     const [staScrivendo, setStaScrivendo] = useState<boolean>(false);
     const allChats = useAppSelector((state) => state.chats.chats);
@@ -20,21 +19,22 @@ const MessengerPageOrg = () => {
     }, [allChats, selectedUser]);
 
     return (
-        <div className="container-fluid vh-100 d-flex flex-column">
-            <div className="row flex-grow-1 d-flex">
-                <MessengerLeftBar setSelectedUser={setSelectedUser} />
+        <div className="d-flex flex-column" style={{ height: `calc(100vh - ${navbarHeight}px)`, overflow: 'hidden' }}>
+            <div className="row flex-grow-1 d-flex" style={{ height: '100%' }}>
+                <MessengerLeftBar setSelectedUser={setSelectedUser} navbarHeight={navbarHeight} />
                 {
                     selectedUser && chat && (
-                        <div className="col-9 d-flex flex-column">
+                        <div className="col-9 d-flex flex-column" style={{ height: '100%' }}>
                             <BigChatBoxe chat={chat} staScrivendo={staScrivendo} />
                             <ChatForm chat={chat} staScrivendo={staScrivendo} setStaScrivendo={setStaScrivendo} />
                         </div>
                     )
                 }
-                <div className="col-0 col-lg-3"></div>
             </div>
         </div>
     );
 };
 
 export default MessengerPageOrg;
+
+
