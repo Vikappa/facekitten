@@ -49,7 +49,7 @@ const ChatWindowDesktop = (
                     overflowY: 'auto',
                     border: '1px solid var(--bs-quaternary)',
                 }}
-                className="d-flex flex-column px-2 py-1 shadow"
+                className="d-flex flex-column shadow"
             >
                 <div className="d-flex justify-content-between"
                 style={{
@@ -57,10 +57,11 @@ const ChatWindowDesktop = (
                 }}
                 onClick={() => setIsOpen(!isOpen)}
                 >
-                <div className='d-flex align-items-center gap-2'>
+                <div className='d-flex align-items-center  gap-2 px-2 py-1'>
                 <Image src={chat.chatWith.profilepicture} alt="profile picture" width={25} height={25} className="rounded-circle" />
                 <p className="m-0 fs-5">{chat.chatWith.userName}</p>
-                </div>                    <RxCross2
+                </div>                    
+                        <RxCross2
                         color={hasNewMessage ? 'white' : 'black'}
                         style={{ cursor: 'pointer' }}
                         onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({

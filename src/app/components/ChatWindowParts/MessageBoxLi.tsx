@@ -13,8 +13,7 @@ const MessageBoxLi = (
         style={{
         }}
         >
-            aaaaaaaaaaaaa
-            {message.message}
+            <p className="m-0 p-0 text-black">{message.message}</p>
         </div>
     )
 }

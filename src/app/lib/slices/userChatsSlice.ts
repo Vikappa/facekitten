@@ -36,9 +36,14 @@ const userChatsSlice = createSlice({
             if(state.openedChats.length >= 4){
                 state.openedChats.shift()
             }
-            state.openedChats.push(newChat)
+            const existingChat = state.chats.find(chat => chat.chatWith.userName === action.payload.chatWith.userName);
+            if (existingChat) {
+                state.openedChats.push(existingChat);
+            } else {
+                state.openedChats.push(newChat);
+            }
         }
-    },
+    },    
     addCasualUserMessageFromUser:
     (state, action:PayloadAction<{chatWith:UserDetails, message: Message}>) => {
         const { chatWith, message } = action.payload
@@ -76,22 +81,11 @@ const userChatsSlice = createSlice({
     },
     addMessageToChat: (state, action: PayloadAction<{chat:Chat, message: Message}>) => {
         const { chat, message } = action.payload
-        const target = state.chats.find((chat:Chat) => (chat.chatWith.userName === chat.chatWith.userName))
-        const openChat = state.openedChats.find((chat:Chat) => (chat.chatWith.userName === chat.chatWith.userName))
+        const target = state.chats.find((fcaìhat:Chat) => (fcaìhat.chatWith.userName === chat.chatWith.userName))
+        const openChat = state.openedChats.find((fcaìhat:Chat) => (fcaìhat.chatWith.userName === chat.chatWith.userName))
         if(target && message) {
             target.messages.push(message)
-        } else {
-            if(message){
-                state.chats.push({
-                    chatWith: chat.chatWith,
-                    messages: [message],
-                    id: state.chats.length + 1,
-                    lastMessage: message.message,
-                    lastMessageTime: message.timestamp,
-                    lastMessageStatus: ''
-                })
-            }
-        }
+        } 
         if(openChat && message){
             openChat.messages.push(message)
         }

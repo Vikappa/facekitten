@@ -19,10 +19,10 @@ const ChatBox = (
         style={{
             minHeight:'25vh'
         }}
-        className="d-flex flex-column justify-content-end gap-2"
+        className="d-flex flex-column justify-content-end gap-2 bg-white"
         >
             {chat.messages.map((message, index) => (
-                <p key={index}>{message.message}</p>
+                <MessageBoxLi key={index} message={message} />
             ))}
         </div>
     )
