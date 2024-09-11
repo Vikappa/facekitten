@@ -30,13 +30,9 @@ const userChatsSlice = createSlice({
             state.chats.push(newChat)
         }
 
-        let newElement = true
-        state.openedChats.forEach((chat:Chat) => {
-            if(chat.chatWith == action.payload.chatWith) {
-                newElement = false
-            }
-        })
-        if(newElement){
+        const chatAlreadyOpened = state.openedChats.some((chat: Chat) => chat.chatWith.userName === action.payload.chatWith.userName);
+
+        if(!chatAlreadyOpened){
             if(state.openedChats.length >= 4){
                 state.openedChats.shift()
             }
@@ -72,27 +68,7 @@ const userChatsSlice = createSlice({
     },
     initializeUserChatsSlice: (state) => {
         state = initialState
-    },
-    openChatWithUser: (state, action: PayloadAction<UserDetails>) => {
-        let newElement = true
-        for (let index = 0; index < state.chats.length; index++) {
-            for (let j = 0; j < state.openedChats.length; j++) {
-                if(state.chats[index] == state.openedChats[j]){
-                    newElement = false
-                    break
-                }
-            }
-        }
-        if(newElement){
-            if(state.openedChats.length >= 4){
-                state.openedChats.shift()
-            }
-            const targetChat = state.chats.find((chat:Chat) => (chat.chatWith == action.payload))
-            if(targetChat){
-                state.openedChats.push(targetChat)
-            }
-        }
-    },
+    }, 
     closeChatWithUser: (state, action: PayloadAction<UserDetails>) => {
         state.openedChats = state.openedChats.filter(
             chat => chat.chatWith.userName !== action.payload.userName
@@ -101,5 +77,5 @@ const userChatsSlice = createSlice({
   },
 })
 
-export const { createChat, addCasualUserMessageFromUser, initializeUserChatsSlice, openChatWithUser, closeChatWithUser } = userChatsSlice.actions
+export const { createChat, addCasualUserMessageFromUser, initializeUserChatsSlice, closeChatWithUser } = userChatsSlice.actions
 export default userChatsSlice.reducer;

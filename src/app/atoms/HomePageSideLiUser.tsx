@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { UserDetails } from "../utils/StorageDataTypes"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
-import { createChat, openChatWithUser } from "../lib/slices/userChatsSlice"
+import { createChat } from "../lib/slices/userChatsSlice"
 
 const HomePageSideLiUser = (
     {user}:
