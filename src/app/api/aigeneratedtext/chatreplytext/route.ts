@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
