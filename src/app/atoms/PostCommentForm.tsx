@@ -4,7 +4,7 @@ import { Form } from "react-bootstrap"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { useState } from "react"
 import { FiSend } from "react-icons/fi";
-import { Post, PostCommentNotificationType } from "../utils/StorageDataTypes"
+import { Post, PostComment, PostCommentNotificationType } from "../utils/StorageDataTypes"
 import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
 import { addCommentToUserPost } from "../lib/slices/userPostsSlice"
 import { GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
@@ -33,9 +33,28 @@ const PostCommentForm = ({post}: {post: Post}) => {
                 }))
 
                 setTimeout( async () => {
-                    
-                    const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
-                    const newComment = await GenerateCommentText(post)
+                    const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)]
+                    const newPostComment:PostComment = {
+                        id: 0,
+                        author: {
+                            userName: randomAuthor.name,
+                            profilepicture: randomAuthor.profilePic
+                        },
+                        body: commentValue,
+                        commented_at: new Date().toISOString()
+                    }
+                    const updatedPost:Post = {
+                        id: post.id,
+                        author: post.author,
+                        body: post.body,
+                        image: "",
+                        comments: [...post.comments, newPostComment],
+                        created_at: post.created_at,
+                        likes: 0,
+                        userliked: false,
+                        likeProfiles: []
+                    }
+                    const newComment = await GenerateCommentText(updatedPost, randomAuthor.name)
                     dispatch(addCommentToUserPost({
                         postNumber: postIndex,
                         commentAuthorDetails: {
@@ -79,7 +98,27 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     }
 
                     if (randomAuthor) {
-                        const generatedComment = await GenerateCommentText(post);
+                        const newPostComment:PostComment = {
+                            id: 0,
+                            author: {
+                                userName: userDetails.userName,
+                                profilepicture: userDetails.profilepictureUrl,
+                            },
+                            body: commentValue,
+                            commented_at: new Date().toISOString()
+                        }
+                        const updatedPost:Post = {
+                            id: post.id,
+                            author: post.author,
+                            body: post.body,
+                            image: "",
+                            comments: [...post.comments, newPostComment],
+                            created_at: post.created_at,
+                            likes: 0,
+                            userliked: false,
+                            likeProfiles: []
+                        }
+                        const generatedComment = await GenerateCommentText(updatedPost, randomAuthor.name)
                         dispatch(addCommentToPost({
                             post: post,
                             commentValue: generatedComment,

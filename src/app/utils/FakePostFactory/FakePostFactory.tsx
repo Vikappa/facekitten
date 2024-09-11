@@ -1,4 +1,4 @@
-import { Post, PostComment, UserDetails } from "../StorageDataTypes"
+import { CasualUser, Post, PostComment, UserDetails } from "../StorageDataTypes"
 
 
 export const FakePostCommentTextFactory = () => {
@@ -13,30 +13,35 @@ export const FakePostCommentTextFactory = () => {
   return fakePostCommentText
 }
 
-export const GenerateCommentText = async (post:Post):Promise<string> => {
-  let propArgumentString = 'Testo del post:' + post.body
-  for (let index = 0; index < post.comments.length; index++) {
-    propArgumentString += 'Autore:'+post.comments[index].author.userName+' Commento:' + post.comments[index].body+'\n'
-  }
+export const GenerateCommentText = async (post: Post, authorname:string): Promise<string> => {
+  let testoDelPost = `Testo del post: ${post.body}\n`;
+
+  testoDelPost += post.comments
+    .map(comment => `Autore: ${comment.author.userName} Commento: ${comment.body}`)
+    .join('\n');
+
   try {
     const response = await fetch('/api/aigeneratedtext/commentreply', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ comment: propArgumentString }),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ testoDelPost, authorname }),
     });
+
     try {
-      const data = await response.json()
+      const data = await response.json();
       return data.message;
     } catch (error) {
-      console.error('Error parsing json')
-      return FakePostCommentTextFactory()
+      console.error('Error parsing json');
+      return FakePostCommentTextFactory();
     }
-} catch (error) {
-    console.error('Error:', error)
-    return FakePostCommentTextFactory()
-}}
+  } catch (error) {
+    console.error('Error:', error);
+    return FakePostCommentTextFactory();
+  }
+};
+
 
 export const FakePostTextFactory = () => {
   let fakePostText = ""
