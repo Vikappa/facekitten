@@ -21,7 +21,7 @@ const ChatsRenderer = () => {
                 gap: '10px', 
                 padding: '0 20px',
             }}
-            className="me-5 pe-5"
+            className="me-5 pe-5 d-none d-md-block"
         >
             {openedChats.toReversed().map((chat, index) => {
             return(

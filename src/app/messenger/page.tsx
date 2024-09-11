@@ -1,17 +1,16 @@
 'use client'
 import { useState } from "react"
 import NavBar from "../components/NavBar"
-import StoreMonitor from "../utils/StoreMonitorComponent"
-
+import MessengerPageOrg from "../organisms/MessengerPage"
+import '../style.css'
 const MessengerPage = () => {
 
     const [showMobileSearch, setShowMobileSearch] = useState<boolean>(false)
 
-
     return(
     <>
       <NavBar />
-      <StoreMonitor/>
+      <MessengerPageOrg/>
       </>
     )
 }

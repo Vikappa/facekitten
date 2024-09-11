@@ -23,7 +23,7 @@ export const fakeChatReplyText = async (chat: Chat, setStaScrivendo:(staScrivend
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ comment: propArgumentString }),
+            body: JSON.stringify({ comment: propArgumentString, catName: chat.chatWith.userName }),
         });
         const data = await response.json();
         console.log(data.message);

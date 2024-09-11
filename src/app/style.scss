@@ -206,3 +206,10 @@ $shadows: (
   background-color: var(--bs-primary) !important;
   color: lightgray
 }
+.chatImgPreview:hover{
+  background-color: var(--bs-grayBg);
+}
+
+.chatImgPreviewSelected{
+  background-color: var(--bs-quinary);
+}

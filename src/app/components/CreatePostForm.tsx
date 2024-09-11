@@ -1,11 +1,13 @@
 'use client'
 import Image from "next/image"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { addPost, randomCommentToUserPost } from "../lib/slices/userPostsSlice"
 import { Form } from "react-bootstrap"
-import { UserDetails } from "../utils/StorageDataTypes"
+import { Post, UserDetails } from "../utils/StorageDataTypes"
 import { createNotification } from "../lib/slices/notificationSlice"
+import { GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
+import { addCommentToPost } from "../lib/slices/sessionGeneratedAccountsSlice"
 
 const CreateFormPost = () =>{
 
@@ -14,12 +16,18 @@ const CreateFormPost = () =>{
     const [postText, setPostText] = useState<string>("")
     const postnumber = useAppSelector(state => state.posts.userPosts.length)
     const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
-    const [triggerRandomComment, setTriggerRandomComment] = useState<boolean>(false)
+    const [currentTargetPostId, setCurrentTargetPostId] = useState<number>(-1)
+    const allPosts = useAppSelector(state => state.posts.userPosts)
+    const currentTargetPost = useMemo(() => {
+        return allPosts.find(post => post.id === currentTargetPostId)
+    }, [allPosts, currentTargetPostId])
+
 
     const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
     
         if(postText.length > 0) {
+            setCurrentTargetPostId(postnumber)
                 dispatch(addPost({
                     id: postnumber,
                     author: {
@@ -36,32 +44,45 @@ const CreateFormPost = () =>{
                 }));
     
             setPostText('');
-            setTriggerRandomComment(true)
     
-            setTimeout(() => {
+            setTimeout( async () => {
                 const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
-                dispatch(randomCommentToUserPost({
-                    postNumber: postnumber, 
-                    commentAuthorDetails: {
-                        userName: randomAuthor.name,
-                        profilepicture: randomAuthor.profilePic
-                    }
-                }))
-                dispatch(createNotification({
-                    notificationTypeNumber: 1,
-                    notificationBody: {
-                        postId: postnumber,
-                        commentAuthor: {
+                if(currentTargetPost){
+                    const generatedText = await GenerateCommentText(currentTargetPost)
+                    dispatch(addCommentToPost({
+                        post: currentTargetPost,
+                        commentValue: generatedText,
+                        author: {
                             userName: randomAuthor.name,
                             profilepicture: randomAuthor.profilePic
-                        },
-                        postAuthor: {
-                            userName: userDetails.userName,
-                            profilepicture: userDetails.profilepictureUrl
                         }
-                    }
-                }))
-            }, Math.round(Math.random() * 11900+100))        }
+                    }))
+                } else {
+                    dispatch(randomCommentToUserPost({
+                        postNumber: postnumber, 
+                        commentAuthorDetails: {
+                            userName: randomAuthor.name,
+                            profilepicture: randomAuthor.profilePic
+                        }
+                    }))
+                    dispatch(createNotification({
+                        notificationTypeNumber: 1,
+                        notificationBody: {
+                            postId: postnumber,
+                            commentAuthor: {
+                                userName: randomAuthor.name,
+                                profilepicture: randomAuthor.profilePic
+                            },
+                            postAuthor: {
+                                userName: userDetails.userName,
+                                profilepicture: userDetails.profilepictureUrl
+                            }
+                        }
+                    }))
+                }
+                
+            }, Math.round(Math.random() * 11900+100))        
+        }
     };
     
 
