@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     Non rompere la quarta parete. Se la chat è stata aperta da poco, inizia una conversazione casuale. Non ripeterti.
     Non rivelare di essere un robot. Cerca di essere breve. Non descrivere azioni che sottintendono il contatto con l'utente.
     Questa è la cronologia dei messaggi fin'ora: ${comment} 
-    Scrivi solo e unicamente il testo della risposta del gatto.
+    Scrivi solo e unicamente il testo della risposta del gatto. Non includere l'orario della chat nella risposta.
      
      `
 
