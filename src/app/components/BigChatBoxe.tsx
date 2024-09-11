@@ -25,11 +25,10 @@ const BigChatBoxe = (
         <div
             ref={chatContainerRef} 
             style={{
-                minHeight: '25vh',
-                maxHeight: '25vh',
                 backgroundColor: 'white',
                 overflowY: 'auto',
-                paddingBottom:'6px' 
+                paddingBottom:'6px',
+                flexGrow: 3,
             }}
         >
             {chat.messages.map((message, index) => (

@@ -15,7 +15,7 @@ const MessengerLeftBar = (
     const allUsers = useAppSelector(state => state.sessionGeneratedAccounts.acc)
 
     return (
-        <div className="col-3 d-flex flex-column bg-white min-h-100 shadow" >
+        <div className="col-3 d-flex flex-column bg-white min-h-90 max-h-90 shadow" >
             <h3>Chats:</h3>
 
             <MessengerSearchBar/>
