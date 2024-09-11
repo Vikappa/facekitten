@@ -1,5 +1,6 @@
 'use client'
-
+import { IoSend } from "react-icons/io5";
+import RoundGreyBorderLess from "@/app/atoms/RoundActivableButton"
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks"
 import { addMessageToChat } from "@/app/lib/slices/userChatsSlice"
 import { fakeChatReplyText } from "@/app/utils/FakeChatReply/FakeChatReply"
@@ -55,7 +56,10 @@ const ChatForm = (
         }, Math.floor(Math.random() * 2000) + 1000) 
     }
     return(
-        <Form onSubmit={sendMessage}>
+        <Form 
+        onSubmit={sendMessage}
+        className="d-flex p-1 px-2 bg-white"
+        >
         <Form.Control
           type="text"
           id="inputChatText"
@@ -64,6 +68,7 @@ const ChatForm = (
           disabled={staScrivendo} 
           autoComplete="off"
         />
+        <RoundGreyBorderLess bgSelected={"bg-grayBg"} bgNotSelected={"bg-grayBg"} iconSelected={<IoSend />} iconUnselected={<IoSend />} selected={false} onClick={()=>sendMessage} size={0}/>
         </Form>
        )
 }

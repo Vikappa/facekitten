@@ -2,6 +2,8 @@
 
 import Image from "next/image"
 import { UserDetails } from "../utils/StorageDataTypes"
+import { useAppDispatch } from "../lib/hooks"
+import { createChat } from "../lib/slices/userChatsSlice"
 
 const MessengerLeftName = (
     {user, setSelectedUser}:
@@ -9,10 +11,19 @@ const MessengerLeftName = (
          | null>>}
 ) => {
 
+    const dispatch = useAppDispatch()
+    const handleClick = () => {
+        dispatch(createChat({chatWith:user}))
+        setSelectedUser(user)
+    }
+
     return(
         <div
         className="d-flex gap-3 align-items-center chatImgPreview p-2"
-        onClick={() => setSelectedUser(user)}
+        onClick={handleClick}
+        style={{
+            cursor: 'pointer'
+        }}
     >
         <Image src={user.profilepicture}
             alt="profile picture"

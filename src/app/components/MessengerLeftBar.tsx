@@ -19,9 +19,10 @@ const MessengerLeftBar = (
              style={{
                  height: `calc(100vh - ${navbarHeight}px)`,
                  overflowY: 'auto',
+                 zIndex: 2,
              }}
         >
-            <h3>Chats:</h3>
+            <h3 className="">Chats:</h3>
             <MessengerSearchBar/>
             <div className="d-flex flex-column justify-content-start">
                 {

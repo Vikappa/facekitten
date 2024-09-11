@@ -28,10 +28,11 @@ const BigChatBoxe = (
                 backgroundColor: 'white',
                 overflowY: 'auto',
                 paddingBottom: '6px',
-                flexGrow: 1, // Riempie tutto lo spazio disponibile
+                flexGrow: 1, 
             }}
+            className="d-flex flex-column flex-column-reverse p-3 py-4"
         >
-            {chat.messages.map((message, index) => (
+            {chat.messages.toReversed().map((message, index) => (
                 <MessageBoxLi key={index} message={message} />
             ))}
 
