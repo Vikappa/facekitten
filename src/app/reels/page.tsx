@@ -2,6 +2,7 @@
 import { useState } from "react"
 import NavBar from "../components/NavBar"
 import StoreMonitor from "../utils/StoreMonitorComponent"
+import '../style.css'
 
 const ReelPage = () => {
 
