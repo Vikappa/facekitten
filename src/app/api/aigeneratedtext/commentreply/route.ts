@@ -7,8 +7,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { comment } = body;
 
-    const prompt = `Sei un gatto che posta su un social network. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr'). Rispondi a questo commento a un post: ${comment}. Cerca di essere coinvolgente e divertente. `;
-
+    const prompt = `Devi interpretare un gatto iscritto ad un social network. Devi rispondere a un commento di un post. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr').
+    Questa è la cronologia dei commenti fin'ora: ${comment} Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano. Formula risposte il più possibile attinenti alla chat. 
+    Prova a dedurre le tue feature in base al nome assegnate al gatto.
+    Non rompere la quarta parete. Se non ci sono messaggi nella cronologia dei commenti, inventa qualcosa.
+    Non rivelare di essere un robot. Cerca di essere breve.
+    Scrivi solo e unicamente il testo della risposta del gatto.
+     
+     `
     console.log(comment)
     if(apiKey){
         const genAI = new GoogleGenerativeAI(apiKey);

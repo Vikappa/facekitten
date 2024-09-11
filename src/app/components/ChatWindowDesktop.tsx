@@ -74,7 +74,7 @@ const ChatWindowDesktop = (
                 </div>
     
                 <ChatBox chat={chat} staScrivendo={staScrivendo} />
-                <ChatForm chat={chat} staScrivendo={staScrivendo} />
+                <ChatForm chat={chat} staScrivendo={staScrivendo} setStaScrivendo={setStaScrivendo} />
             </div>
         );
     } else {

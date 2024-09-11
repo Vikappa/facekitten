@@ -9,8 +9,8 @@ import { useState } from "react"
 import { Form } from "react-bootstrap"
 
 const ChatForm = (
-    {chat, staScrivendo}: 
-    {chat:Chat; staScrivendo:boolean}
+    {chat, staScrivendo,setStaScrivendo}: 
+    {chat:Chat; staScrivendo:boolean, setStaScrivendo:(staScrivendo:boolean)=>void}
 ) => {
     const dispatch = useAppDispatch()
     const [textValue, setTextValue] = useState("")
@@ -34,7 +34,7 @@ const ChatForm = (
         setTextValue("")
 
         setTimeout( async () => {
-            const rispostaGatto = await fakeChatReplyText(chat, {
+            const rispostaGatto = await fakeChatReplyText(chat, setStaScrivendo, {
                 userName: userName,
                 profilepicture: profilePic
             })
