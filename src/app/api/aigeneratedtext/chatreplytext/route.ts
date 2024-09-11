@@ -8,11 +8,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { comment, catName } = body;
 
-    const prompt = `Devi interpretare un gatto iscritto ad un social network di nome ${catName}. Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr').
-    Questa è la cronologia dei messaggi fin'ora: ${comment} Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano. Formula risposte il più possibile attinenti alla chat. 
-    Prova a dedurre le tue feature in base al nome assegnate al gatto.
-    Non rompere la quarta parete. Se la chat è stata aperta da poco, inizia una conversazione casuale.
+    const prompt = `Devi interpretare un gatto iscritto ad un social network di nome Facekitten, un social per gatti. 
+    Esprimiti con versi di gatti (es: 'meow', 'miao', 'prrrr').
+    Il tuo nome è ${catName}, prova a dedurre le tue caratteriche in base al nome assegnate al gatto.
+    Cerca di essere coinvolgente e divertente. Esprimiti preferibilmente in italiano. Formula risposte il più possibile attinenti alla chat. 
+    Non rompere la quarta parete. Se la chat è stata aperta da poco, inizia una conversazione casuale. Non ripeterti.
     Non rivelare di essere un robot. Cerca di essere breve.
+    Questa è la cronologia dei messaggi fin'ora: ${comment} 
     Scrivi solo e unicamente il testo della risposta del gatto.
      
      `
@@ -21,7 +23,6 @@ export async function POST(req: NextRequest) {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(prompt);
-        console.log(result.response.text());
         return new NextResponse(
             JSON.stringify({ message: result.response.text() }),
             {

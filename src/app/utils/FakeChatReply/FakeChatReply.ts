@@ -17,6 +17,7 @@ export const fakeChatReplyText = async (chat: Chat, setStaScrivendo:(staScrivend
         const time = formatDate(message.timestamp)
         return `${senderName}: ${message.message} (ore ${time})`
     }).join('\n')
+
     try {
         const response = await fetch('/api/aigeneratedtext/chatreplytext', {
             method: 'POST',
@@ -26,7 +27,6 @@ export const fakeChatReplyText = async (chat: Chat, setStaScrivendo:(staScrivend
             body: JSON.stringify({ comment: propArgumentString, catName: chat.chatWith.userName }),
         });
         const data = await response.json();
-        console.log(data.message);
         setStaScrivendo(false)
         return data.message;
     } catch (error) {

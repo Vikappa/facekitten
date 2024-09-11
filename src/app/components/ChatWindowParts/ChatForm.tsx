@@ -1,10 +1,9 @@
 'use client'
 import { IoSend } from "react-icons/io5";
-import RoundGreyBorderLess from "@/app/atoms/RoundActivableButton"
 import { useAppDispatch, useAppSelector } from "@/app/lib/hooks"
 import { addMessageToChat } from "@/app/lib/slices/userChatsSlice"
 import { fakeChatReplyText } from "@/app/utils/FakeChatReply/FakeChatReply"
-import { Chat } from "@/app/utils/StorageDataTypes"
+import { Chat, Message } from "@/app/utils/StorageDataTypes"
 import { stat } from "fs"
 import { useState } from "react"
 import { Form } from "react-bootstrap"
@@ -17,6 +16,7 @@ const ChatForm = (
     const [textValue, setTextValue] = useState("")
     const userName = useAppSelector(state => state.userCredentials.userName)
     const profilePic = useAppSelector(state => state.userCredentials.profilepictureUrl)
+    const allChat = useAppSelector(state => state.chats.chats)
 
     const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -31,34 +31,55 @@ const ChatForm = (
             timestamp: new Date().toISOString(),
             seen: false
         }
+        
         dispatch(addMessageToChat({chat, message}))
         setTextValue("")
 
         setTimeout( async () => {
-            const rispostaGatto = await fakeChatReplyText(chat, setStaScrivendo, {
+
+            const targetChat:Chat = {
+                id: chat.id,
+                chatWith: {
+                    userName: chat.chatWith.userName,
+                    profilepicture: chat.chatWith.profilepicture
+                },
+                lastMessage: chat.lastMessage,
+                lastMessageTime: chat.lastMessageTime,
+                lastMessageStatus: chat.lastMessageStatus,
+                messages: [...chat.messages, message]
+            }
+
+                const rispostaGatto = await fakeChatReplyText(targetChat, setStaScrivendo, {
                 userName: userName,
                 profilepicture: profilePic
-            })
-        dispatch(addMessageToChat({chat, message: {
-            id: 0,
-            sender: {
-                userName: chat.chatWith.userName,
-                profilepicture: chat.chatWith.profilepicture
-            },
-            receiver: {
-                userName: userName,
-                profilepicture: profilePic
-            },
-            message: rispostaGatto,
-            timestamp: new Date().toISOString(),
-            seen: false
-        }}))
+                })
+                dispatch(addMessageToChat({chat, message: {
+                    id: 0,
+                    sender: {
+                        userName: chat.chatWith.userName,
+                        profilepicture: chat.chatWith.profilepicture
+                    },
+                    receiver: {
+                        userName: userName,
+                        profilepicture: profilePic
+                    },
+                    message: rispostaGatto,
+                    timestamp: new Date().toISOString(),
+                    seen: false
+                }}))
+            
         }, Math.floor(Math.random() * 2000) + 1000) 
     }
+
+    const handleSendClick = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+        e.preventDefault()
+        sendMessage(e as unknown as React.FormEvent<HTMLFormElement>)
+    }
+
     return(
         <Form 
         onSubmit={sendMessage}
-        className="d-flex p-1 px-2 bg-white"
+        className="d-flex align-items-center p-1 gap-2 px-2 bg-white"
         >
         <Form.Control
           type="text"
@@ -68,9 +89,8 @@ const ChatForm = (
           disabled={staScrivendo} 
           autoComplete="off"
         />
-        <RoundGreyBorderLess bgSelected={"bg-grayBg"} bgNotSelected={"bg-grayBg"} iconSelected={<IoSend />} iconUnselected={<IoSend />} selected={false} onClick={()=>sendMessage} size={0}/>
+        <IoSend size={30} color="black" onClick={handleSendClick}/>
         </Form>
        )
 }
-
 export default ChatForm

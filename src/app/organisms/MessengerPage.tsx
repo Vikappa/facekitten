@@ -31,7 +31,9 @@ const MessengerPageOrg = ({ navbarHeight }: { navbarHeight: number }) => {
                                 <p className="m-0 p-0">{chat.chatWith.userName}</p>
                             </div>
                             <BigChatBoxe chat={chat} staScrivendo={staScrivendo} />
+                            <div className="m-0 p-2">
                             <ChatForm chat={chat} staScrivendo={staScrivendo} setStaScrivendo={setStaScrivendo} />
+                            </div>
                         </div>
                     )
                 }
