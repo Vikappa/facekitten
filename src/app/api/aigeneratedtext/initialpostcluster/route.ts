@@ -19,7 +19,6 @@ const casualThemes = () => {
     const temi = [
         '&q=attualità', 
         '&q=gatti', 
-        '&q=tech',
         '&q=informatica',
         '&q=videogiochi',
         '&q=lavoro',
@@ -31,7 +30,7 @@ const casualThemes = () => {
         '&q=libri'
     ];
 
-    const numTemi = Math.floor(Math.random() * 3) + 1;
+    const numTemi = Math.floor(Math.random() * 4) + 1;
     const temiCasuali = temi.sort(() => 0.5 - Math.random());
     const temiSelezionati = temiCasuali.slice(0, numTemi);
 
@@ -42,7 +41,7 @@ const casualThemes = () => {
 
 const newResume = async (): Promise<string[]> => {
     try {
-        const response = await fetch('https://newsapi.org/v2/everything?pageSize=10&language=it'+casualThemes(), {
+        const response = await fetch('https://newsapi.org/v2/everything?pageSize=20&language=it'+casualThemes(), {
             method: 'GET',
             headers: {
                 authorization: `bearer ${newApiKey}`
@@ -64,7 +63,7 @@ export async function GET(req: NextRequest) {
     const news = await newResume();
 
     const prompt = `
-    In un social network, facekitten, sono iscritti solo gatti. Scrivi 30 testi di post di pareri di gatti su notizie di attualità.
+    In un social network, facekitten, sono iscritti solo gatti. Scrivi 20 testi di post di pareri di gatti su notizie di attualità.
     Di seguito ti fornisco una serie di titoli e notizie di attualità da usare come argomento per i post.
     Ecco le notizie:
     ${news}
