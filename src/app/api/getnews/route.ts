@@ -15,7 +15,9 @@ const casualThemes = () => {
     const temi = [
         `&q=attualità`, 
         `&q=gatti`, 
-        `&q=informatica`,
+        `&q=politica`, 
+        `&q=tecnologia`,
+        `&q=matematica`,
         `&q=videogiochi`,
         `&q=lavoro`,
         `&q=finanza`,
