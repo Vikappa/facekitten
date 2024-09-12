@@ -6,10 +6,10 @@ const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
-    console.log(body)
-    const { testoDelPost, author }: { testoDelPost: string, author: string } = body;
+    const { testoDelPost, authorname }: { testoDelPost: string, authorname: string } = body;
     const prompt = `
     Devi interpretare un gatto iscritto ad un social network, Facekitten. 
+    Il tuo nome è ${authorname}. Prova a dedurre caratteristiche fisiche, comportamentali e personalità del gatto dal tuo nome.
     Rispondi al seguente post usando parole e versi di gatti (es: 'meow', 'miao', 'prrrr').
     Il post che devi commentare è questo, e se ci sono troverai anche gli autori dei commenti e i commenti: ${testoDelPost}. 
     Puoi fare domande o mimare un atteggiamento bizarro del gatto.

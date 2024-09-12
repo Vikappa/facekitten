@@ -45,7 +45,7 @@ const CreateFormPost = () => {
 
             setTimeout(async () => {
                 const randomAuthor = accountsFromRedux[Math.floor(Math.random() * accountsFromRedux.length)];
-                const generatedText = await GenerateCommentText(newPost);
+                const generatedText = await GenerateCommentText(newPost, randomAuthor.name);
                 const targetPost = allPostsRef.current.find(fpost => fpost.id === newPost.id);
 
                 if (targetPost) {
