@@ -42,7 +42,7 @@ const casualThemes = () => {
 
 const newResume = async (): Promise<string[]> => {
     try {
-        const response = await fetch('https://newsapi.org/v2/everything?pageSize=5&language=it'+casualThemes(), {
+        const response = await fetch('https://newsapi.org/v2/everything?pageSize=10&language=it'+casualThemes(), {
             method: 'GET',
             headers: {
                 authorization: `bearer ${newApiKey}`
