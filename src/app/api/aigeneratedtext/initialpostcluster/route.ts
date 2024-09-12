@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     const news = await newResume();
 
     const prompt = `
-    In un social network, facekitten, sono iscritti solo gatti. Scrivi 20 testi di post di pareri di gatti su notizie di attualità.
+    In un social network, facekitten, sono iscritti solo gatti. Scrivi 15 testi di post di pareri di gatti su notizie di attualità.
     Di seguito ti fornisco una serie di titoli e notizie di attualità da usare come argomento per i post.
     Ecco le notizie:
     ${news}
