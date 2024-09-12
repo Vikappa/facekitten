@@ -8,7 +8,7 @@ import ChatForm from "../components/ChatWindowParts/ChatForm"
 import BigChatBoxe from "../components/BigChatBoxe"
 import Image from "next/image"
 
-const MessengerPageOrg = ({ navbarHeight }: { navbarHeight: number }) => {
+const MessengerPageOrg = () => {
     const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null);
     const [staScrivendo, setStaScrivendo] = useState<boolean>(false);
     const allChats = useAppSelector((state) => state.chats.chats);
@@ -20,9 +20,9 @@ const MessengerPageOrg = ({ navbarHeight }: { navbarHeight: number }) => {
     }, [allChats, selectedUser]);
 
     return (
-        <div className="d-flex flex-column" style={{ height: `calc(100vh - ${navbarHeight}px)`, overflow: 'hidden' }}>
+        <div className="d-flex flex-column" style={{ overflow: 'hidden' }}>
             <div className="row flex-grow-1 d-flex" style={{ height: '100%' }}>
-                <MessengerLeftBar setSelectedUser={setSelectedUser} navbarHeight={navbarHeight} />
+                <MessengerLeftBar setSelectedUser={setSelectedUser} />
                 {
                     selectedUser && chat && (
                         <div className="col-9 d-flex flex-column p-0 m-0 bg-white" style={{ height: '100%' }}>

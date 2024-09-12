@@ -8,8 +8,8 @@ import MessengerLeftName from "../atoms/MessengerLeftName"
 import { SetStateAction } from "react"
 
 const MessengerLeftBar = (
-    {setSelectedUser, navbarHeight}:
-    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>; navbarHeight: number}
+    {setSelectedUser}:
+    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>}
 ) => {
 
     const allUsers = useAppSelector(state => state.sessionGeneratedAccounts.acc);
@@ -17,7 +17,6 @@ const MessengerLeftBar = (
     return (
         <div className="col-3 d-flex flex-column bg-white shadow"
              style={{
-                 height: `calc(100vh - ${navbarHeight}px)`,
                  overflowY: 'auto',
                  zIndex: 2,
              }}

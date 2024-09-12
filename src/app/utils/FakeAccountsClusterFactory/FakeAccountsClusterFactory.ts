@@ -9,7 +9,6 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     if (response.ok) {
         const data = await response.json()
         postTexts = [...data]
-        console.log(postTexts)
     } else {
         for (let index = 0; index < 30; index++) {
             postTexts.push(FakePostTextFactory())            
