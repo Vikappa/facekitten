@@ -30,3 +30,14 @@ export const MakeFakeAccount = async (): Promise<CasualUser> => {
         posts: fakeAccountsPosts
     };
 };
+
+export const MakeFakeAccountNoPosts = async (): Promise<CasualUser> => {
+    const fakeCredential = await CreateFakeUser();
+    const fakeAccountsPosts: Post[] = [];
+
+    return {
+        name: fakeCredential.userName,
+        profilePic: fakeCredential.profilepicture, 
+        posts: fakeAccountsPosts
+    };
+};

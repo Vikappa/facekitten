@@ -126,3 +126,25 @@ export interface photoSrc {
     landscape: string;
     tiny:      string;
 }
+
+export interface NewsApiPayload {
+    status:       string;
+    totalResults: number;
+    articles:     NewsArticle[];
+}
+
+export interface NewsArticle {
+    source:      NewsSource;
+    author:      null | string;
+    title:       string;
+    description: string;
+    url:         string;
+    urlToImage:  string;
+    publishedAt: Date;
+    content:     string;
+}
+
+export interface NewsSource {
+    id:   null | string;
+    name: string;
+}

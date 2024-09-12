@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { CasualUser, PostComment, UserDetails } from '@/app/utils/StorageDataTypes';
+import { FakePostCommentTextFactory } from '@/app/utils/FakePostFactory/FakePostFactory';
 
 const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
@@ -21,7 +22,6 @@ export async function POST(req: NextRequest) {
      Rispondi solo e solamente con la stringa di risposta del gatto.
      `;
 
-    console.log(prompt)
 
     if (apiKey) {
         try {
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         } catch (error) {
             console.error('Error generating content:', error);
             return new NextResponse(
-                JSON.stringify({ error: "Generation error" }),
+                JSON.stringify({ message: FakePostCommentTextFactory() }),
                 {
                     status: 500,
                     headers: {
