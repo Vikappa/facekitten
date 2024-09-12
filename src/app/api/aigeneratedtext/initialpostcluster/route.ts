@@ -79,7 +79,6 @@ export async function GET(req: NextRequest) {
 
             const generatedText = result.response
 
-            console.log(generatedText.text())
             return new NextResponse(
                  generatedText.text() ,
                 {
