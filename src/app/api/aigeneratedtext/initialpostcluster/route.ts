@@ -5,6 +5,7 @@ import { NewsApiPayload } from '@/app/utils/StorageDataTypes';
 
 const GoogleApyKey = process.env.GOOGLE_GEMINI_API_KEY;
 const newApiKey = process.env.NEWS_API_KEY
+export const dynamic = 'force-dynamic';
 
 const fallbackArray = [
     "Titolo: Gatto rimane sull'albero, Notizia: Momenti di terrore in giardino, il gatto salito sull'albero non riesce a scendere. I pompieri sono intervenuti per riportarlo a terra.",
