@@ -14,16 +14,41 @@ const fallbackArray = [
     "Titolo: Gatto scopre antica moneta sotto il divano, Notizia: Un gatto curioso ha portato alla luce una moneta antica nascosta sotto un divano, sorprendendo i proprietari e gli archeologi."
 ];
 
+const casualThemes = () => {
+    const temi = [
+        '&q=attualità', 
+        '&q=gatti', 
+        '&q=tech',
+        '&q=informatica',
+        '&q=videogiochi',
+        '&q=lavoro',
+        '&q=finanza',
+        '&q=musica',
+        '&q=cinema',
+        '&q=viaggi',
+        '&q=scienza',
+        '&q=libri'
+    ];
+
+    const numTemi = Math.floor(Math.random() * 3) + 1;
+    const temiCasuali = temi.sort(() => 0.5 - Math.random());
+    const temiSelezionati = temiCasuali.slice(0, numTemi);
+
+    return temiSelezionati.join('');
+};
+
+
 
 const newResume = async (): Promise<string[]> => {
     try {
-        const response = await fetch('https://newsapi.org/v2/everything?language=it&q=gatti', {
+        const response = await fetch('https://newsapi.org/v2/everything?language=it'+casualThemes(), {
             method: 'GET',
             headers: {
                 authorization: `bearer ${newApiKey}`
             }
         });
-        const data: NewsApiPayload = await response.json();
+        let data: NewsApiPayload = await response.json();
+        data.articles.sort(() => 0.5 - Math.random());
         const news = data.articles.map(article => {
             return `Titolo: ${article.title}, Notizia: ${article.description}`;
         });
