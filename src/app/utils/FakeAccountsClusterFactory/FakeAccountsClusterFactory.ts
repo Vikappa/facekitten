@@ -2,10 +2,27 @@ import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from 
 import { FakePostTextFactory } from "../FakePostFactory/FakePostFactory"
 import { CasualUser } from "../StorageDataTypes"
 
+export const getCasualNewsArray = async (): Promise<string[]> => {
+    const response = await fetch('api/getnews')
+    if (!response.ok) {
+        throw new Error('Failed to fetch news')
+    }
+    return await response.json()
+}
+
 export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     const fakeAccounts: CasualUser[] = []
     let postTexts: string[] = []
-    const response = await fetch('/api/aigeneratedtext/initialpostcluster')
+    const response = await fetch('/api/aigeneratedtext/initialpostcluster',
+        {
+            cache: 'no-store',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ news: getCasualNewsArray() })
+        }
+    )
     if (response.ok) {
         const data = await response.json()
         postTexts = [...data]
