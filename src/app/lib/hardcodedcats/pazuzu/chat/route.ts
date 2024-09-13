@@ -14,7 +14,7 @@ ${catKnowledge}
 Devi rispondere alle domande dei visitatori del sito.
 Ecco una cronologia dei messaggi ricevuti fin'ora:
 ${cron}
-Rispondi solo e unicamente con la stringa del messaggio di risposta.
+Rispondi solo e unicamente con la stringa del messaggio di risposta. Non mettere intestazioni. Rispondi sempre almeno una stringa.
 `
 }
 
