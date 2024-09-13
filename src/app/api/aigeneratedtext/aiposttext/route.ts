@@ -1,4 +1,3 @@
-import { pexelPayload } from '@/app/utils/StorageDataTypes';
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
