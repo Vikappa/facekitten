@@ -1,5 +1,6 @@
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
 import { CasualUser, Post, PostComment, UserDetails } from "../StorageDataTypes"
+const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 //Sorteggio a caso di parole
 export const FakePostCommentTextFactory = () => {
@@ -17,7 +18,7 @@ export const FakePostCommentTextFactory = () => {
 //Generate 6 post partendo dagli utenti forniti e con tempo precedente a tutti i post esistenti (per simulare post più vecchi)
 export const PostCluster6 = async (currentAccounts:CasualUser[]):Promise<Post[]> => {
   let returnArray: Post[] = []
-  const currentPosts = currentAccounts.map(user => user.posts).flat()
+  const currentPosts = currentAccounts.flatMap((accounts) => accounts.posts);
 
   // Verifica che l'array non sia vuoto
   if (currentPosts.length === 0) {
@@ -39,7 +40,12 @@ export const PostCluster6 = async (currentAccounts:CasualUser[]):Promise<Post[]>
   let lastPostIndex: number = currentPosts.length
 
   try {
-    const reponse = await fetch('api/aigeneratedtext/postcluster')
+    const reponse = await fetch('api/aigeneratedtext/postcluster',{
+      headers: {
+        'Authorization': `Bearer ${jwtSecret}`,
+        'Content-Type': 'application/json'
+      }
+    })
     if(reponse.ok){
       const data = await reponse.json()
       for (let index = 0; index < data.length; index++) {
@@ -117,6 +123,7 @@ export const GenerateCommentText = async (post: Post, authorname:string): Promis
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtSecret}`
       },
       body: JSON.stringify({ testoDelPost, authorname }),
     });
@@ -185,7 +192,13 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
     const queryUrl = `/api/storedcatphotos`; 
   
     try {
-      const response = await fetch(queryUrl);
+      const response = await fetch(queryUrl,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': `Bearer ${jwtSecret}`  
+        },
+      });
       if (!response.ok) {
         throw new Error('Errore nella fetch della picture casuale');
       }

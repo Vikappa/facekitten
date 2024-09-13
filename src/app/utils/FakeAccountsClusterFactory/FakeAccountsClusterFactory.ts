@@ -2,8 +2,15 @@ import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from 
 import { FakePostTextFactory } from "../FakePostFactory/FakePostFactory"
 import { CasualUser } from "../StorageDataTypes"
 
+const jwtSecret = process.env.NEXT_PUBLIC_SELF
+
 export const getCasualNewsArray = async (): Promise<string[]> => {
-    const response = await fetch('api/getnews')
+    const response = await fetch('api/getnews',{
+        headers: {
+            'Authorization': `Bearer ${jwtSecret}`,
+            'Content-Type': 'application/json'
+        }, 
+    })
     if (!response.ok) {
         throw new Error('Failed to fetch news')
     }
@@ -18,7 +25,8 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
             cache: 'no-store',
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwtSecret}`
             },
             body: JSON.stringify({ news: getCasualNewsArray() })
         }

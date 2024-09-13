@@ -9,6 +9,11 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
     const {news} = await req.json();
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token !== process.env.NEXT_PUBLIC_SELF) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
 
     const prompt = `
     In un social network, facekitten, sono iscritti solo gatti. Scrivi 15 testi di post di pareri di gatti su notizie di attualità.

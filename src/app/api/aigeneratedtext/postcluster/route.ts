@@ -60,6 +60,11 @@ const newResume = async (): Promise<string[]> => {
 };
 
 export async function GET(req: NextRequest) {
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token !== process.env.NEXT_PUBLIC_SELF) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
     const news = await newResume();
 
     const prompt = `

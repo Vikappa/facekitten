@@ -1,4 +1,5 @@
 import { UserDetails } from "../StorageDataTypes"
+const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 export const sortRandomAccountPictureQuery = () => {
 
@@ -42,19 +43,23 @@ export const fetchRandomPictureCat = async (): Promise<string> => {
     const queryUrl = `/api/storedcatprofilepictures`; 
   
     try {
-      const response = await fetch(queryUrl);
+      const response = await fetch(queryUrl, {
+        headers: {
+          'Authorization': `Bearer ${jwtSecret}`,
+          'Content-Type': 'application/json',
+        }
+      });
       if (!response.ok) {
         throw new Error('Errore nella fetch della nuova profile picture casuale');
       }
       const data = await response.json();
-      return data
+      return data;
     } catch (error) {
       console.error(error);
       // Immagine di fallback in caso di errore
       return 'https://images.pexels.com/photos/3974516/pexels-photo-3974516.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280';
     }
 }
-
 const createRandomUserName = () => {
     const names = [
         "Micio", "Luna", "Felix", "Tigro", "Leo", "Nina", "Vladdalo", "Zoe", "Salem", "Mila", 
@@ -93,7 +98,12 @@ export const fetchRandomCoverPhoto = async (): Promise<string> => {
     const queryUrl = `/api/storedcatcoverphoto`; 
   
     try {
-      const response = await fetch(queryUrl);
+      const response = await fetch(queryUrl,{
+        headers: {
+          'Authorization': `Bearer ${jwtSecret}`,
+          'Content-Type': 'application/json'
+        }
+      });
       if (!response.ok) {
         throw new Error('Errore nella fetch della nuova cover photo casuale');
       }

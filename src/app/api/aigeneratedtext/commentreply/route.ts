@@ -7,6 +7,11 @@ const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
+    const authHeader = req.headers.get('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token !== process.env.NEXT_PUBLIC_SELF) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
     const { testoDelPost, authorname }: { testoDelPost: string, authorname: string } = body;
     const prompt = `
     Devi interpretare un gatto iscritto ad un social network, Facekitten. 

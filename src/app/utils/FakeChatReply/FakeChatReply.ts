@@ -1,7 +1,7 @@
-import { error } from "console";
 import { Chat, UserDetails } from "../StorageDataTypes"
 import { FakePostCommentTextFactory } from "../FakePostFactory/FakePostFactory";
-import StaScrivendo from "@/app/atoms/StaScrivendo";
+
+const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 const formatDate = (timestamp: string | number | Date) => {
     const date = new Date(timestamp)
@@ -23,6 +23,7 @@ export const fakeChatReplyText = async (chat: Chat, setStaScrivendo:(staScrivend
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwtSecret}`
             },
             body: JSON.stringify({ comment: propArgumentString, catName: chat.chatWith.userName }),
         });

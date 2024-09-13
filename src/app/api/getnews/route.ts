@@ -1,4 +1,5 @@
 import { NewsApiPayload } from '@/app/utils/StorageDataTypes';
+import { NextRequest, NextResponse } from 'next/server';
 
 const newApiKey = process.env.NEWS_API_KEY
 export const dynamic = `force-dynamic`;
@@ -55,7 +56,14 @@ const newResume = async (): Promise<string[]> => {
     }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (token !== process.env.NEXT_PUBLIC_SELF) {
+        return new NextResponse('Unauthorized', { status: 401 })
+    }
+
     const news = await newResume()
-    return Response.json(news)
+    return NextResponse.json(news)
 }
