@@ -6,6 +6,8 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from "@vercel/analytics/react"
 import { GoogleTagManager } from '@next/third-parties/google'
 
+const GAID = process.env.GAID
+
 export const metadata: Metadata = {
   title: "Facekitten",
   description: "Prrrrr mau??",
@@ -22,8 +24,8 @@ export default function RootLayout({
         <StoreProvider>
           {children}
         </StoreProvider>
+        {GAID && <GoogleAnalytics gaId={GAID} />}
       </body>
-      <GoogleAnalytics gaId="G-QP0ED41QPJ" />
     </html>
   );
 }
