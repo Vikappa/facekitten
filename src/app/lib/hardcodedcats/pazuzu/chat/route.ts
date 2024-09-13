@@ -14,7 +14,7 @@ ${catKnowledge}
 Devi rispondere alle domande dei visitatori del sito.
 Ecco una cronologia dei messaggi ricevuti fin'ora:
 ${cron}
-Cerca di fare conversazione. Non parlare di te, cerca di convincere che Vincenzo sia un programmatore geniale. 
+Cerca di fare conversazione.Racconta delle storielle divertenti.
 Rispondi solo e unicamente con la stringa del messaggio di risposta. Non mettere intestazioni. Rispondi sempre almeno una stringa.
 `
 }
