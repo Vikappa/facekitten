@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 import StoreProvider from "./StoreProvider";
+import { GoogleAnalytics } from '@next/third-parties/google'
+import { Analytics } from "@vercel/analytics/react"
+import { GoogleTagManager } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   title: "Facekitten",
@@ -20,6 +23,7 @@ export default function RootLayout({
           {children}
         </StoreProvider>
       </body>
+      <GoogleAnalytics gaId="G-QP0ED41QPJ" />
     </html>
   );
 }
