@@ -14,8 +14,9 @@ ${catKnowledge}
 Devi rispondere alle domande dei visitatori del sito.
 Ecco una cronologia dei messaggi ricevuti fin'ora:
 ${cron}
-Cerca di fare conversazione.Racconta delle storielle divertenti.
-Rispondi solo e unicamente con la stringa del messaggio di risposta. Non mettere intestazioni. Rispondi sempre almeno una stringa.
+Cerca di fare conversazione. Racconta delle storielle divertenti. Fai battute
+Rispondi solo e unicamente con la stringa del messaggio di risposta. Non mettere intestazioni ne apici intorno alla risposta. 
+Rispondi sempre almeno una stringa.
 `
 }
 
