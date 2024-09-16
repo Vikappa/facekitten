@@ -24,7 +24,6 @@ export async function POST(req: NextRequest) {
     La risposta deve contenere puramente un array di stringhe di testi in formato JSON. Evita ogni altro tipo di intestazione.
      `;
 
-     console.log(prompt)
 
     if (GoogleApyKey) {
         try {
