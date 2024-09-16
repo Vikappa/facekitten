@@ -4,7 +4,6 @@ const inter = Inter({ subsets: ["latin"] });
 import StoreProvider from "./StoreProvider";
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Analytics } from "@vercel/analytics/react"
-import { GoogleTagManager } from '@next/third-parties/google'
 
 const GAID = process.env.GAID
 
@@ -18,12 +17,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('----------------------------',GAID)
   return (
     <html lang="en class">
       <body className={`${inter.className} bg-grayBg`}>
         <StoreProvider>
           {children}
         </StoreProvider>
+        <Analytics/>
         {GAID && <GoogleAnalytics gaId={GAID} />}
       </body>
     </html>
