@@ -38,7 +38,7 @@ try:
         
         # Scrivi ogni file come elemento dell'array
         for img in image_files:
-            f.write(f"    '/storedcatmarketplacephotos/imgs/{img}',\n")
+            f.write(f"    '/storedcatmarketplacephotos/{img}',\n")
         
         f.write("];\n")
     
