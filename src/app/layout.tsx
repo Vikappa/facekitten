@@ -17,7 +17,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log('----------------------------',GAID)
   return (
     <html lang="en class">
       <body className={`${inter.className} bg-grayBg`}>
