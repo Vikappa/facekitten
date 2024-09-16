@@ -12,11 +12,19 @@ import { BsShop } from "react-icons/bs";
 import { IoBookmarkSharp } from "react-icons/io5";
 import { FaCalendar } from "react-icons/fa";
 import { IoBrowsers } from "react-icons/io5";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/app/lib/hooks";
+import { setShowProfileDropDown } from "@/app/lib/slices/appStateSlice";
 
 const TastieraFunzioni = () => {
+    const router = useRouter()
+    const dispatch = useAppDispatch()
+    const pushToAmici = () => {
+        dispatch(setShowProfileDropDown(false))
+        router.push('/amici')
+    }
 
     const fakeFunction = () =>{
-
     }
 
     return(
@@ -78,7 +86,7 @@ const TastieraFunzioni = () => {
             <SquaredOptButton 
             text="A-Mici" 
             icon={<FaUserFriends />} 
-            onClick={fakeFunction} 
+            onClick={pushToAmici} 
             />
             
             

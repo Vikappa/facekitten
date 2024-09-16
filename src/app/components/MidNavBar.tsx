@@ -30,7 +30,7 @@ const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPag
     const setPage3 = () => {
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
-        router.push('/gruppi')
+        router.push('/amici')
        setNavbarPage(3)
     }
     const setPage4 = () => {

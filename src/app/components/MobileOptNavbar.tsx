@@ -33,7 +33,7 @@ const MobileOptNavbar = () => {
         dispatch(setShowNotificationModal(false))
     }
     const setPage3 = () => {
-        router.push('/gruppi')
+        router.push('/amici')
        dispatch(setNavbarPage(3))
        dispatch(setShowNotificationModal(false))
     }
