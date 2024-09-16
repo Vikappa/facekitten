@@ -36,8 +36,6 @@ export async function POST(req: NextRequest) {
 
             const generatedText = result.response
 
-            console.log(generatedText.text());
-
             return new NextResponse(
                 JSON.stringify({ message: generatedText.text() }),
                 {

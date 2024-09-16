@@ -25,7 +25,7 @@ const UserProfileRenderer = () => {
                 </div>
                 
             </div>
-            <div className="p-2">
+            <div className="align-align-items-center justify-content-center mx-auto col-sm-9 p-2 px-sm-0">
             <CreateFormPost/>
             </div>
                 <UserProfilePostRenderer/>
