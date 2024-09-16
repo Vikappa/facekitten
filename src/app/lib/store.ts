@@ -1,28 +1,21 @@
-import { configureStore } from '@reduxjs/toolkit'
-import userCredentialsSlice from './slices/userCrediantSlice'
-import friendsSlice from './slices/friendsSlice'
-import appStateSlice from './slices/appStateSlice'
-import sessionGeneratedAccountsSlice from './slices/sessionGeneratedAccountsSlice'
-import userPostsSlice from './slices/userPostsSlice'
-import notificationSlice from './slices/notificationSlice'
-import userChatsSlice from './slices/userChatsSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import { persistStore } from 'redux-persist';
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import rootReducer from './rootReducer';
 
-export const makeStore = () => {
-  return configureStore({
-    reducer: {
-      userCredentials: userCredentialsSlice,
-      friendList: friendsSlice,
-      sessionGeneratedAccounts: sessionGeneratedAccountsSlice,
-      status: appStateSlice,
-      posts: userPostsSlice,
-      notifications: notificationSlice,
-      chats: userChatsSlice
-    }
-  })
-}
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+});
 
-// Infer the type of makeStore
-export type AppStore = ReturnType<typeof makeStore>
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<AppStore['getState']>
-export type AppDispatch = AppStore['dispatch']
+export const persistor = persistStore(store);
+
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;

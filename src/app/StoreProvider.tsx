@@ -1,10 +1,11 @@
 'use client'
 import { useRef } from 'react'
 import { Provider } from 'react-redux'
-import { makeStore, AppStore } from './lib/store'
+import { PersistGate } from 'redux-persist/integration/react'
+import { store, persistor, AppStore } from './lib/store' 
 import { initializeFriendsSlice } from './lib/slices/friendsSlice'
 import { initializeAppGlobalStatus } from './lib/slices/appStateSlice'
-import {initializeUserCredentialSlice} from './lib/slices/userCrediantSlice'
+import { initializeUserCredentialSlice } from './lib/slices/userCrediantSlice'
 import { initializeNotification } from './lib/slices/notificationSlice'
 import { initializeUserChatsSlice } from './lib/slices/userChatsSlice'
 
@@ -13,12 +14,14 @@ export default function StoreProvider({
 }: {
   children: React.ReactNode
 }) {
-  const storeRef = useRef<AppStore>()
+  const storeRef = useRef<AppStore>(store) 
+
   if (!storeRef.current) {
-    storeRef.current = makeStore()
+    storeRef.current = store 
 
     storeRef.current.dispatch(initializeUserCredentialSlice({
-      userName: '', profilepictureUrl: '',
+      userName: '',
+      profilepictureUrl: '',
       coverPhotoUrl: ''
     }))
     storeRef.current.dispatch(initializeFriendsSlice())
@@ -27,5 +30,11 @@ export default function StoreProvider({
     storeRef.current.dispatch(initializeUserChatsSlice())
   }
 
-  return <Provider store={storeRef.current}>{children}</Provider>
+  return (
+    <Provider store={storeRef.current}>
+      <PersistGate loading={null} persistor={persistor}>
+        {children}
+      </PersistGate>
+    </Provider>
+  )
 }
