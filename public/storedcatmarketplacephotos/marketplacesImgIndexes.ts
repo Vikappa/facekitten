@@ -1,5 +1,16 @@
 export const marketplaceImgIndexes = [
+    '/storedcatmarketplacephotos/1660922193_12_7368.jpg',
+    '/storedcatmarketplacephotos/41XUAqCwkyL._AC_.jpg',
+    '/storedcatmarketplacephotos/551607011_2_640x640.jpg',
+    '/storedcatmarketplacephotos/7d3cb4b1-ba25-4fe2-be1d-91cd3ec1746e.jpg',
+    '/storedcatmarketplacephotos/814rSz3b9qL._AC_SL1500_.jpg',
+    '/storedcatmarketplacephotos/download.jpg',
+    '/storedcatmarketplacephotos/istockphoto-463640481-612x612.jpg',
+    '/storedcatmarketplacephotos/jingle_ball_cat_toy.jpg',
+    '/storedcatmarketplacephotos/mr-bill-cat-toy.jpg',
+    '/storedcatmarketplacephotos/th-176045673.jpg',
     '/storedcatmarketplacephotos/th-2071089138.jpg',
     '/storedcatmarketplacephotos/th-2265756562.jpg',
     '/storedcatmarketplacephotos/th-3236258968.jpg',
+    '/storedcatmarketplacephotos/th-3710801458.jpg',
 ];

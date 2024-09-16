@@ -23,8 +23,8 @@ print("File trovati nella cartella:")
 for f in file_list:
     print(f)
 
-# Filtra i file che sono immagini (es. con estensioni comuni come .jpeg, .jpg, .png, .webp)
-image_files = [f for f in file_list if f.lower().endswith(('.jpeg', '.jpg', '.png', '.webp'))]
+# Filtra i file che sono immagini (es. con estensioni comuni come .jpeg, .jpg)
+image_files = [f for f in file_list if f.lower().endswith(('.jpeg', '.jpg'))]
 
 # Debug: stampa i file che sono stati considerati come immagini
 print("File immagine trovati:")
