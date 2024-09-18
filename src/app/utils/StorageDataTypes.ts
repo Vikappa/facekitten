@@ -5,13 +5,40 @@ export interface FriendList {
 export interface Post {
     id: number;
     author: UserDetails;
-    body: string;
-    image: string;
+    body: NormalPostBody | MarketPlacePostString | ImagePostBody | VideoPostBody | Retweetpostbody;
     comments: PostComment[];
     created_at: string;
     likes: number;
     userliked: boolean;
     likeProfiles: UserDetails[];
+}
+
+export interface NormalPostBody{
+    normalPostTex: string;
+}
+
+
+export interface MarketPlacePostString{
+    marketPlaceText: string;
+    marketplacePhotoUrl: string;
+}
+
+export interface ImagePostBody{
+    imageUrl:string;
+    imagePostText: string;
+    generativeContext:string;
+}
+
+export interface VideoPostBody{
+    videoUrl:string;
+    videoText: string;
+    generativeContext:string;
+}
+
+export interface Retweetpostbody {
+    rewtweetText: string;
+    userName: string;
+    profilePicture: string;
 }
 
 export interface PostComment {

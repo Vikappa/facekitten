@@ -6,6 +6,7 @@ import { addCommentToUserPost, addPost, randomCommentToUserPost } from "../lib/s
 import { Form } from "react-bootstrap"
 import { createNotification } from "../lib/slices/notificationSlice"
 import { GenerateCommentText } from "../utils/FakePostFactory/FakePostFactory"
+import { NormalPostBody } from "../utils/StorageDataTypes"
 
 const CreateFormPost = () => {
     const dispatch = useAppDispatch();
@@ -23,6 +24,11 @@ const CreateFormPost = () => {
     }, [allPosts]);
 
     const inviaPost = async (e: React.FormEvent<HTMLFormElement>) => {
+
+        const postBody:NormalPostBody = {
+            normalPostTex: postText
+        }
+
         e.preventDefault();
         const newPost = {
             id: postnumber,
@@ -30,8 +36,7 @@ const CreateFormPost = () => {
                 userName: userDetails.userName,
                 profilepicture: userDetails.profilepictureUrl,
             },
-            body: postText,
-            image: '',
+            body: postBody,
             comments: [],
             created_at: new Date().toISOString(),
             likes: 0,

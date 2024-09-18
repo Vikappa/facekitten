@@ -18,7 +18,6 @@ import { SiFeedly } from "react-icons/si";
 import { setShowDropDownNotification, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 import ContactUl from "../components/ContactUl";
 import BirthdaysComponent from "../components/BirthdaysComponent";
-import { PostCluster6 } from "../utils/FakePostFactory/FakePostFactory";
 import { spreadOldPosts } from "../lib/slices/sessionGeneratedAccountsSlice";
 
 const HomePage = () => {
@@ -39,9 +38,9 @@ const HomePage = () => {
   const loadMorePosts = async () => {
     setIsFetching(true);
     setTimeout(async () => {
-      const oldPosts = await PostCluster6(accountsFromRedux)
-      console.log(oldPosts)
-      dispatch(spreadOldPosts(oldPosts));
+      // const oldPosts = await PostCluster6(accountsFromRedux)
+      // console.log(oldPosts)
+      // dispatch(spreadOldPosts(oldPosts));
       setIsFetching(false);
     }, 2000)
   }

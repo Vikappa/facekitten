@@ -1,6 +1,6 @@
 import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
 import { FakePostTextFactory } from "../FakePostFactory/FakePostFactory"
-import { CasualUser } from "../StorageDataTypes"
+import { CasualUser, NormalPostBody } from "../StorageDataTypes"
 
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
@@ -19,7 +19,7 @@ export const getCasualNewsArray = async (): Promise<string[]> => {
 
 export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     const fakeAccounts: CasualUser[] = []
-    let postTexts: string[] = []
+    let postTexts: NormalPostBody[] = []
     const response = await fetch('/api/aigeneratedtext/initialpostcluster',
         {
             cache: 'no-store',
@@ -33,7 +33,13 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     )
     if (response.ok) {
         const data = await response.json()
-        postTexts = [...data]
+        const postStrings = [...data]
+        for (let index = 0; index < postStrings.length; index++) {
+            const newPostBody:NormalPostBody = {
+                normalPostTex: postStrings[index]
+            }
+            postTexts.push(newPostBody)
+        }
     } else {
         for (let index = 0; index < 30; index++) {
             postTexts.push(FakePostTextFactory())            
@@ -61,7 +67,6 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
                 profilepicture: fakeAccounts[random].profilePic
             },
             body: postTexts[index],
-            image: "",
             comments: [],
             created_at: time.toISOString(),
             likes: Math.floor(Math.random() * 5),

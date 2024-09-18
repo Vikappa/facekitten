@@ -33,7 +33,7 @@ const userPostsSlice = createSlice({
           const randomComment: PostComment = {
               id: post.comments.length + 1,  
               author: commentAuthorDetails,
-              body: FakePostTextFactory(),
+              body: FakePostTextFactory().normalPostTex,
               commented_at: new Date().toISOString()
           };
 
