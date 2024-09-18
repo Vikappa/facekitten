@@ -20,7 +20,7 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     const router = useRouter()
 
     const logOutFunction = () => {
-        localStorage.removeItem('facekittenData')
+        localStorage.removeItem('persist:root')
         window.location.reload();
     }
 
