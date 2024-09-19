@@ -77,6 +77,15 @@ const userCredentialsSlice = createSlice({
           targetUser.posts.push(newPost);
         }
       })
+    },
+    addPostsToOriginalAccount: (state, action: PayloadAction<Post[]>) => {
+      const newPosts = action.payload;
+      newPosts.forEach(newPost => {
+        const targetUser = state.acc.find(suser => suser.name === newPost.author.userName);
+        if (targetUser) {
+          targetUser.posts.push(newPost);
+        }
+      })
     }
  },
   extraReducers: (builder) => {
@@ -86,5 +95,5 @@ const userCredentialsSlice = createSlice({
   }
 });
 
-export const { addCommentToPost, userLiked, userDisliked, spreadOldPosts } = userCredentialsSlice.actions;
+export const { addCommentToPost, userLiked, userDisliked, spreadOldPosts, addPostsToOriginalAccount } = userCredentialsSlice.actions;
 export default userCredentialsSlice.reducer;

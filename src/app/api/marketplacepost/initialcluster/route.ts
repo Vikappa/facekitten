@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
   const prompt = `
     Devi interpretare dei gatti che pubblicano post in un social network chiamato FaceKitten.
     Adesso ti trovi nella sezione marketplace. Le foto che ti fornisco nel prompt sono oggetti per post 
-    del marketplace. Interpretando dei gatti, scrivi il testo per ogni immagine.
+    del marketplace. Interpretando dei gatti, scrivi il testo dell'annuncio di vendita per ogni immagine.
     Fornisci solo 3 stringhe separate senza intestazioni.
   `;
 
@@ -84,8 +84,14 @@ export async function GET(request: NextRequest) {
       const imageParts = [filePart1, filePart2, filePart3];
       const generatedContent = await model.generateContent([prompt, ...imageParts])
 
-      // Return the generated content
-      return NextResponse.json({ text: generatedContent.response.text() })
+      return NextResponse.json({
+         text: generatedContent.response.text(),
+         images: [
+           urls[0],
+           urls[1],
+           urls[2],
+         ]
+        })
     } catch (error) {
       console.error('Error generating content:', error);
       return new NextResponse('Internal Server Error', { status: 500 })

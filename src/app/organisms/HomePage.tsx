@@ -73,7 +73,7 @@ const HomePage = () => {
       <MobileOptionFullScreenModal />
       <div className="row position-relative">
 
-        <div className="col-0 col-md-3 d-none d-md-block p-0 m-0 p-4 position-fixed start-0">
+        <div className="col-0 col-md-3 d-none d-lg-block p-0 m-0 p-4 position-fixed start-0">
           <ul className="p-0 m-0">
             <li className="d-flex align-items-center gap-2 fw-bold py-2 liSideElement" onClick={handleButton1}>
               <Image src={profilepictureUrl} alt={userName} height={40} width={40} className="rounded-circle" />

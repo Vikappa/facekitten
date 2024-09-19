@@ -1,5 +1,5 @@
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
-import { CasualUser, Post, PostComment, UserDetails } from "../StorageDataTypes"
+import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails } from "../StorageDataTypes"
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 //Sorteggio a caso di parole
@@ -16,99 +16,97 @@ export const FakePostCommentTextFactory = () => {
 }
 
 //Generate 6 post partendo dagli utenti forniti e con tempo precedente a tutti i post esistenti (per simulare post più vecchi)
-export const PostCluster6 = async (currentAccounts:CasualUser[]):Promise<Post[]> => {
-  let returnArray: Post[] = []
-  const currentPosts = currentAccounts.flatMap((accounts) => accounts.posts);
+// export const PostCluster6 = async (currentAccounts:CasualUser[]):Promise<Post[]> => {
+//   let returnArray: Post[] = []
+//   const currentPosts = currentAccounts.flatMap((accounts) => accounts.posts);
 
-  // Verifica che l'array non sia vuoto
-  if (currentPosts.length === 0) {
-    throw new Error("No posts available");
-  }
+//   // Verifica che l'array non sia vuoto
+//   if (currentPosts.length === 0) {
+//     throw new Error("No posts available");
+//   }
 
-  // Filtra i post che hanno la proprietà 'created_at'
-  const validPosts = currentPosts.filter(post => post.created_at)
+//   // Filtra i post che hanno la proprietà 'created_at'
+//   const validPosts = currentPosts.filter(post => post.created_at)
 
-  // Verifica che ci siano post validi con 'created_at'
-  if (validPosts.length === 0) {
-    throw new Error("No valid posts with 'created_at' found");
-  }
+//   // Verifica che ci siano post validi con 'created_at'
+//   if (validPosts.length === 0) {
+//     throw new Error("No valid posts with 'created_at' found");
+//   }
 
-  const oldestPost = validPosts.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]
-  const oldestPostDate = new Date(oldestPost.created_at)
+//   const oldestPost = validPosts.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0]
+//   const oldestPostDate = new Date(oldestPost.created_at)
 
-  let newOldest: Date
-  let lastPostIndex: number = currentPosts.length
+//   let newOldest: Date
+//   let lastPostIndex: number = currentPosts.length
 
-  try {
-    const reponse = await fetch('api/aigeneratedtext/postcluster',{
-      headers: {
-        'Authorization': `Bearer ${jwtSecret}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    if(reponse.ok){
-      const data = await reponse.json()
-      for (let index = 0; index < data.length; index++) {
-        const minIntervalInHours = 1000;  // Intervallo minimo tra i post (1 secondo)
-        const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
-        const randomInterval = generateRandomInterval(minIntervalInHours , maxIntervalInDays );
-        newOldest = new Date(oldestPostDate.getTime() - randomInterval)
-        const sorted = currentAccounts[Math.floor(Math.random() * currentAccounts.length)]
-        const casualauthor: UserDetails = {
-          userName: sorted.name,
-          profilepicture: sorted.profilePic
-        }
+//   try {
+//     const reponse = await fetch('api/aigeneratedtext/postcluster',{
+//       headers: {
+//         'Authorization': `Bearer ${jwtSecret}`,
+//         'Content-Type': 'application/json'
+//       }
+//     })
+//     if(reponse.ok){
+//       const data = await reponse.json()
+//       for (let index = 0; index < data.length; index++) {
+//         const minIntervalInHours = 1000;  // Intervallo minimo tra i post (1 secondo)
+//         const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
+//         const randomInterval = generateRandomInterval(minIntervalInHours , maxIntervalInDays );
+//         newOldest = new Date(oldestPostDate.getTime() - randomInterval)
+//         const sorted = currentAccounts[Math.floor(Math.random() * currentAccounts.length)]
+//         const casualauthor: UserDetails = {
+//           userName: sorted.name,
+//           profilepicture: sorted.profilePic
+//         }
 
-        const newPost: Post = {
-          id: lastPostIndex,
-          author: casualauthor,
-          body: FakePostTextFactory(),
-          image: '',
-          comments: [],
-          created_at: newOldest.toISOString(),
-          likes: Math.floor(Math.random() * 6),
-          userliked: false,
-          likeProfiles: []
-        }
-        lastPostIndex++
-        returnArray.push(newPost)
+//         const newPost: Post = {
+//           id: lastPostIndex,
+//           author: casualauthor,
+//           body: FakePostTextFactory(),
+//           comments: [],
+//           created_at: newOldest.toISOString(),
+//           likes: Math.floor(Math.random() * 6),
+//           userliked: false,
+//           likeProfiles: []
+//         }
+//         lastPostIndex++
+//         returnArray.push(newPost)
         
-      }
-    }
-  } catch (error) {
-    console.error('Errore fetch generate 6 post texts')
-    console.error(error)
-    for (let index = 0; index < 6; index++) {
-      const minIntervalInHours = 1000;  // Intervallo minimo tra i post (1 secondo)
-      const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
-      const randomInterval = generateRandomInterval(minIntervalInHours , maxIntervalInDays );
-      newOldest = new Date(oldestPostDate.getTime() - randomInterval)
-      const sorted = currentAccounts[Math.floor(Math.random() * currentAccounts.length)]
-      const casualauthor: UserDetails = {
-        userName: sorted.name,
-        profilepicture: sorted.profilePic
-      }
-      const imageChance = Math.random() *100
-      const image = imageChance < 20 ? fetchRandomPostFoto() : ''
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Errore fetch generate 6 post texts')
+//     console.error(error)
+//     for (let index = 0; index < 6; index++) {
+//       const minIntervalInHours = 1000;  // Intervallo minimo tra i post (1 secondo)
+//       const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
+//       const randomInterval = generateRandomInterval(minIntervalInHours , maxIntervalInDays );
+//       newOldest = new Date(oldestPostDate.getTime() - randomInterval)
+//       const sorted = currentAccounts[Math.floor(Math.random() * currentAccounts.length)]
+//       const casualauthor: UserDetails = {
+//         userName: sorted.name,
+//         profilepicture: sorted.profilePic
+//       }
+//       const imageChance = Math.random() *100
+//       const image = imageChance < 20 ? fetchRandomPostFoto() : ''
       
-      const newPost: Post = {
-        id: lastPostIndex,
-        author: casualauthor,
-        body: FakePostTextFactory(),
-        image: await image,
-        comments: [],
-        created_at: newOldest.toISOString(),
-        likes: Math.floor(Math.random() * 6),
-        userliked: false,
-        likeProfiles: []
-      }
-      lastPostIndex++
-      returnArray.push(newPost)
-    }
-  }
+//       const newPost: Post = {
+//         id: lastPostIndex,
+//         author: casualauthor,
+//         body: FakePostTextFactory(),
+//         comments: [],
+//         created_at: newOldest.toISOString(),
+//         likes: Math.floor(Math.random() * 6),
+//         userliked: false,
+//         likeProfiles: []
+//       }
+//       lastPostIndex++
+//       returnArray.push(newPost)
+//     }
+//   }
 
-  return returnArray
-}
+//   return returnArray
+// }
 
 //Crea un commento per un post prendendo il post in questione e l'autore del commento 
 export const GenerateCommentText = async (post: Post, authorname:string): Promise<string> => {
@@ -142,7 +140,7 @@ export const GenerateCommentText = async (post: Post, authorname:string): Promis
 };
 
 //Sorteggio a caso di parole
-export const FakePostTextFactory = () => {
+export const FakePostTextFactory = ():NormalPostBody => {
   let fakePostText = ""
   const fakePostSortWords = ['meo', 'meow', 'miao', 'mau', 'hiss', 'hisssss', 'prrrr', 'prrrrra', 'prrraaau', 'prau', 'nyan', 'nya', 
       'meeeooow', 'frrr', 'frrrrrr', 'frau', '(procede a stiracchiarsi)', '* crunch crunch *', '*sniff sniff*', '(si lecca)'
@@ -151,7 +149,7 @@ export const FakePostTextFactory = () => {
   for (let index = 0; index < numberOfWords; index++) {
       fakePostText += fakePostSortWords[Math.floor(Math.random() * fakePostSortWords.length)] + ' '
   }   
-  return fakePostText
+  return {normalPostTex: fakePostText}
 }
 
 export const FakePostFactory = async (time: Date, author:UserDetails, num:number): Promise<Post> => {
@@ -167,7 +165,6 @@ export const FakePostFactory = async (time: Date, author:UserDetails, num:number
         id:num+1,
         author,
         body: fakePostText,
-        image: imageString,
         comments: fakePostComments,
         created_at: time.toISOString(),
         likes: Math.floor(Math.random()*15),
@@ -208,4 +205,49 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
       console.error(error);
       return '';
     }
+}
+
+export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
+
+  const queryUrl = `/api/marketplacepost/initialcluster`;
+  const response = await fetch(queryUrl, {
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': `Bearer ${jwtSecret}`
+    }
+  })
+
+  if(response.ok){
+    const {text, images} = await response.json()
+    const returnArray: Post[] = []
+    const parsedText: string[] = text.split('\n')
+    const imageArray = [...images]
+
+    for (let index = 0; index < 3; index++) {
+
+      const body: MarketPlacePostString = {
+        marketPlaceText: parsedText[index],
+        marketplacePhotoUrl: imageArray[index]
+      }
+
+      lastId++
+
+      const post:Post = {
+        id: lastId,
+        author: randomAuthor[index],
+        body: body,
+        comments: [],
+        created_at: new Date().toISOString(),
+        likes: 0,
+        userliked: false,
+        likeProfiles: []
+      }      
+      returnArray.push(post)
+    }
+
+    return returnArray
+  } else {
+    console.error('Errore nella fetch dei post marketplace casuale');
+    return []
+  }
 }
