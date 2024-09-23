@@ -67,7 +67,8 @@ const ChatWindowDesktop = (
                         style={{ cursor: 'pointer' }}
                         onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
                             userName: chat.chatWith.userName,
-                            profilepicture: chat.chatWith.profilepicture
+                            profilepicture: chat.chatWith.profilepicture,
+                            coverPhotoUrl: chat.chatWith.coverPhotoUrl,
                         }))}
                         size={25}
                     />
@@ -107,7 +108,8 @@ const ChatWindowDesktop = (
                     style={{ cursor: 'pointer' }}
                     onClick={() => chat.chatWith !== undefined && dispatch(closeChatWithUser({
                         userName: chat.chatWith.userName,
-                        profilepicture: chat.chatWith.profilepicture
+                        profilepicture: chat.chatWith.profilepicture,
+                        coverPhotoUrl: chat.chatWith.coverPhotoUrl,
                     }))}
                     size={25}
                 />
