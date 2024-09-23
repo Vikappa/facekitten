@@ -19,7 +19,9 @@ export interface NormalPostBody{
 
 
 export interface MarketPlacePostString{
+    marketplaceTitle: string;
     marketPlaceText: string;
+    marketplacePrice: string;
     marketplacePhotoUrl: string;
 }
 

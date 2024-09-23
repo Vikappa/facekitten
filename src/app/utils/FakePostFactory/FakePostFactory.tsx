@@ -221,13 +221,16 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
     const {text, images} = await response.json()
     const returnArray: Post[] = []
     const parsedText: string[] = text.split('\n')
+
     const imageArray = [...images]
 
     for (let index = 0; index < 3; index++) {
 
       const body: MarketPlacePostString = {
-        marketPlaceText: parsedText[index],
-        marketplacePhotoUrl: imageArray[index]
+        marketPlaceText: parsedText[index+3],
+        marketplacePhotoUrl: imageArray[index],
+        marketplaceTitle: parsedText[index],
+        marketplacePrice: parsedText[index+6]
       }
 
       lastId++

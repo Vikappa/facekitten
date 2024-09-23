@@ -39,11 +39,12 @@ const MarketplacePage = () => {
 
   useEffect(() => {
     const fetchInitialCluster = async () => {
-      const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth)
-      dispatch(addPostsToOriginalAccount(initialCluster))
+        const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth)
+        dispatch(addPostsToOriginalAccount(initialCluster))
+      
     }
     if (marketPlacePostsCount === 0) fetchInitialCluster()
-  }, [dispatch, marketPlacePostsCount, postNumber, random3Auth])
+  }, [marketPlacePostsCount, postNumber, random3Auth])
 
   return (
     <>

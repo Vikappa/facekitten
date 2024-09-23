@@ -55,8 +55,21 @@ export async function GET(request: NextRequest) {
   const prompt = `
     Devi interpretare dei gatti che pubblicano post in un social network chiamato FaceKitten.
     Adesso ti trovi nella sezione marketplace. Le foto che ti fornisco nel prompt sono oggetti per post 
-    del marketplace. Interpretando dei gatti, scrivi il testo dell'annuncio di vendita per ogni immagine.
-    Fornisci solo 3 stringhe separate senza intestazioni.
+    del marketplace. 
+    Interpretando dei gatti, scrivi titolo dell'annuncio testo dell'annuncio e prezzo di vendita indicato in crocchette per ogni immagine.
+    Indica tre titoli, tre testi e tre prezzi.
+    Non devi scrivere nulla di diverso dal titolo, testo e prezzo.
+    Non usare intestazioni o footer.
+    Usa questo formato:
+    titolo 1\n
+    titolo 2\n
+    titolo 3\n
+    testo 1\n
+    testo 2\n
+    testo 3\n
+    prezzo1\n
+    prezzo2\n
+    prezzo3\n
   `;
 
   if (selfApiKey && GAK) {
