@@ -64,7 +64,8 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
             id: index,
             author: {
                 userName: fakeAccounts[random].name,
-                profilepicture: fakeAccounts[random].profilePic
+                profilepicture: fakeAccounts[random].profilePic,
+                coverPhotoUrl: fakeAccounts[random].coverPhotoUrl
             },
             body: postTexts[index],
             comments: [],
