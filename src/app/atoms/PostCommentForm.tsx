@@ -15,7 +15,6 @@ const PostCommentForm = ({post}: {post: Post}) => {
     const userDetails = useAppSelector((state) => state.userCredentials)
     const dispatch = useAppDispatch()
     const accountsFromRedux = useAppSelector(state => state.sessionGeneratedAccounts.acc);
-    const postnumber = useAppSelector(state => state.posts.userPosts.length)
 
     const sendComment = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -28,7 +27,8 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     commentValue: commentValue,
                     commentAuthorDetails: {
                         userName: userDetails.userName,
-                        profilepicture: userDetails.profilepictureUrl
+                        profilepicture: userDetails.profilepictureUrl,
+                        coverPhotoUrl: userDetails.coverPhotoUrl
                     }
                 }))
 
@@ -38,7 +38,8 @@ const PostCommentForm = ({post}: {post: Post}) => {
                         id: 0,
                         author: {
                             userName: randomAuthor.name,
-                            profilepicture: randomAuthor.profilePic
+                            profilepicture: randomAuthor.profilePic,
+                            coverPhotoUrl: randomAuthor.coverPhotoUrl
                         },
                         body: commentValue,
                         commented_at: new Date().toISOString()
@@ -58,7 +59,8 @@ const PostCommentForm = ({post}: {post: Post}) => {
                         postNumber: postIndex,
                         commentAuthorDetails: {
                             userName: randomAuthor.name,
-                            profilepicture: randomAuthor.profilePic
+                            profilepicture: randomAuthor.profilePic,
+                            coverPhotoUrl: randomAuthor.coverPhotoUrl
                         },
                         commentValue: newComment
                     }))
@@ -68,11 +70,13 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             postId: post.id,
                             commentAuthor: {
                                 userName: randomAuthor.name,
-                                profilepicture: randomAuthor.profilePic
+                                profilepicture: randomAuthor.profilePic,
+                                coverPhotoUrl: randomAuthor.coverPhotoUrl
                             },
                             postAuthor: {
                                 userName: post.author.userName,
-                                profilepicture: post.author.profilepicture
+                                profilepicture: post.author.profilepicture,
+                                coverPhotoUrl: post.author.coverPhotoUrl
                             }
                         }
                     }))
@@ -83,7 +87,8 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     commentValue,
                     author: {
                         userName: userDetails.userName,
-                        profilepicture: userDetails.profilepictureUrl
+                        profilepicture: userDetails.profilepictureUrl,
+                        coverPhotoUrl: userDetails.coverPhotoUrl
                     }
                 }))
 
@@ -102,6 +107,7 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             author: {
                                 userName: userDetails.userName,
                                 profilepicture: userDetails.profilepictureUrl,
+                                coverPhotoUrl: userDetails.coverPhotoUrl
                             },
                             body: commentValue,
                             commented_at: new Date().toISOString()
@@ -122,18 +128,21 @@ const PostCommentForm = ({post}: {post: Post}) => {
                             commentValue: generatedComment,
                             author: {
                                 userName: randomAuthor.name,
-                                profilepicture: randomAuthor.profilePic
+                                profilepicture: randomAuthor.profilePic,
+                                coverPhotoUrl: randomAuthor.coverPhotoUrl
                             }
                         }))
                         const notifBody:PostCommentNotificationType= {
                             postId: post.id,
                             commentAuthor: {
                                 userName: randomAuthor.name,
-                                profilepicture: randomAuthor.profilePic
+                                profilepicture: randomAuthor.profilePic,
+                                coverPhotoUrl: randomAuthor.coverPhotoUrl
                             },
                             postAuthor: {
                                 userName: post.author.userName,
-                                profilepicture: post.author.profilepicture
+                                profilepicture: post.author.profilepicture,
+                                coverPhotoUrl: post.author.coverPhotoUrl
                             }
                         }
                         dispatch(createNotification({

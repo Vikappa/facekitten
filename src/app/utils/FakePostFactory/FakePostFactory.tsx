@@ -110,7 +110,30 @@ export const FakePostCommentTextFactory = () => {
 
 //Crea un commento per un post prendendo il post in questione e l'autore del commento 
 export const GenerateCommentText = async (post: Post, authorname:string): Promise<string> => {
-  let testoDelPost = `Testo del post: ${post.body}\n`;
+  let testoDelPost = `Testo del post: ${post.author.userName} scrive:\n
+  ${
+    post.body !== undefined && typeof post.body === 'object' && 'normalPostTex' in post.body ? (
+      post.body.normalPostTex
+  ) : 
+  post.body !== undefined && typeof post.body === 'object' && 'marketPlaceText' in post.body ? (
+    post.body.marketPlaceText
+  )
+  :
+  post.body !== undefined && typeof post.body === 'object' && 'imagePostText' in post.body ? (
+    post.body.imagePostText
+  )
+  : 
+  post.body !== undefined && typeof post.body === 'object' && 'videoText' in post.body ? (
+    post.body.videoText
+  )
+  : 
+  post.body !== undefined && typeof post.body === 'object' && 'rewtweetText' in post.body ? (
+    post.body.rewtweetText
+  )
+  : 
+  '' 
+  }
+  `;
 
   testoDelPost += post.comments
     .map(comment => `Autore: ${comment.author.userName} Commento: ${comment.body}`)
