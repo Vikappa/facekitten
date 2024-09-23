@@ -1,5 +1,5 @@
 import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
-import { FakePostTextFactory } from "../FakePostFactory/FakePostFactory"
+import { FakePostTextFactory, getXNewVideoPosts } from "../FakePostFactory/FakePostFactory"
 import { CasualUser, NormalPostBody } from "../StorageDataTypes"
 
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
@@ -74,6 +74,18 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
             userliked: false,
             likeProfiles: []
         })
+    }
+
+    const get5Random = (array: CasualUser[]): CasualUser[] => {
+        const shuffled = [...array].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 5);
+    }
+
+    const reels = await getXNewVideoPosts(5, get5Random(fakeAccounts))
+
+    for (let index = 0; index < reels.length; index++) {
+        const random = Math.floor(Math.random() * fakeAccounts.length)
+        fakeAccounts[random].posts.push(reels[index])
     }
 
     return fakeAccounts
