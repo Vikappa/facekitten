@@ -20,7 +20,7 @@ const PostCardComponent = ({post}:{post:Post}) => {
 
     return(
     <div className="
-        bg-white p-3 my-3 rounded-3 shadow-sm w-100 position-relative
+        bg-white p-3 my-1 rounded-3 shadow-sm w-100 position-relative
         ">
         <PostHeader user={post?.author} time={post?.created_at}/>
         {

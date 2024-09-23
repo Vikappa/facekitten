@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { GoDotFill } from "react-icons/go";
 import { CommentReplyNotificationType, NotificationType, PostCommentNotificationType } from "../utils/StorageDataTypes"
-import { useAppSelector } from "../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { useRouter } from "next/navigation";
+import { setShowDropDownNotification } from "../lib/slices/appStateSlice";
 
 const NotificationLi = (
     {notification}:
@@ -10,7 +11,7 @@ const NotificationLi = (
 ) => {
     const userName = useAppSelector(state => state.userCredentials.userName)
     const navigator = useRouter()
-
+    const dispatch = useAppDispatch()
     if(notification.type===1){
         //PostCommentNotificationType
         const notifBody: PostCommentNotificationType = notification.body as PostCommentNotificationType
@@ -19,6 +20,7 @@ const NotificationLi = (
                 <li className="d-flex p-0 py-2 m-0 gap-2 w-100 liNotificationElement  align-items-center"
                 onClick={
                     () => {
+                        dispatch(setShowDropDownNotification(false))
                         navigator.push(linkUrl)
                     }
                 }>
@@ -59,6 +61,7 @@ const NotificationLi = (
             <li className="d-flex p-0 py-2 m-0 gap-2 w-100 liNotificationElement  align-items-center"
             onClick={
                 () => {
+                    dispatch(setShowDropDownNotification(false))
                     navigator.push(linkUrl)
                 }
             }
