@@ -34,7 +34,7 @@ for img in image_files:
 # Inizia a scrivere il file TypeScript
 try:
     with open(output_file, 'w') as f:
-        f.write("export const postImgIndexes = [\n")
+        f.write("export const postVideoIndexes = [\n")
         
         # Scrivi ogni file come elemento dell'array
         for img in image_files:
