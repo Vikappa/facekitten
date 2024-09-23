@@ -1,5 +1,5 @@
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
-import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails } from "../StorageDataTypes"
+import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails, VideoPostBody } from "../StorageDataTypes"
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 //Sorteggio a caso di parole
@@ -230,8 +230,6 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
     }
 }
 
-
-
 export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
   const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
   const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
@@ -283,4 +281,60 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
     console.error('Errore nella fetch dei post marketplace casuale');
     return []
   }
+}
+
+const generateXVideoPosts = async (x:number, randomAuthor:CasualUser[]):Promise<Post[]> => {
+  const returnArray: Post[] = []
+
+  const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
+  const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
+
+  let lastPostTime = new Date().getTime()
+  lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
+
+  const queryUrl = `/api/videostreaming/geturl?qty=`+x
+  let limit = 0 
+  if(x<randomAuthor.length){
+    limit = x
+  } else {
+    limit = randomAuthor.length
+  }
+
+  const response = await fetch(queryUrl, {
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': `Bearer ${jwtSecret}`
+    }
+  })
+
+  if(!response.ok){
+    console.error('Errore nella fetch dei reel');
+    return []
+  }
+
+  const data = await response.json() 
+
+  for (let index = 0; index < limit; index++) {
+    const newBody: VideoPostBody = {
+      videoUrl: data[index],
+      videoText: data[index],
+      generativeContext: ""
+    }
+    const newPost:Post = {
+      id: randomAuthor[index].posts.length + 1,
+      author: {
+        userName: randomAuthor[index].name,
+        profilepicture: randomAuthor[index].profilePic,
+        coverPhotoUrl: randomAuthor[index].coverPhotoUrl,
+      },
+      body: newBody,
+      comments: [],
+      created_at: new Date(lastPostTime).toISOString(),
+      likes: 0,
+      userliked: false,
+      likeProfiles: []
+    }
+  }
+
+  return returnArray
 }
