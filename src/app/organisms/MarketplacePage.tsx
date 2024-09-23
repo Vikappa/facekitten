@@ -3,6 +3,9 @@ import { useMemo } from "react"
 import { useAppSelector } from "../lib/hooks"
 import { Post } from "../utils/StorageDataTypes"
 import PostCardComponent from "../components/PostCardComponent"
+import MarketplaceSidebarheader from "../atoms/MarketplaceSidebarheader"
+import MarketplaceSideSearchBar from "../atoms/MarketplaceSideSearchBar"
+import MarketplacePostCard from "../components/MarketplacePostCard"
 
 const MarketplaceContent = () => {
   const botsMarketPlacePosts = useAppSelector(state => state.sessionGeneratedAccounts.acc.flatMap(account => account.posts))
@@ -16,13 +19,22 @@ const MarketplaceContent = () => {
   }, [botsMarketPlacePosts, userPosts])
 
   return (
-    <div className="container">
-        <div className="row">
-        <div className="col-0 col-sm-3" >
+    <div className="container-fluid h-100"
+    style={{
+      minHeight: '100vh'
+    }}
+    >
+        <div className="row h-100">
+        <div className="col-0 col-sm-2 bg-white shadow h-100" 
+        style={{
+          minHeight:'100vh'
+        }}>
+          <MarketplaceSidebarheader/>
+          <MarketplaceSideSearchBar/>
       </div>
-      <div className="col-12 col-sm-9">
+      <div className="col-12 col-sm-9 d-flex flex-wrap py-3">
         {allMarketPlacePosts.map((marketplacePost) => (
-          <PostCardComponent 
+          <MarketplacePostCard 
             key={`${marketplacePost.id}${marketplacePost.author.userName}${Date.now()}`} 
             post={marketplacePost} 
           />

@@ -10,6 +10,8 @@ import MarketplaceContent from "../organisms/MarketplacePage"
 
 const selfToken = process.env.NEXT_PUBLIC_SELF
 
+import { useRef } from 'react';
+
 const MarketplacePage = () => {
   const dispatch = useAppDispatch()
 
@@ -22,27 +24,31 @@ const MarketplacePage = () => {
     )
   )
 
-  const random3Auth = useMemo(() => {
-    return allAccounts.length > 0 
-      ? Array.from({ length: 3 }, () => {
-          const randomAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)]
-          return {
-            userName: randomAccount.name,
-            profilepicture: randomAccount.profilePic
-          }
-        })
-      : []
-  }, [allAccounts])
-
   const postNumber = useMemo(() => userPosts.length + accountsPost.length, [userPosts, accountsPost])
+
+  const initialClusterLoaded = useRef(false) 
 
   useEffect(() => {
     const fetchInitialCluster = async () => {
+      const random3Auth = allAccounts.length > 0 
+        ? Array.from({ length: 3 }, () => {
+            const randomAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)]
+            return {
+              userName: randomAccount.name,
+              profilepicture: randomAccount.profilePic
+            }
+          })
+        : []
+      
       const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth)
       dispatch(addPostsToOriginalAccount(initialCluster))
+      initialClusterLoaded.current = true 
     }
-    if (marketPlacePostsCount === 0) fetchInitialCluster()
-  }, [dispatch, marketPlacePostsCount, postNumber, random3Auth])
+
+    if (marketPlacePostsCount === 0 && !initialClusterLoaded.current) {
+      fetchInitialCluster()
+    }
+  }, [dispatch, marketPlacePostsCount, postNumber, allAccounts])
 
   return (
     <>
