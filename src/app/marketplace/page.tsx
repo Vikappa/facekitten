@@ -7,6 +7,7 @@ import { GenerateInitialMarketplaceCluster } from "../utils/FakePostFactory/Fake
 import { addPostsToOriginalAccount } from "../lib/slices/sessionGeneratedAccountsSlice"
 import '@/app/style.css'
 import MarketplaceContent from "../organisms/MarketplacePage"
+import ModaleNotificationMobileModale from "../modali/ModaleNotificationMobileModale"
 
 const selfToken = process.env.NEXT_PUBLIC_SELF
 
@@ -47,6 +48,7 @@ const MarketplacePage = () => {
   return (
     <>
       <NavBar />
+      <ModaleNotificationMobileModale />
       <MarketplaceContent />
     </>
   )
