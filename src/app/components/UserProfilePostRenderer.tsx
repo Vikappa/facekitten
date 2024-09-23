@@ -9,7 +9,7 @@ const UserProfilePostRenderer = () => {
     return(
         <div className="container w-100" >
 
-    <div className="d-flex flex-column align-items-center justify-content-center w-100 p-2 bg-grayBg col-9">
+    <div className="d-flex flex-column align-items-center justify-content-center w-100 p-2 bg-grayBg col-8">
         {posts.map((post, index) => (
             <PostCardComponent key={"userPost"+index} post={post} />
         ))}

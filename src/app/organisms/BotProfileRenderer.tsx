@@ -24,7 +24,7 @@ const BotProfileRenderer = ({user}:{user:CasualUser}) => {
                     </div>
                     
                 </div>
-                <div className="align-align-items-center justify-content-center mx-auto col-sm-9 p-2 px-sm-0">
+                <div className="align-align-items-center justify-content-center mx-auto col-sm-8 p-2 px-sm-0">
                 {user.posts.map((post, index) => (
                 <PostCardComponent key={post.author.userName.replace(' ','')+index}  post={post} />
             ))}
