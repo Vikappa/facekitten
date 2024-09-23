@@ -1,5 +1,7 @@
+import { Next } from "react-bootstrap/esm/PageItem"
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
-import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails } from "../StorageDataTypes"
+import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails, VideoPostBody } from "../StorageDataTypes"
+import { NextResponse } from "next/server"
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 //Sorteggio a caso di parole
@@ -283,4 +285,50 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
     console.error('Errore nella fetch dei post marketplace casuale');
     return []
   }
+}
+
+//Ritorna X post casuali di video
+export const getXNewVideoPosts = async (x:number, randomAuthor:CasualUser[]): Promise<Post[]> => {
+  const response = await fetch('/api/videostreaming/geturl?qty='+x,{
+      headers: {
+          'Authorization': `Bearer ${jwtSecret}`,
+          'Content-Type': 'application/json'
+      },
+  })
+  if (!response.ok) {
+      throw new Error('Failed to fetch news')
+  }
+
+  let limit = 0
+  if(x > randomAuthor.length){
+      limit = randomAuthor.length
+  } else {
+      limit = x
+  }
+
+  const data = await response.json()
+  const returnArray: Post[] = []  
+  for (let index = 0; index < limit; index++) {
+    const newPostBody:VideoPostBody = {
+      videoUrl: data[index],
+      videoText: data[index],
+      generativeContext: ""
+    }
+    const newPost:Post = {
+      id: randomAuthor[index].posts.length+1,
+      author: {
+        userName: randomAuthor[index].name,
+        profilepicture: randomAuthor[index].profilePic,
+        coverPhotoUrl: randomAuthor[index].coverPhotoUrl,
+      },
+      body: newPostBody,
+      comments: [],
+      created_at: "",
+      likes: 0,
+      userliked: false,
+      likeProfiles: []
+    }
+    returnArray.push(newPost)
+  }
+  return returnArray
 }
