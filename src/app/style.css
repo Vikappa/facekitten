@@ -12801,4 +12801,10 @@ textarea.form-control-lg {
 
 .chatImgPreviewSelected {
   background-color: var(--bs-quinary);
+}
+
+@media screen and (min-width: 576px) {
+  .min-vh-sm-100 {
+    min-height: 100vh;
+  }
 }/*# sourceMappingURL=style.css.map */

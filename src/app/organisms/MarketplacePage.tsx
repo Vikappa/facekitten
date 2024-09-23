@@ -25,10 +25,8 @@ const MarketplaceContent = () => {
     }}
     >
         <div className="row h-100">
-        <div className="col-0 col-sm-2 bg-white shadow h-100" 
-        style={{
-          minHeight:'100vh'
-        }}>
+        <div className="col-0 col-sm-2 bg-white shadow h-100 min-vh-sm-100" 
+        >
           <MarketplaceSidebarheader/>
           <MarketplaceSideSearchBar/>
       </div>
