@@ -37,7 +37,7 @@ const BirthdaysComponent = () => {
                 electedAccount.map((user, index) => (
                     <div className="d-flex gap-2" key={index}>
                         <FaGifts color="darkblue" size={24}/>
-                        <HomePageSideLiUser user={{profilepicture:user.profilePic, userName:user.name}}  />
+                        <HomePageSideLiUser user={{profilepicture:user.profilePic, userName:user.name, coverPhotoUrl:user.coverPhotoUrl}}  />
                     </div>
                 ))
             }
