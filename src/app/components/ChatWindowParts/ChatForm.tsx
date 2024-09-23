@@ -16,7 +16,7 @@ const ChatForm = (
     const [textValue, setTextValue] = useState("")
     const userName = useAppSelector(state => state.userCredentials.userName)
     const profilePic = useAppSelector(state => state.userCredentials.profilepictureUrl)
-    const allChat = useAppSelector(state => state.chats.chats)
+    const coverPhotoUrl = useAppSelector(state => state.userCredentials.coverPhotoUrl)
 
     const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -25,7 +25,8 @@ const ChatForm = (
             id: chat.messages.length+1,
             sender: {
                 userName: userName,
-                profilepicture: profilePic
+                profilepicture: profilePic,
+                coverPhotoUrl: coverPhotoUrl,
             },
             receiver: chat.chatWith,
             timestamp: new Date().toISOString(),
@@ -41,7 +42,8 @@ const ChatForm = (
                 id: chat.id,
                 chatWith: {
                     userName: chat.chatWith.userName,
-                    profilepicture: chat.chatWith.profilepicture
+                    profilepicture: chat.chatWith.profilepicture,
+                    coverPhotoUrl: chat.chatWith.coverPhotoUrl
                 },
                 lastMessage: chat.lastMessage,
                 lastMessageTime: chat.lastMessageTime,
@@ -51,17 +53,20 @@ const ChatForm = (
 
                 const rispostaGatto = await fakeChatReplyText(targetChat, setStaScrivendo, {
                 userName: userName,
-                profilepicture: profilePic
+                profilepicture: profilePic,
+                coverPhotoUrl: coverPhotoUrl,
                 })
                 dispatch(addMessageToChat({chat, message: {
                     id: 0,
                     sender: {
                         userName: chat.chatWith.userName,
-                        profilepicture: chat.chatWith.profilepicture
+                        profilepicture: chat.chatWith.profilepicture,
+                        coverPhotoUrl: chat.chatWith.coverPhotoUrl,
                     },
                     receiver: {
                         userName: userName,
-                        profilepicture: profilePic
+                        profilepicture: profilePic,
+                        coverPhotoUrl: coverPhotoUrl,
                     },
                     message: rispostaGatto,
                     timestamp: new Date().toISOString(),
