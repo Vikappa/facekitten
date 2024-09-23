@@ -29,7 +29,8 @@ const MarketplacePage = () => {
           const randomAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)]
           return {
             userName: randomAccount.name,
-            profilepicture: randomAccount.profilePic
+            profilepicture: randomAccount.profilePic,
+            coverPhotoUrl: randomAccount.coverPhotoUrl
           }
         })
       : []
