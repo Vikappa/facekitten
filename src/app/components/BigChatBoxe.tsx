@@ -6,10 +6,11 @@ import StaScrivendo from "@/app/atoms/StaScrivendo"
 import MessageBoxLi from "./ChatWindowParts/MessageBoxLi"
 
 const BigChatBoxe = (
-    {chat, staScrivendo}: 
-    {chat: Chat; staScrivendo: boolean}
+    { chat, staScrivendo, chatContainerHeight }: 
+    { chat: Chat; staScrivendo: boolean, chatContainerHeight: number }
 ) => {
-    const chatContainerRef = useRef<HTMLDivElement | null>(null);
+    const chatContainerRef = useRef<HTMLDivElement | null>(null)
+    const headerContainer = useRef<HTMLDivElement | null>(null)
 
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
@@ -23,20 +24,21 @@ const BigChatBoxe = (
 
     return (
         <div
-            ref={chatContainerRef} 
+            ref={chatContainerRef}
             style={{
                 backgroundColor: 'white',
                 overflowY: 'auto',
                 paddingBottom: '6px',
-                flexGrow: 1, 
+                flexGrow: 1,
+                maxHeight: `${chatContainerHeight}px`,  
+                minHeight: `${chatContainerHeight}px`,
             }}
-            className="d-flex flex-column flex-column-reverse p-3 py-4"
+            className="d-flex flex-column-reverse p-3 py-4 flex-grow-1"
         >
+            {staScrivendo && <StaScrivendo staScrivendo={staScrivendo} />}
             {chat.messages.toReversed().map((message, index) => (
                 <MessageBoxLi key={index} message={message} />
             ))}
-
-            {staScrivendo && <StaScrivendo staScrivendo={staScrivendo} />}
         </div>
     );
 }

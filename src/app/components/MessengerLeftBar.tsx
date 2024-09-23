@@ -5,11 +5,11 @@ import { useAppSelector } from "../lib/hooks"
 import MessengerSearchBar from "../atoms/MessengerSearchBar"
 import { UserDetails } from "../utils/StorageDataTypes"
 import MessengerLeftName from "../atoms/MessengerLeftName"
-import { SetStateAction } from "react"
+import { SetStateAction, useRef } from "react"
 
 const MessengerLeftBar = (
-    {setSelectedUser}:
-    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>}
+    {setSelectedUser,remainingHeight}:
+    {setSelectedUser: React.Dispatch<React.SetStateAction<UserDetails | null>>;remainingHeight:number}
 ) => {
 
     const allUsers = useAppSelector(state => state.sessionGeneratedAccounts.acc);
@@ -19,11 +19,12 @@ const MessengerLeftBar = (
              style={{
                  overflowY: 'auto',
                  zIndex: 2,
+                 maxHeight:`${remainingHeight}px`
              }}
         >
             <h3 className="">Chats:</h3>
             <MessengerSearchBar/>
-            <div className="d-flex flex-column justify-content-start">
+            <div className="d-flex flex-column justify-content-start" >
                 {
                     allUsers.map((user, index) => (
                         <MessengerLeftName key={index} user={{
