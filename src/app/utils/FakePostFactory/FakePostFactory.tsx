@@ -207,8 +207,11 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
     }
 }
 
-export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
 
+
+export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
+  const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
+  const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
   const queryUrl = `/api/marketplacepost/initialcluster`;
   const response = await fetch(queryUrl, {
     headers: {
@@ -218,19 +221,21 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
   })
 
   if(response.ok){
+    let lastPostTime = new Date().getTime()
+    lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
     const {text, images} = await response.json()
     const returnArray: Post[] = []
-    const parsedText: string[] = text.split('\n')
+    const parsedText: string[] = text.split('#')
 
     const imageArray = [...images]
 
     for (let index = 0; index < 3; index++) {
 
       const body: MarketPlacePostString = {
-        marketPlaceText: parsedText[index+3],
         marketplacePhotoUrl: imageArray[index],
         marketplaceTitle: parsedText[index],
-        marketplacePrice: parsedText[index+6]
+        marketPlaceText: parsedText[(index+3)],
+        marketplacePrice: parsedText[(index+6)]
       }
 
       lastId++
@@ -240,12 +245,14 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
         author: randomAuthor[index],
         body: body,
         comments: [],
-        created_at: new Date().toISOString(),
+        created_at: new Date(lastPostTime).toISOString(),
         likes: 0,
         userliked: false,
         likeProfiles: []
       }      
+
       returnArray.push(post)
+      lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
     }
 
     return returnArray

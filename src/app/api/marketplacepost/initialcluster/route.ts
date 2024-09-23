@@ -61,15 +61,8 @@ export async function GET(request: NextRequest) {
     Non devi scrivere nulla di diverso dal titolo, testo e prezzo.
     Non usare intestazioni o footer.
     Usa questo formato:
-    titolo 1\n
-    titolo 2\n
-    titolo 3\n
-    testo 1\n
-    testo 2\n
-    testo 3\n
-    prezzo1\n
-    prezzo2\n
-    prezzo3\n
+    titolo1#titolo2#titolo3#testo1#testo2#testo3#prezzo1#prezzo2#prezzo3
+
   `;
 
   if (selfApiKey && GAK) {
