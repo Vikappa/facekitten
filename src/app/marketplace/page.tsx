@@ -1,39 +1,55 @@
 'use client'
-import { useRef, useState, useEffect } from "react";
-import NavBar from "../components/NavBar";
-import MessengerPageOrg from "../organisms/MessengerPage";
-import '../style.css';
-import ModaleNotificationMobileModale from "../modali/ModaleNotificationMobileModale";
-import MobileOptionFullScreenModal from "../modali/MobileOptionFullScreenModal";
+import { useEffect, useMemo, useState } from "react"
+import NavBar from "../components/NavBar"
+import { useAppDispatch, useAppSelector } from "../lib/hooks"
+import { CasualUser, Post, UserDetails } from "../utils/StorageDataTypes"
+import { GenerateInitialMarketplaceCluster } from "../utils/FakePostFactory/FakePostFactory"
+import { addPostsToOriginalAccount } from "../lib/slices/sessionGeneratedAccountsSlice"
+import '@/app/style.css'
+import MarketplaceContent from "../organisms/MarketplacePage"
 
-const MessengerPage = () => {
-    const navBarRef = useRef<HTMLDivElement | null>(null); 
-    const [remainingHeight, setRemainingHeight] = useState<number>(0);
+const selfToken = process.env.NEXT_PUBLIC_SELF
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (navBarRef.current) {
-                const navbarHeight = navBarRef.current.clientHeight;  
-                setRemainingHeight(window.innerHeight - navbarHeight);  
-            }
-        };
+const MarketplacePage = () => {
+  const dispatch = useAppDispatch()
 
-        window.addEventListener("resize", handleResize);
-        handleResize(); 
+  const userPosts = useAppSelector(state => state.posts.userPosts)
+  const accountsPost = useAppSelector(state => state.sessionGeneratedAccounts.acc.flatMap(account => account.posts))
+  const allAccounts = useAppSelector(state => state.sessionGeneratedAccounts.acc)
+  const marketPlacePostsCount = useAppSelector(state => 
+    state.sessionGeneratedAccounts.acc.reduce((acc, account) => 
+      acc + account.posts.filter(post => post.body && typeof post.body === "object" && 'marketplacePhotoUrl' in post.body).length, 0
+    )
+  )
 
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+  const random3Auth = useMemo(() => {
+    return allAccounts.length > 0 
+      ? Array.from({ length: 3 }, () => {
+          const randomAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)]
+          return {
+            userName: randomAccount.name,
+            profilepicture: randomAccount.profilePic
+          }
+        })
+      : []
+  }, [allAccounts])
 
-    return (
-        <div className="d-flex flex-column" style={{ height: '100vh' }}>
-            <ModaleNotificationMobileModale />
-            <MobileOptionFullScreenModal/>
-            <div ref={navBarRef}>  
-                <NavBar />
-            </div>
-                <MessengerPageOrg remainingHeight={remainingHeight}/>
-        </div>
-    );
+  const postNumber = useMemo(() => userPosts.length + accountsPost.length, [userPosts, accountsPost])
+
+  useEffect(() => {
+    const fetchInitialCluster = async () => {
+      const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth)
+      dispatch(addPostsToOriginalAccount(initialCluster))
+    }
+    if (marketPlacePostsCount === 0) fetchInitialCluster()
+  }, [dispatch, marketPlacePostsCount, postNumber, random3Auth])
+
+  return (
+    <>
+      <NavBar />
+      <MarketplaceContent />
+    </>
+  )
 }
 
-export default MessengerPage;
+export default MarketplacePage
