@@ -12,12 +12,16 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
+  const qty = Number(req.nextUrl.searchParams.get('qty'))
+  const returnArray: string[] = []
+  for (let index = 0; index < qty; index++) {
+    returnArray.push(postVideoIndexes[Math.floor(Math.random() * postVideoIndexes.length)])
+  }
   // Seleziona casualmente un file dall'array postVideoIndexes
   const fileName: string = postVideoIndexes[Math.floor(Math.random() * postVideoIndexes.length)]
 
   // Genera l'URL del video che punta all'endpoint di streaming
   const filename = `${path.basename(fileName)}`
-
   // Restituisci l'URL del video
-  return NextResponse.json({ filename })
+  return NextResponse.json({ returnArray })
 }
