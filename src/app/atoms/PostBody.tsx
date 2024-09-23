@@ -47,7 +47,8 @@ const PostBody = (
             <div className="p-1 py-3 position-relative">
             {bodyPost.videoUrl &&
             <div className="w-100 d-flex justify-content-center">
-                <video controls>
+                <video controls className="w-100 h-auto p-3" 
+                style={{maxWidth:'100%', maxHeight:'100%'}}>
                     <source src={bodyPost.videoUrl} type="video/mp4" />
                 </video>      
             </div>
