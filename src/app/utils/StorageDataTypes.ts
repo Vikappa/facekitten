@@ -66,11 +66,13 @@ export interface CasualUser {
     name: string;
     profilePic: string;
     posts: Post[]
+    coverPhotoUrl: string;
 }
 
 export interface UserDetails{
     userName: string;
     profilepicture:string
+    coverPhotoUrl: string;
 }
 
 export interface Message {

@@ -4,14 +4,12 @@ import { useAppSelector } from "../lib/hooks"
 import ProfileImageResponsiveComponent from "../atoms/ProfileImageResponsiveComponent"
 import UserProfilePostRenderer from "../components/UserProfilePostRenderer"
 import CreateFormPost from "../components/CreatePostForm"
+import { CasualUser } from "../utils/StorageDataTypes"
 
-const UserProfileRenderer = () => {
-    const coverPhoto = useAppSelector(state => state.userCredentials.coverPhotoUrl)
-    const profilePicture = useAppSelector(state => state.userCredentials.profilepictureUrl)
-    const userName = useAppSelector(state => state.userCredentials.userName)
-    console.log(coverPhoto)
+const BotProfileRenderer = ({user}:{user:CasualUser}) => {
 
-    if(coverPhoto && profilePicture && userName){
+
+    if(user){
         return(
             <>
             <div 
@@ -20,15 +18,13 @@ const UserProfileRenderer = () => {
             }}
             >
                 <div className="col-sm-9">
-                <Image src={coverPhoto} alt="Cover Photo" className="w-100 rounded-bottom-3" width={400} height={280}/> 
-                <ProfileImageResponsiveComponent profilePicture={profilePicture} userName={userName}/>
+                <Image src={user.coverPhotoUrl} alt="Cover Photo" className="w-100 rounded-bottom-3" width={400} height={280}/> 
+                <ProfileImageResponsiveComponent profilePicture={user.profilePic} userName={user.name}/>
                 </div>
                 
             </div>
             <div className="align-align-items-center justify-content-center mx-auto col-sm-9 p-2 px-sm-0">
-            <CreateFormPost/>
             </div>
-                <UserProfilePostRenderer/>
                 </>
         )
     } else {
@@ -36,4 +32,4 @@ const UserProfileRenderer = () => {
     }
 }
 
-export default UserProfileRenderer
+export default BotProfileRenderer

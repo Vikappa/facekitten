@@ -3,9 +3,10 @@ import Image from "next/image"
 import { useAppSelector } from "../lib/hooks"
 import FriendsImagesRow from "../components/FriendsImagesRow"
 
-const ProfileImageResponsiveComponent = () => {
-    const profilePicture = useAppSelector(state => state.userCredentials.profilepictureUrl)
-    const userName = useAppSelector(state => state.userCredentials.userName)
+const ProfileImageResponsiveComponent = (
+    {profilePicture, userName}:
+    {profilePicture: string, userName: string}
+) => {
     const friendsNum = useAppSelector(state => state.friendList.friends.length)
     return(
             <>
@@ -38,9 +39,7 @@ const ProfileImageResponsiveComponent = () => {
                 </div>
             </div>
 
-
             {/* mobile */}
-
             <div className="d-sm-none d-flex flex-column align-items-center justify-content-center">
                     <Image 
                     src={profilePicture}

@@ -86,10 +86,12 @@ const createRandomUserName = () => {
 
 export const CreateFakeUser = async (): Promise<UserDetails> => {
     const userName = createRandomUserName();
-    const profilepicture = await fetchRandomPictureCat();
+    const profilepicture = await fetchRandomPictureCat()
+    const coverPhotoUrl = await fetchRandomCoverPhoto()
     return {
         userName: userName,
-        profilepicture: profilepicture
+        profilepicture: profilepicture,
+        coverPhotoUrl: coverPhotoUrl
     };
 }
 

@@ -27,7 +27,8 @@ export const MakeFakeAccount = async (): Promise<CasualUser> => {
     return {
         name: fakeCredential.userName,
         profilePic: fakeCredential.profilepicture, 
-        posts: fakeAccountsPosts
+        posts: fakeAccountsPosts,
+        coverPhotoUrl: fakeCredential.coverPhotoUrl
     };
 };
 
@@ -38,6 +39,7 @@ export const MakeFakeAccountNoPosts = async (): Promise<CasualUser> => {
     return {
         name: fakeCredential.userName,
         profilePic: fakeCredential.profilepicture, 
-        posts: fakeAccountsPosts
+        posts: fakeAccountsPosts,
+        coverPhotoUrl: fakeCredential.coverPhotoUrl
     };
 };
