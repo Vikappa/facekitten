@@ -283,49 +283,46 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
   }
 }
 
-const generateXVideoPosts = async (x:number, randomAuthor:CasualUser[]):Promise<Post[]> => {
-  const returnArray: Post[] = []
+export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[]): Promise<Post[]> => {
+  const returnArray: Post[] = [];
 
-  const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
-  const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
+  const shuffledArray = inputAuthors.sort(() => Math.random() - 0.5);
+  const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
+  const maxIntervalInDays = 86400000 * 2;   // 2 giorni
 
-  let lastPostTime = new Date().getTime()
-  lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
+  let lastPostTime = new Date().getTime();
+  lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
 
-  const queryUrl = `/api/videostreaming/geturl?qty=`+x
-  let limit = 0 
-  if(x<randomAuthor.length){
-    limit = x
-  } else {
-    limit = randomAuthor.length
-  }
+  const queryUrl = `/api/videostreaming/geturl?qty=` + x;
+  const limit = Math.min(x, shuffledArray.length);
 
   const response = await fetch(queryUrl, {
     headers: {
       'Content-Type': 'application/json',
       'authorization': `Bearer ${jwtSecret}`
     }
-  })
+  });
 
-  if(!response.ok){
+  if (!response.ok) {
     console.error('Errore nella fetch dei reel');
-    return []
+    return [];
   }
 
-  const data = await response.json() 
+  const data = await response.json();
 
   for (let index = 0; index < limit; index++) {
     const newBody: VideoPostBody = {
-      videoUrl: data[index],
-      videoText: data[index],
+      videoUrl: data.returnArray[index],
+      videoText: data.returnArray[index],
       generativeContext: ""
-    }
-    const newPost:Post = {
-      id: randomAuthor[index].posts.length + 1,
+    };
+
+    const newPost: Post = {
+      id: returnArray.length, 
       author: {
-        userName: randomAuthor[index].name,
-        profilepicture: randomAuthor[index].profilePic,
-        coverPhotoUrl: randomAuthor[index].coverPhotoUrl,
+        userName: shuffledArray[index].name,
+        profilepicture: shuffledArray[index].profilePic,
+        coverPhotoUrl: shuffledArray[index].coverPhotoUrl,
       },
       body: newBody,
       comments: [],
@@ -333,8 +330,11 @@ const generateXVideoPosts = async (x:number, randomAuthor:CasualUser[]):Promise<
       likes: 0,
       userliked: false,
       likeProfiles: []
-    }
+    };
+
+    returnArray.push(newPost);
+    lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
   }
 
-  return returnArray
-}
+  return returnArray;
+};

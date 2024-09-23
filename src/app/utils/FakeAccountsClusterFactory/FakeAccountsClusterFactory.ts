@@ -1,5 +1,5 @@
 import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
-import { FakePostTextFactory } from "../FakePostFactory/FakePostFactory"
+import { FakePostTextFactory, generateXVideoPosts } from "../FakePostFactory/FakePostFactory"
 import { CasualUser, NormalPostBody } from "../StorageDataTypes"
 
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
@@ -74,6 +74,12 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
             userliked: false,
             likeProfiles: []
         })
+    }
+
+    const reels = await generateXVideoPosts(3, fakeAccounts);
+    
+    for (let index = 0; index < reels.length; index++) {
+        fakeAccounts.find(account => account.name === reels[index].author.userName)?.posts.push(reels[index])
     }
 
     return fakeAccounts

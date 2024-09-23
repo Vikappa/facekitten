@@ -42,6 +42,23 @@ const PostBody = (
         </div>
     )
     }
+    if(bodyPost !== undefined && typeof bodyPost === 'object' && 'videoText' in bodyPost){
+        return(
+            <div className="p-1 py-3 position-relative">
+            {bodyPost.videoUrl &&
+            <div className="w-100 d-flex justify-content-center">
+                <video controls>
+                    <source src={bodyPost.videoUrl} type="video/mp4" />
+                </video>      
+            </div>
+            }
+            <div className="position-absolute d-flex gap-2" style={{right:'0', bottom:'-1rem', fontSize:'0.8rem'}}>
+            {post.likes>0 && <p>{post.likes} mi piace</p>}
+            {post.comments.length>0 && <p>{post.comments.length} comment{post.comments.length === 1 ? 'o':'i'}</p>}
+        </div>
+        </div>
+    )
+    }
     return null
 }
 
