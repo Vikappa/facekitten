@@ -14,6 +14,7 @@ const MessengerPageOrg = ({ remainingHeight }: { remainingHeight: number }) => {
     const allChats = useAppSelector((state) => state.chats.chats);
     const [chatFormHeight, setChatFormHeight] = useState<number>(0);
     const chatFormRef = useRef<HTMLDivElement | null>(null);
+    const headerContainer = useRef<HTMLDivElement | null>(null);  // Aggiungiamo il ref per l'header
 
     useEffect(() => {
         const handleResize = () => {
@@ -46,8 +47,8 @@ const MessengerPageOrg = ({ remainingHeight }: { remainingHeight: number }) => {
                 {
                     selectedUser && chat && (
                         <div className="col-9 d-flex flex-column p-0 m-0 bg-white">
-                            <div className="d-flex p-2 gap-3">
-                                <Image src={chat.chatWith.profilepicture} alt={chat.chatWith.userName} height={35} width={35} className="rounded-circle" />
+                            <div className="d-flex p-2 gap-3" ref={headerContainer}>
+                            <Image src={chat.chatWith.profilepicture} alt={chat.chatWith.userName} height={35} width={35} className="rounded-circle" />
                                 <p className="m-0 p-0">{chat.chatWith.userName}</p>
                             </div>
                             <BigChatBoxe chat={chat} staScrivendo={staScrivendo} chatContainerHeight={remainingHeight - chatFormHeight} />
