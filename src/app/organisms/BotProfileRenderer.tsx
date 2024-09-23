@@ -2,8 +2,6 @@
 import Image from "next/image"
 import { useAppSelector } from "../lib/hooks"
 import ProfileImageResponsiveComponent from "../atoms/ProfileImageResponsiveComponent"
-import UserProfilePostRenderer from "../components/UserProfilePostRenderer"
-import CreateFormPost from "../components/CreatePostForm"
 import { CasualUser } from "../utils/StorageDataTypes"
 import PostCardComponent from "../components/PostCardComponent"
 
@@ -26,7 +24,7 @@ const BotProfileRenderer = ({user}:{user:CasualUser}) => {
                 </div>
                 <div className="align-align-items-center justify-content-center mx-auto col-sm-8 p-2 px-sm-0">
                 {user.posts.map((post, index) => (
-                <PostCardComponent key={post.author.userName.replace(' ','')+index}  post={post} />
+                <PostCardComponent key={post.author.userName.replace(' ','')+index} post={post} />
             ))}
                 </div>
             </div>

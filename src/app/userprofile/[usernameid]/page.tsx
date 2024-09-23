@@ -3,7 +3,6 @@ import { useParams } from 'next/navigation'
 import '../../style.css'
 import Navbar from "../../components/NavBar"
 import ModaleNotificationMobileModale from "../../modali/ModaleNotificationMobileModale"
-import UserProfileRenderer from "../../organisms/UserProfileRenderer"
 import MobileOptionFullScreenModal from '../../modali/MobileOptionFullScreenModal'
 import { useAppDispatch, useAppSelector } from '@/app/lib/hooks'
 import { useEffect } from 'react'
