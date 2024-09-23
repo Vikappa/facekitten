@@ -7,10 +7,12 @@ import { useParams } from "next/navigation"
 import '@/app/style.css'
 
 
+
 const UserPostPage = () => {
     const id = useParams()
     const post = useAppSelector(state => state.posts.userPosts.find(post => post.id === Number(id.id)))
 
+    
     if(!post){
         return null
     }   

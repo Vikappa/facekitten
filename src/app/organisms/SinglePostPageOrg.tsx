@@ -4,8 +4,17 @@ import Image from "next/image"
 import { Post } from "../utils/StorageDataTypes"
 import ProfileImageResponsiveComponent from "../atoms/ProfileImageResponsiveComponent"
 import PostCardComponent from "../components/PostCardComponent"
+import { useAppDispatch, useAppSelector } from "../lib/hooks"
+import { useEffect } from "react"
+import { setNavbarPage } from "../lib/slices/appStateSlice"
 
 const SinglePostPageOrg = ({post}:{post:Post}) => {
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        dispatch(setNavbarPage(20))
+    }, [])
+    
     return (
         <div>
             <div className="d-flex flex-column align-items-center justify-content-start mb-3 shadow"

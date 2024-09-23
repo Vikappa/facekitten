@@ -24,6 +24,12 @@ const TastieraFunzioni = () => {
         router.push('/amici')
     }
 
+    const logOutFunction = () => {
+        localStorage.removeItem('persist:root')
+        window.location.reload()
+        router.push('/')
+    }
+
     const fakeFunction = () =>{
     }
 
@@ -67,9 +73,9 @@ const TastieraFunzioni = () => {
             
             
             <SquaredOptButton 
-            text="Ads Manager" 
+            text="Log Out" 
             icon={<IoSadSharp />} 
-            onClick={fakeFunction} 
+            onClick={logOutFunction} 
             />
             
 
