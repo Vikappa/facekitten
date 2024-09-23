@@ -232,8 +232,6 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
     }
 }
 
-
-
 export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
   const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
   const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
@@ -289,6 +287,10 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
 
 //Ritorna X post casuali di video
 export const getXNewVideoPosts = async (x:number, randomAuthor:CasualUser[]): Promise<Post[]> => {
+  const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
+  const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
+  let lastPostTime = new Date().getTime()
+  lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
   const response = await fetch('/api/videostreaming/geturl?qty='+x,{
       headers: {
           'Authorization': `Bearer ${jwtSecret}`,
@@ -323,12 +325,14 @@ export const getXNewVideoPosts = async (x:number, randomAuthor:CasualUser[]): Pr
       },
       body: newPostBody,
       comments: [],
-      created_at: "",
+      created_at: new Date(lastPostTime).toISOString(),
       likes: 0,
       userliked: false,
       likeProfiles: []
     }
     returnArray.push(newPost)
+    lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
+
   }
   return returnArray
 }
