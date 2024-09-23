@@ -35,6 +35,8 @@ const CreateFormPost = () => {
             author: {
                 userName: userDetails.userName,
                 profilepicture: userDetails.profilepictureUrl,
+                coverPhotoUrl: userDetails.coverPhotoUrl,
+
             },
             body: postBody,
             comments: [],
@@ -60,6 +62,8 @@ const CreateFormPost = () => {
                         commentAuthorDetails: {
                             userName: randomAuthor.name,
                             profilepicture: randomAuthor.profilePic,
+                            coverPhotoUrl: randomAuthor.coverPhotoUrl,
+
                         },
                     }));
 
@@ -70,10 +74,13 @@ const CreateFormPost = () => {
                             commentAuthor: {
                                 userName: randomAuthor.name,
                                 profilepicture: randomAuthor.profilePic,
+                                coverPhotoUrl: randomAuthor.coverPhotoUrl
                             },
                             postAuthor: {
                                 userName: userDetails.userName,
                                 profilepicture: userDetails.profilepictureUrl,
+                                coverPhotoUrl: userDetails.coverPhotoUrl,
+
                             },
                         },
                     }));
