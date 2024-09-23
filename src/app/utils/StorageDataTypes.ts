@@ -115,6 +115,7 @@ export interface PostCommentNotificationType {
 }
 
 export interface CommentReplyNotificationType {
+    postId: number;
     postAuthor: UserDetails;
     commentAuthor: UserDetails;
 }

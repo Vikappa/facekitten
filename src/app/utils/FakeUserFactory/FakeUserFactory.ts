@@ -60,7 +60,10 @@ export const fetchRandomPictureCat = async (): Promise<string> => {
       return 'https://images.pexels.com/photos/3974516/pexels-photo-3974516.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280';
     }
 }
-const createRandomUserName = () => {
+
+const generatedNames = new Set<string>(); 
+
+const createRandomUserName = (): string => {
     const names = [
         "Micio", "Luna", "Felix", "Tigro", "Leo", "Nina", "Vladdalo", "Zoe", "Salem", "Mila", 
         "Oliver", "Simba", "Miciomicio", "Bella", "Charlie", "Sophie", "Jasper", "Maya", "Oreo", "Misty", 
@@ -77,12 +80,21 @@ const createRandomUserName = () => {
         "Fuggente", "Guardingo", "McFurr", "Scattante", "Misterioso", "Serafico", "Saltatore", "Indomito", "Vispo", "Cauto"
     ];
 
-    const randomName = names[Math.floor(Math.random() * names.length)];
+    let randomName: string;
+    let randomSurname: string;
+    let fullName: string;
 
-    const randomSurname = surnames[Math.floor(Math.random() * surnames.length)];
+    do {
+        randomName = names[Math.floor(Math.random() * names.length)];
+        randomSurname = surnames[Math.floor(Math.random() * surnames.length)];
+        fullName = `${randomName} ${randomSurname}`;
+    } while (generatedNames.has(fullName))
 
-    return `${randomName} ${randomSurname}`;
+    generatedNames.add(fullName)
+
+    return fullName
 }
+
 
 export const CreateFakeUser = async (): Promise<UserDetails> => {
     const userName = createRandomUserName();
