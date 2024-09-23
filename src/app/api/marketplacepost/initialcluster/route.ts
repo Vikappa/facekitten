@@ -11,6 +11,7 @@ const GAK = process.env.GOOGLE_GEMINI_API_KEY
 const getImagesUrl = async (): Promise<string[]> => {
   if (selfApiKey) {
     const apiUrl = `${sslProtocol}${baseUrl}/api/storedcatmarketplacephoto`;
+    console.log('API URL:', apiUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
