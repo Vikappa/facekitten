@@ -1,6 +1,6 @@
 'use client'
-import { useParams } from 'next/navigation'; // Importa useParams
-import '../style.css';
+import { useParams } from 'next/navigation'
+import '../../style.css';
 import Navbar from "../../components/NavBar";
 import ModaleNotificationMobileModale from "../../modali/ModaleNotificationMobileModale";
 import UserProfileRenderer from "../../organisms/UserProfileRenderer";

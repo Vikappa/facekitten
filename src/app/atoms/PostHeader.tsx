@@ -4,6 +4,7 @@ import { UserDetails } from "../utils/StorageDataTypes"
 import { FaUserFriends } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoCloseOutline } from "react-icons/io5";
+import Link from "next/link";
 
 const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undefined}) => {
     const timeDifference = ():string => {
@@ -38,13 +39,26 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undef
 
     if(user){
         return(
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3 underline-none">
                 <Image src={user.profilepicture} alt={'Profile picture of ' + user.userName} width={40} height={40} 
                 className="rounded-circle"
                 />
                 <div>
-                <p className="fw-bold m-0 p-0">{user.userName}</p>
-                <p className="m-0 p-0 d-flex align-items-center gap-2 text-secondary" style={{fontSize:'0.85rem'}}>{time ? timeDifference() : ''} · <FaUserFriends /></p>
+                <Link href={"/userprofile/" + encodeURIComponent(user.userName)}
+                style={{
+                        textDecoration:'none',
+                        color:'#000',
+                        fontWeight:'bold',
+                        fontSize:'1.2rem',
+                    }}>
+                        <p className="m-0 p-0" style={{
+                            }}>{user.userName}</p>
+                    </Link>
+                    <p className="m-0 p-0 d-flex align-items-center gap-2 text-secondary" 
+                    style={{
+                        fontSize:'0.85rem',
+                        textDecoration:'none',
+                        }}>{time ? timeDifference() : ''} · <FaUserFriends /></p>
                 </div>
 
                 <div className="ms-auto d-flex align-items-center gap-2" style={{transform:'translateY(-10px)'}}>
