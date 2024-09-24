@@ -31,7 +31,7 @@ const getImagesUrl = async (): Promise<string[]> => {
 
 
 // Funzione per convertire un file locale in un oggetto GenerativeAI.Part
-function fileToGenerativePart(filePath: string, mimeType: string) {
+export function fileToGenerativePart(filePath: string, mimeType: string) {
   if (!filePath) {
     throw new Error('File path is undefined or empty')
   }

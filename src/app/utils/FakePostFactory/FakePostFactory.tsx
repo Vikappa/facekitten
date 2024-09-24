@@ -109,58 +109,96 @@ export const FakePostCommentTextFactory = () => {
 // }
 
 //Crea un commento per un post prendendo il post in questione e l'autore del commento 
-export const GenerateCommentText = async (post: Post, authorname:string): Promise<string> => {
-  let testoDelPost = `Testo del post: ${post.author.userName} scrive:\n
-  ${
-    post.body !== undefined && typeof post.body === 'object' && 'normalPostTex' in post.body ? (
-      post.body.normalPostTex
-  ) : 
-  post.body !== undefined && typeof post.body === 'object' && 'marketPlaceText' in post.body ? (
-    post.body.marketPlaceText
-  )
-  :
-  post.body !== undefined && typeof post.body === 'object' && 'imagePostText' in post.body ? (
-    post.body.imagePostText
-  )
-  : 
-  post.body !== undefined && typeof post.body === 'object' && 'videoText' in post.body ? (
-    post.body.videoText
-  )
-  : 
-  post.body !== undefined && typeof post.body === 'object' && 'rewtweetText' in post.body ? (
-    post.body.rewtweetText
-  )
-  : 
-  '' 
-  }
-  `;
-
-  testoDelPost += post.comments
+export const GenerateCommentText = async (post: Post, authorname: string): Promise<string> => {
+  if(post.body !== undefined && typeof post.body === 'object' && 'normalPostTex' in post.body){
+    let testoDelPost = `Testo del post: ${post.author.userName} scrive:\n${post.body.normalPostTex}`
+    testoDelPost += post.comments
     .map(comment => `Autore: ${comment.author.userName} Commento: ${comment.body}`)
-    .join('\n');
-
-  try {
-    const response = await fetch('/api/aigeneratedtext/commentreply', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwtSecret}`
-      },
-      body: JSON.stringify({ testoDelPost, authorname }),
-    });
-
+    .join('\n')
     try {
-      const data = await response.json();
-      return data.message;
+      const response = await fetch('/api/aigeneratedtext/commentreply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtSecret}`
+        },
+        body: JSON.stringify({ testoDelPost, authorname }),
+      });
+  
+      try {
+        const data = await response.json();
+        return data.message;
+      } catch (error) {
+        console.error('Error parsing json');
+        return FakePostCommentTextFactory();
+      }
     } catch (error) {
-      console.error('Error parsing json');
+      console.error('Error:', error);
       return FakePostCommentTextFactory();
     }
-  } catch (error) {
-    console.error('Error:', error);
+  } else if (post.body !== undefined && typeof post.body === 'object' && 'marketPlaceText' in post.body) {
+
+    let testoDelPost = `Testo del post: ${post.author.userName} scrive:\n${post.body.marketPlaceText}`
+    const imageUrl = post.body.marketplacePhotoUrl
+
+    testoDelPost += post.comments
+    .map(comment => `Autore: ${comment.author.userName} Commento: ${comment.body}`)
+    .join('\n')
+
+    try {
+      const response = await fetch('/api/marketplacepost/commentmarketplacepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtSecret}`
+        },
+        body: JSON.stringify({ testoDelPost, imageUrl, authorname }),
+      })
+
+      if(response.ok){
+        const data = await response.json()
+        return data.text
+      }
+    } catch (error) {
+      return FakePostCommentTextFactory();
+    }
     return FakePostCommentTextFactory();
-  }
-};
+  } else if (post.body !== undefined && typeof post.body === 'object' && 'imagePostText' in post.body) {
+
+    let testoDelPost = `Testo del post: ${post.author.userName} scrive:\n${post.body.imagePostText}`
+    const imageUrl = post.body.imageUrl
+
+    testoDelPost += post.comments
+    .map(comment => `Autore: ${comment.author.userName} Commento: ${comment.body}`)
+    .join('\n')
+
+    try {
+      const response = await fetch('/api/marketplacepost/commentmarketplacepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwtSecret}`
+        },
+        body: JSON.stringify({ testoDelPost, imageUrl, authorname }),
+      })
+
+      if(response.ok){
+        const data = await response.json()
+        return data.text
+      }
+    } catch (error) {
+      return FakePostCommentTextFactory();
+    }
+    return FakePostCommentTextFactory();
+  } else if (post.body !== undefined && typeof post.body === 'object' && 'videoText' in post.body) {
+      
+    return FakePostCommentTextFactory();
+  } else if (post.body !== undefined && typeof post.body === 'object' && 'rewtweetText' in post.body) {
+    return FakePostCommentTextFactory();
+  } else {
+     return FakePostCommentTextFactory();
+}
+}
 
 //Sorteggio a caso di parole
 export const FakePostTextFactory = ():NormalPostBody => {

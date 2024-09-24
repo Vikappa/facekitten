@@ -1,11 +1,11 @@
 'use client'
 const HomePageSideLi = (
-    {icon, text}:
-    {icon: React.ReactNode, text: string}
+    {icon, text, funzione}:
+    {icon: React.ReactNode, text: string; funzione:()=> void}
 ) => {
 
     return(
-    <li
+    <li onClick={funzione}
     className="d-flex align-items-center gap-2 py-2 rounded-2 liSideElement   "
     >
         {icon}{text}
