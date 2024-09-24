@@ -5,10 +5,20 @@ import MessengerPageOrg from "../organisms/MessengerPage";
 import '../style.css';
 import ModaleNotificationMobileModale from "../modali/ModaleNotificationMobileModale";
 import MobileOptionFullScreenModal from "../modali/MobileOptionFullScreenModal";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
+import { setNavbarPage } from "../lib/slices/appStateSlice";
 
 const MessengerPage = () => {
     const navBarRef = useRef<HTMLDivElement | null>(null);  
-    const [remainingHeight, setRemainingHeight] = useState<number>(0);
+    const [remainingHeight, setRemainingHeight] = useState<number>(0)
+    const navbarPage = useAppSelector(state => state.status.shownpage)
+    const dispatch = useAppDispatch()
+    useEffect(() => {
+        if(navbarPage !== 9){
+            dispatch(setNavbarPage(9))
+        }
+    }, [])
+    
 
     useEffect(() => {
         const handleResize = () => {

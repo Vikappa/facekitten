@@ -3,7 +3,7 @@ import { GoDotFill } from "react-icons/go";
 import { CommentReplyNotificationType, NotificationType, PostCommentNotificationType } from "../utils/StorageDataTypes"
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { useRouter } from "next/navigation";
-import { setShowDropDownNotification } from "../lib/slices/appStateSlice";
+import { setShowDropDownNotification, setShowNotificationModal } from "../lib/slices/appStateSlice";
 
 const NotificationLi = (
     {notification}:
@@ -21,6 +21,7 @@ const NotificationLi = (
                 onClick={
                     () => {
                         dispatch(setShowDropDownNotification(false))
+                        dispatch(setShowNotificationModal(false))
                         navigator.push(linkUrl)
                     }
                 }>
@@ -62,6 +63,7 @@ const NotificationLi = (
             onClick={
                 () => {
                     dispatch(setShowDropDownNotification(false))
+                    dispatch(setShowNotificationModal(false))
                     navigator.push(linkUrl)
                 }
             }

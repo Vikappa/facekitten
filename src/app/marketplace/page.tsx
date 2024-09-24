@@ -8,12 +8,13 @@ import { addPostsToOriginalAccount } from "../lib/slices/sessionGeneratedAccount
 import '@/app/style.css'
 import MarketplaceContent from "../organisms/MarketplacePage"
 import ModaleNotificationMobileModale from "../modali/ModaleNotificationMobileModale"
+import { setNavbarPage } from "../lib/slices/appStateSlice"
 
 const selfToken = process.env.NEXT_PUBLIC_SELF
 
 const MarketplacePage = () => {
   const dispatch = useAppDispatch()
-
+  const navbarPage = useAppSelector(state => state.status.shownpage)
   const userPosts = useAppSelector(state => state.posts.userPosts)
   const accountsPost = useAppSelector(state => state.sessionGeneratedAccounts.acc.flatMap(account => account.posts))
   const allAccounts = useAppSelector(state => state.sessionGeneratedAccounts.acc)
@@ -46,6 +47,12 @@ const MarketplacePage = () => {
     }
     if (marketPlacePostsCount === 0) fetchInitialCluster()
   }, [marketPlacePostsCount, postNumber, random3Auth])
+
+  useEffect(() => {
+      if(navbarPage !== 9){
+          dispatch(setNavbarPage(9))
+      }
+  }, [])
 
   return (
     <>
