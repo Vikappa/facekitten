@@ -30,7 +30,6 @@ const userCredentialsSlice = createSlice({
       const { post, commentValue, author } = action.payload;
       const targetPost = state.acc.find(user => user.name === post.author.userName)?.posts.find(p => p.id === post.id);
       if (targetPost) {
-        targetPost.comments = targetPost.comments || [];
         targetPost.comments.push({
           id: targetPost.comments.length + 1,
           author: author,
