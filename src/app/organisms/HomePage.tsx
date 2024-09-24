@@ -15,10 +15,11 @@ import { MdGroups } from "react-icons/md";
 import { PiVideoFill } from "react-icons/pi";
 import { FaShop } from "react-icons/fa6";
 import { SiFeedly } from "react-icons/si";
-import { setShowDropDownNotification, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
+import { setNavbarPage, setShowDropDownNotification, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
 import ContactUl from "../components/ContactUl";
 import BirthdaysComponent from "../components/BirthdaysComponent";
 import { spreadOldPosts } from "../lib/slices/sessionGeneratedAccountsSlice";
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +27,11 @@ const HomePage = () => {
   const userpost = useAppSelector((state) => state.posts.userPosts);
   const userName = useAppSelector((state) => state.userCredentials.userName);
   const profilepictureUrl = useAppSelector((state) => state.userCredentials.profilepictureUrl);
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(false)
+  const router = useRouter()
+  const fakeFunction = () => {
+    console.log("hello");
+  };
 
   const postArray = useMemo(() => {
     const returnArray = accountsFromRedux.flatMap((accounts) => accounts.posts);
@@ -79,13 +84,16 @@ const HomePage = () => {
               <Image src={profilepictureUrl} alt={userName} height={40} width={40} className="rounded-circle" />
               {userName}
             </li>
-            <HomePageSideLi icon={<FaUserFriends style={{ color: "#23ADFD" }} size={35} />} text={"Friends"} />
-            <HomePageSideLi icon={<FaClockRotateLeft size={35} style={{ color: "#1877F2" }} />} text={"Memories"} />
-            <HomePageSideLi icon={<IoBookmarkSharp size={35} style={{ color: "#AE4FD8" }} />} text={"Saved"} />
-            <HomePageSideLi icon={<MdGroups size={35} style={{ color: "#209CFA" }} />} text={"Groups"} />
-            <HomePageSideLi icon={<PiVideoFill size={35} style={{ color: "#30AAD4" }} />} text={"Video"} />
-            <HomePageSideLi icon={<FaShop size={35} style={{ color: "#55C7D5" }} />} text={"Marketplace"} />
-            <HomePageSideLi icon={<SiFeedly size={35} style={{ color: "#209DF9" }} />} text={"Feed"} />
+            <HomePageSideLi icon={<FaUserFriends style={{ color: "#23ADFD" }} size={35} />} text={"Friends"} funzione={fakeFunction} />
+            <HomePageSideLi icon={<FaClockRotateLeft size={35} style={{ color: "#1877F2" }} />} text={"Memories"} funzione={fakeFunction} />
+            <HomePageSideLi icon={<IoBookmarkSharp size={35} style={{ color: "#AE4FD8" }} />} text={"Saved"}funzione={fakeFunction}  />
+            <HomePageSideLi icon={<MdGroups size={35} style={{ color: "#209CFA" }} />} text={"Groups"}funzione={fakeFunction}  />
+            <HomePageSideLi icon={<PiVideoFill size={35} style={{ color: "#30AAD4" }} />} text={"Video"} funzione={()=>{
+              dispatch(setNavbarPage(10))
+              router.push("/reels")
+            }} />
+            <HomePageSideLi icon={<FaShop size={35} style={{ color: "#55C7D5" }} />} text={"Marketplace"} funzione={fakeFunction} />
+            <HomePageSideLi icon={<SiFeedly size={35} style={{ color: "#209DF9" }} />} text={"Feed"} funzione={fakeFunction}  />
           </ul>
         </div>
 
