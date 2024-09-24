@@ -1,9 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fileToGenerativePart } from "../initialcluster/route";
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { UserDetails } from "@/app/utils/StorageDataTypes";
 const GAK = process.env.GOOGLE_GEMINI_API_KEY
+import fs from "fs"
+import path from "path"
+
+function fileToGenerativePart(filePath: string, mimeType: string) {
+    if (!filePath) {
+      throw new Error('File path is undefined or empty')
+    }
+  
+    const absolutePath = path.join(process.cwd(), 'public', filePath);
+  
+    if (!fs.existsSync(absolutePath)) {
+      throw new Error(`File does not exist at path: ${absolutePath}`);
+    }
+  
+    return {
+      inlineData: {
+        data: Buffer.from(fs.readFileSync(absolutePath)).toString("base64"),
+        mimeType,
+      },
+    };
+  }
+  
 
 const prompt = ( commentAuthor:UserDetails, postText:string) => `
 Devi interpretare un gatto che pubblica un post in un social network chiamato FaceKitten.

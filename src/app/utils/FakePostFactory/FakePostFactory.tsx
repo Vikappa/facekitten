@@ -376,3 +376,9 @@ export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[])
 
   return returnArray;
 };
+
+export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):Post[] => {
+  const returnArray: Post[] = [];
+
+  return returnArray
+}

@@ -1,5 +1,5 @@
 import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
-import { FakePostTextFactory, generateXVideoPosts } from "../FakePostFactory/FakePostFactory"
+import { FakePostTextFactory, generateXMutedImagePosts, generateXVideoPosts } from "../FakePostFactory/FakePostFactory"
 import { CasualUser, NormalPostBody } from "../StorageDataTypes"
 
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
@@ -82,5 +82,10 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
         fakeAccounts.find(account => account.name === reels[index].author.userName)?.posts.push(reels[index])
     }
 
+    const muteImages = await generateXMutedImagePosts(3, fakeAccounts)
+    for (let index = 0; index < muteImages.length; index++) {
+        fakeAccounts.find(account => account.name === muteImages[index].author.userName)?.posts.push(muteImages[index])
+    }
+    
     return fakeAccounts
 }
