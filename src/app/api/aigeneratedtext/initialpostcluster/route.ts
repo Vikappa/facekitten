@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
                         "Content-Type": "application/json",
                     },
                 }
-            );
+            )
         }
     }
 
@@ -64,5 +64,5 @@ export async function POST(req: NextRequest) {
                 "Content-Type": "application/json",
             },
         }
-    );
+    )
 }
