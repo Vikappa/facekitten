@@ -1,5 +1,5 @@
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
-import { CasualUser, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails, VideoPostBody } from "../StorageDataTypes"
+import { CasualUser, ImagePostBody, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails, VideoPostBody } from "../StorageDataTypes"
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
 
 //Sorteggio a caso di parole
@@ -378,7 +378,81 @@ export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[])
 };
 
 export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):Post[] => {
+
+  const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
+  const maxIntervalInDays = 86400000 * 2;   // 2 giorni
+
+  let lastPostTime = new Date().getTime();
+  lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
+  
   const returnArray: Post[] = [];
+  let limit = 0
+  if(x > inputAuthors.length){
+    limit = inputAuthors.length
+  } else {
+    limit = x
+  }
+
+  for (let index = 0; index < x; index++) {
+    const muted = 70 > Math.floor(Math.random() * 100)
+    const newBody: ImagePostBody = {
+      imageUrl: inputAuthors[index].profilePic,
+      generativeContext: "",
+      imagePostText: muted?'':FakePostCommentTextFactory()
+    }
+    const newPost:Post = {
+      id: inputAuthors[index].posts.length,
+      author: {
+        userName: inputAuthors[index].name,
+        profilepicture: inputAuthors[index].profilePic,
+        coverPhotoUrl: inputAuthors[index].coverPhotoUrl,
+      },
+      body: newBody,
+      comments: [],
+      created_at: new Date(lastPostTime).toISOString(),
+      likes: 0,
+      userliked: false,
+      likeProfiles: []
+    }
+    returnArray.push(newPost)
+    lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays)
+  }
+
+  return returnArray
+}
+
+export const create3ImagePostsNoAI = async (inputAuthors: CasualUser[]):Promise<Post[]> => {
+  const returnArray: Post[] = []
+  const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
+  const maxIntervalInDays = 86400000 * 2;   // 2 giorni
+  const shuffledArray = inputAuthors.sort(() => Math.random() - 0.5);
+  let lastPostTime = new Date().getTime();
+  lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
+  for (let index = 0; index < 3; index++) {
+    const random = 70 < Math.floor(Math.random() * 100)
+    const newBody: ImagePostBody = {
+      imageUrl: await fetchRandomPostFoto(),
+      imagePostText: random?FakePostCommentTextFactory():'',
+      generativeContext: ""
+    }    
+    const newPost:Post = {
+      id: returnArray.length,
+      author: {
+        userName: shuffledArray[index].name,
+        profilepicture: shuffledArray[index].profilePic,
+        coverPhotoUrl: shuffledArray[index].coverPhotoUrl,
+      },
+      body: newBody,
+      comments: [],
+      created_at: new Date(lastPostTime).toISOString(),
+      likes: 0,
+      userliked: false,
+      likeProfiles: []
+    }
+
+    returnArray.push(newPost)
+    lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays)
+  }
 
   return returnArray
 }
