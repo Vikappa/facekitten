@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server"
-import { json } from "stream/consumers"
 import fs from "fs"
 import path from "path"
 import { GoogleGenerativeAI } from "@google/generative-ai"
