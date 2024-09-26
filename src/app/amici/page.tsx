@@ -10,6 +10,7 @@ const AmiciPage = () => {
         <>
         <NavBar/>
         <StoreMonitor/>
+        
         </>
     )
 }
