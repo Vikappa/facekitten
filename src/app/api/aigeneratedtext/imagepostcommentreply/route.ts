@@ -41,16 +41,16 @@ export async function POST(req:NextRequest) {
         return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const {testo, immagine, commentAuthor} = await req.json()
-
+    const {testoDelPost, imageUrl, authorname} = await req.json()
+    console.log(testoDelPost, imageUrl, authorname)
     try {
-        const filePart1 = fileToGenerativePart(immagine, "image/jpeg")
+        const filePart1 = fileToGenerativePart(imageUrl, "image/jpeg")
         // Initialize the Google Generative AI instance
         const genAI = new GoogleGenerativeAI(GAK);
         const model = genAI.getGenerativeModel({
         model: "gemini-1.5-pro",
       })
-        const generatedContent = await model.generateContent([prompt(commentAuthor, testo), filePart1])
+        const generatedContent = await model.generateContent([prompt(authorname, testoDelPost), filePart1])
         return NextResponse.json({
             text: generatedContent.response.text()
         })

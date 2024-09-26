@@ -21,6 +21,7 @@ const PostCommentForm = ({post}: {post: Post}) => {
 
         if(post && commentValue){
             const postIndex = post.id
+            // se l'autore del post è l'utente
             if(post.author.userName === userDetails.userName) {
                 dispatch(addCommentToUserPost({
                     postNumber: postIndex,
@@ -82,6 +83,7 @@ const PostCommentForm = ({post}: {post: Post}) => {
                     }))
                 }, Math.round(Math.random() * 11900+100))
             } else  {
+                //l'autore del post non è l'utente
                 dispatch(addCommentToPost({
                     post,
                     commentValue,

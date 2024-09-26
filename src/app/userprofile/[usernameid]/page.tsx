@@ -10,18 +10,30 @@ import { setNavbarPage } from '@/app/lib/slices/appStateSlice'
 import BotProfileRenderer from '@/app/organisms/BotProfileRenderer'
 
 const UserBotPage = () => {
-    const params = useParams()
-    const usernameid = Array.isArray(params.usernameid) ? params.usernameid[0] : params.usernameid
-    const userNameString = decodeURIComponent(usernameid || '')
-    const userCredential = useAppSelector(state => state.sessionGeneratedAccounts.acc.find( account => account.name === userNameString))
-
-    const dispatch = useAppDispatch()
+    // Verifica che siamo in ambiente browser e ottieni il path
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+    console.log(pathname)
     
-    useEffect(() => {
-        dispatch(setNavbarPage(20))
-    }, [dispatch])
+    // Spezza l'URL in segmenti
+    const segments = pathname.split('/');
+    
+    // Ottieni il penultimo segmento che contiene il nome
+    const encodedName = segments[segments.length - 2]; // penultimo segmento
+    
+    // Decodifica il nome per rimuovere %20 e altri caratteri codificati
+    const userNameString = decodeURIComponent(encodedName);
 
-    if(userCredential){
+    const userCredential = useAppSelector(state => 
+        state.sessionGeneratedAccounts.acc.find(account => account.name === userNameString)
+    );
+
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(setNavbarPage(20));
+    }, [dispatch]);
+
+    if (userCredential) {
         return (
             <div id="container bg-danger">
                 <ModaleNotificationMobileModale />
@@ -29,7 +41,10 @@ const UserBotPage = () => {
                 <Navbar />
                 <BotProfileRenderer user={userCredential} />
             </div>
-        )
+        );
     }
+
+    return <div>Loading...</div>;
 }
-export default UserBotPage
+
+export default UserBotPage;

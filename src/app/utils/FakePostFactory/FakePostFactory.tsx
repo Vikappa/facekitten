@@ -176,7 +176,7 @@ export const GenerateCommentText = async (post: Post, authorname: string): Promi
     .join('\n')
 
     try {
-      const response = await fetch('/api/marketplacepost/commentmarketplacepost', {
+      const response = await fetch('/api/aigeneratedtext/imagepostcommentreply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -288,7 +288,6 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
         marketplacePrice: parsedText[(index+6)]
       }
 
-      lastId++
 
       const post:Post = {
         id: lastId,
@@ -303,6 +302,7 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
 
       returnArray.push(post)
       lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
+      lastId++
     }
 
     return returnArray
@@ -318,7 +318,9 @@ export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[])
   const shuffledArray = inputAuthors.sort(() => Math.random() - 0.5);
   const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
   const maxIntervalInDays = 86400000 * 2;   // 2 giorni
-
+  let postsNumber: number = inputAuthors
+  .flatMap(author => author.posts)
+  .length; 
   let lastPostTime = new Date().getTime();
   lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
 
@@ -347,7 +349,7 @@ export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[])
     };
 
     const newPost: Post = {
-      id: returnArray.length, 
+      id: postsNumber, 
       author: {
         userName: shuffledArray[index].name,
         profilepicture: shuffledArray[index].profilePic,
@@ -363,6 +365,7 @@ export const generateXVideoPosts = async (x: number, inputAuthors: CasualUser[])
 
     returnArray.push(newPost);
     lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
+    postsNumber++;
   }
 
   return returnArray;

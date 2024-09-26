@@ -12,7 +12,7 @@ const UserProfilePage = () => {
             <ModaleNotificationMobileModale/>
             <MobileOptionFullScreenModal />
             <Navbar/>
-                <UserProfileRenderer/>
+            <UserProfileRenderer/>
         </div>
     )
 }

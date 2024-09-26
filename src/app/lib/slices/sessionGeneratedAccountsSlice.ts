@@ -1,7 +1,6 @@
 import { CreateInitialCluster } from '@/app/utils/FakeAccountsClusterFactory/FakeAccountsClusterFactory';
 import { CasualUser, Post, PostComment, UserDetails } from '@/app/utils/StorageDataTypes';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { use } from 'react';
 
 interface sessionGeneratedAccountsState {
     acc: CasualUser[];
@@ -31,7 +30,7 @@ const userCredentialsSlice = createSlice({
       const targetPost = state.acc.find(user => user.name === post.author.userName)?.posts.find(p => p.id === post.id);
       if (targetPost) {
         targetPost.comments.push({
-          id: targetPost.comments.length + 1,
+          id: targetPost.comments.length,
           author: author,
           body: commentValue,
           commented_at: new Date().toISOString()

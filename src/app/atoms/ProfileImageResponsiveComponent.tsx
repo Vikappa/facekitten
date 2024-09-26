@@ -2,12 +2,15 @@
 import Image from "next/image"
 import { useAppSelector } from "../lib/hooks"
 import FriendsImagesRow from "../components/FriendsImagesRow"
+import ProfilePageBar from "../components/ProfilePageBar"
+import { useState } from "react"
 
 const ProfileImageResponsiveComponent = (
     {profilePicture, userName}:
     {profilePicture: string, userName: string}
 ) => {
     const friendsNum = useAppSelector(state => state.friendList.friends.length)
+    const [profileBarState, setProfileBarState] = useState(1)
     return(
             <>
             {/* desktop */}
@@ -35,7 +38,7 @@ const ProfileImageResponsiveComponent = (
                 </div>
                 <div>
                     <hr/>
-                    posts about friends photos videos checkins more
+                    <ProfilePageBar profileBarState={profileBarState} setProfileBarState={setProfileBarState}/>
                 </div>
             </div>
 

@@ -30,7 +30,10 @@ function fileToGenerativePart(filePath: string, mimeType: string) {
   }
 
 const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> => {
-    const prompt = `
+  let postsNumber: number = inputAuthors
+  .flatMap(author => author.posts) 
+  .length; 
+  const prompt = `
     Su un social network, facekitten, sono iscritti solo gatti. Devi generare 3 testi dei post per le tre immagini fornite.
     I testi devono essere brevi e divertenti. Non ripeterti.
     Non mettere intestazioni. 
@@ -84,7 +87,7 @@ const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> =
         imagePostText: texts[index]
       }
       const newPost:Post = {
-        id: inputAuthors[index].posts.length,
+        id: postsNumber,
         author: {
           userName: inputAuthors[index].name,
           profilepicture: inputAuthors[index].profilePic,
@@ -99,6 +102,7 @@ const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> =
       }
       returnArray.push(newPost)
       lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays)
+      postsNumber++
     }
   
     return returnArray

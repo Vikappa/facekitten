@@ -89,7 +89,6 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
 
     const textedImagePostPosts = await fetchTextedImgPosts(fakeAccounts)
     for (let index = 0; index < textedImagePostPosts.length; index++) {
-        console.log(textedImagePostPosts[index])
         fakeAccounts.find(account => account.name === textedImagePostPosts[index].author.userName)?.posts.push(textedImagePostPosts[index])
     }
 
