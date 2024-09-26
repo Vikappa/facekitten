@@ -1,3 +1,4 @@
+import { postImgIndexes } from "../../../../public/storedcatphotos/imgs/postImgIndexes"
 import { generateRandomInterval } from "../FakeAccountFactory/FakeAccountFactory"
 import { CasualUser, ImagePostBody, MarketPlacePostString, NormalPostBody, Post, PostComment, UserDetails, VideoPostBody } from "../StorageDataTypes"
 const jwtSecret = process.env.NEXT_PUBLIC_SELF
@@ -386,7 +387,7 @@ export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):P
   for (let index = 0; index < x; index++) {
     const muted = 70 > Math.floor(Math.random() * 100)
     const newBody: ImagePostBody = {
-      imageUrl: inputAuthors[index].profilePic,
+      imageUrl: 70> Math.floor(Math.random() * 100) ? postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)] : inputAuthors[index].profilePic,
       generativeContext: "",
       imagePostText: muted?'':FakePostCommentTextFactory()
     }
