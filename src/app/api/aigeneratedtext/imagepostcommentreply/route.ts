@@ -31,7 +31,8 @@ Devi interpretare un gatto che pubblica un post in un social network chiamato Fa
 L'utente ha commentato un post con immagine.
 Devi interpretare ${commentAuthor.userName}.
 Il post è questo ${postText}.
-Sii divertente e cerca di mandare avanti la conversazione.
+Sii divertente e cerca di mandare avanti la conversazione. Non ripetere il testo del post.
+Non usare intestazioni o footer. Rispondi solo e unicamente col testo del commento.
 `
 
 
@@ -55,6 +56,7 @@ export async function POST(req:NextRequest) {
             text: generatedContent.response.text()
         })
     } catch (error) {
+      console.error('Error:', error)
         return new NextResponse('Internal Server Error', { status: 500 })
     }
 }
