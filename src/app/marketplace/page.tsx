@@ -9,11 +9,16 @@ import '@/app/style.css'
 import MarketplaceContent from "../organisms/MarketplacePage"
 import ModaleNotificationMobileModale from "../modali/ModaleNotificationMobileModale"
 import { setNavbarPage } from "../lib/slices/appStateSlice"
+import MarketplaceSpinnerGroup from "../spinners/MarketplaceSpinnerGroup"
+import { useRouter } from "next/navigation"
 
 const selfToken = process.env.NEXT_PUBLIC_SELF
 
 const MarketplacePage = () => {
+  const userCredentials = useAppSelector(state => state.userCredentials); 
+  const router = useRouter()
   const dispatch = useAppDispatch()
+  const [isLoading, setIsLoading] = useState(true)
   const navbarPage = useAppSelector(state => state.status.shownpage)
   const userPosts = useAppSelector(state => state.posts.userPosts)
   const accountsPost = useAppSelector(state => state.sessionGeneratedAccounts.acc.flatMap(account => account.posts))
@@ -41,7 +46,7 @@ const MarketplacePage = () => {
 
   useEffect(() => {
     const fetchInitialCluster = async () => {
-        const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth)
+        const initialCluster = await GenerateInitialMarketplaceCluster(postNumber, random3Auth, setIsLoading)
         dispatch(addPostsToOriginalAccount(initialCluster))
       
     }
@@ -52,13 +57,18 @@ const MarketplacePage = () => {
       if(navbarPage !== 2){
           dispatch(setNavbarPage(2))
       }
+      if(userCredentials.userName===''){
+        router.push('/') 
+      }
   }, [])
 
   return (
     <>
       <NavBar />
       <ModaleNotificationMobileModale />
-      <MarketplaceContent />
+      { !isLoading? <MarketplaceContent /> :
+      <MarketplaceSpinnerGroup/>
+      }
     </>
   )
 }

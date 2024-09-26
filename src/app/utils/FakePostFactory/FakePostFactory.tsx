@@ -259,7 +259,7 @@ export const fetchRandomPostFoto = async (): Promise<string> => {
     }
 }
 
-export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[]):Promise<Post[]> => {
+export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAuthor:UserDetails[], setIsLoading: (state: boolean) => void):Promise<Post[]> => {
   const minIntervalInHours = 1000*60*60*3;  // Intervallo minimo tra i post (3 ore)
   const maxIntervalInDays = 86400000 *2;   // Intervallo massimo tra i post (2 giorni)
   const queryUrl = `/api/marketplacepost/initialcluster`;
@@ -304,10 +304,11 @@ export const GenerateInitialMarketplaceCluster = async (lastId:number, randomAut
       lastPostTime -= generateRandomInterval(minIntervalInHours , maxIntervalInDays )
       lastId++
     }
-
+    setIsLoading(false)
     return returnArray
   } else {
     console.error('Errore nella fetch dei post marketplace casuale');
+    setIsLoading(false)
     return []
   }
 }
