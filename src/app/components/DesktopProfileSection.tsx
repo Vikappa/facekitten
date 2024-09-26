@@ -20,7 +20,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
 
     const handleFirstButton = () => {
         dispatch(setShowDropDownNotification(false))
-        dispatch(setShowProfileDropDown(!showProfileDropDown))
+        dispatch(setShowProfileDropDown(false))
         if(selected === 5){
             setSelected(0)
         } else {
