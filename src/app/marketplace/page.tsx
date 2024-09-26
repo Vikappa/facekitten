@@ -49,8 +49,8 @@ const MarketplacePage = () => {
   }, [marketPlacePostsCount, postNumber, random3Auth])
 
   useEffect(() => {
-      if(navbarPage !== 9){
-          dispatch(setNavbarPage(9))
+      if(navbarPage !== 2){
+          dispatch(setNavbarPage(2))
       }
   }, [])
 
