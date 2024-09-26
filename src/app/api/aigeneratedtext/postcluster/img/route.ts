@@ -5,6 +5,7 @@ import { FakePostCommentTextFactory, fetchRandomPostFoto } from "@/app/utils/Fak
 import { CasualUser, ImagePostBody, Post } from "@/app/utils/StorageDataTypes";
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { NextRequest, NextResponse } from "next/server";
+import { postImgIndexes } from "../../../../../../public/storedcatphotos/imgs/postImgIndexes";
 
 const GAK = process.env.GOOGLE_GEMINI_API_KEY
 const  jwtSecret = process.env.NEXT_PUBLIC_SELF
@@ -32,18 +33,20 @@ const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> =
     const prompt = `
     Su un social network, facekitten, sono iscritti solo gatti. Devi generare 3 testi dei post per le tre immagini fornite.
     I testi devono essere brevi e divertenti. Non ripeterti.
+    Non mettere intestazioni. 
+    Rispondi solo e unicamente con il testo dei post in questo formato:
+    testo1#testo2#testo3
     `
     const returnArray: Post[] = []
     const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
     const maxIntervalInDays = 86400000 * 2;   // 2 giorni
-    const shuffledArray = inputAuthors.sort(() => Math.random() - 0.5);
     let lastPostTime = new Date().getTime();
     lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
     const images: string[] = []
     const texts: string[] = []
-    images.push(await fetchRandomPostFoto())
-    images.push(await fetchRandomPostFoto())
-    images.push(await fetchRandomPostFoto())
+    images.push(postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)])
+    images.push(postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)])
+    images.push(postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)])
     try {
       if(GAK){
         const filePart1 = fileToGenerativePart(images[0], "image/jpeg")
@@ -58,6 +61,10 @@ const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> =
               // Combine prompt and images
               const imageParts = [filePart1, filePart2, filePart3];
               const generatedContent = await model.generateContent([prompt, ...imageParts])
+              let textExtended = [...generatedContent.response.text().split('#')]
+              for (let index = 0; index < textExtended.length; index++) {
+                texts.push(textExtended[index])                
+              }
       } else {
         console.log("No GAK")
         texts.push(FakePostCommentTextFactory())
@@ -99,8 +106,10 @@ const generate3ImagePosts = async (inputAuthors: CasualUser[]):Promise<Post[]> =
 
 export async function POST(request:NextRequest){
 
-    const token = request.headers.get("Authorization")
+    let auth = request.headers.get("Authorization")
+    const token = auth?.split(' ')[1];  
 
+    
     const {authors} = await request.json()
 
     if(!token || token !== jwtSecret){
@@ -108,7 +117,6 @@ export async function POST(request:NextRequest){
     }
 
     const returnArray: Post[] = await generate3ImagePosts(authors)
-
 
     return new NextResponse(
         JSON.stringify(returnArray),

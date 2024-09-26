@@ -410,3 +410,26 @@ export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):P
 
   return returnArray
 }
+
+export const fetchTextedImgPosts = async (usersArray:CasualUser[]):Promise<Post[]> => {
+
+  const returnArray: Post[] = []
+
+  const response = await fetch('/api/aigeneratedtext/postcluster/img', 
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${jwtSecret}`
+      }, 
+      method: "POST",
+      body: JSON.stringify({authors: usersArray})
+    }
+  )
+
+  if(response.ok){
+    const generatedPosts = await response.json()
+    returnArray.push(...generatedPosts)
+  }
+
+  return returnArray
+}
