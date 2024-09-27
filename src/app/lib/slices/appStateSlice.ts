@@ -8,6 +8,7 @@ interface AppStatusState {
   showNotificationDropDown: boolean;
   showProfileDropDown: boolean;
   showNotificationModal: boolean;
+  showMessengerDropDown: boolean;
 }
 
 const initialState: AppStatusState = {
@@ -17,6 +18,7 @@ const initialState: AppStatusState = {
   showNotificationDropDown: false,
   showProfileDropDown: false,
   showNotificationModal:false,
+  showMessengerDropDown: false,
 }
 
 const appStatusSlice = createSlice({
@@ -52,6 +54,12 @@ const appStatusSlice = createSlice({
      },
      updateShowNotificationModal: (state) => {
       state.showNotificationModal = !state.showNotificationModal
+     },
+     updateShowMessengerDropDown: (state) => {
+      state.showMessengerDropDown = !state.showMessengerDropDown
+     },
+     setShowMessengerDropDown: (state, action: PayloadAction<boolean>) => {
+      state.showMessengerDropDown = action.payload;
      }
     }
 });
@@ -59,5 +67,6 @@ const appStatusSlice = createSlice({
 export const { setNavbarPage, initializeAppGlobalStatus, 
   updateShowOptionsModal, hideOptionsModal, setShowMobileSearch, 
   setShowMobileSearchFalse, setShowDropDownNotification, setShowProfileDropDown,
-  setShowNotificationModal, updateShowNotificationModal } = appStatusSlice.actions;
+  setShowNotificationModal, updateShowNotificationModal,
+  updateShowMessengerDropDown, setShowMessengerDropDown } = appStatusSlice.actions;
 export default appStatusSlice.reducer;

@@ -8,8 +8,9 @@ import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setShowDropDownNotification, setShowNotificationModal, setShowProfileDropDown } from "../lib/slices/appStateSlice";
+import { setShowDropDownNotification, setShowMessengerDropDown, setShowNotificationModal, setShowProfileDropDown, updateShowMessengerDropDown } from "../lib/slices/appStateSlice";
 import NotificationButton from "../atoms/NotificationButton";
+import MessengerButton from "./MessengerButton";
 
 
 const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSelected(selected:number): void;}) => {
@@ -21,36 +22,23 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
     const handleFirstButton = () => {
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
-        if(selected === 5){
-            setSelected(0)
-        } else {
-            setSelected(5)
-        }
+        dispatch(setShowMessengerDropDown(false))
     }
 
     const handleSecondButton = () => {
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
-        if(selected === 6){
-            setSelected(0)
-        } else {
-            setSelected(6)
-        }
+        dispatch(updateShowMessengerDropDown())
+
     }
     
     const handleThirdButtonButton = () => {
         dispatch(setShowDropDownNotification(!showNotificationDropDown))
         dispatch(setShowProfileDropDown(false))
         dispatch(setShowNotificationModal(false))
+        dispatch(setShowMessengerDropDown(false))
     }
 
-    const handleProfileButtonButton = () => {
-        if(selected === 8){
-            setSelected(0)
-        } else {
-            setSelected(8)
-        }
-    }
 
     return(
         <div className="d-none d-sm-flex align-items-center p-0 m-0 gap-2 ">
@@ -65,14 +53,8 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             size={30}
             />
 
-            <RoundGreyBorderLess 
-            iconSelected={<FaFacebookMessenger/>} 
-            iconUnselected={<RiMessengerLine />} 
-            selected={(selected === 6)} 
+            <MessengerButton 
             onClick={handleSecondButton}
-            bgSelected="bg-quinary"
-            bgNotSelected="bg-grayBg"
-            size={30}
             />
 
             
