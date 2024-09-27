@@ -62,6 +62,15 @@ const MarketplacePage = () => {
       }
   }, [])
 
+  useEffect(() => {
+    if (marketPlacePostsCount > 0) {
+      setIsLoading(false)
+    }
+  }, [marketPlacePostsCount])
+  
+
+
+
   return (
     <>
       <NavBar />
