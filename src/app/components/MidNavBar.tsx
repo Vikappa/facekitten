@@ -12,7 +12,6 @@ const MidNavBar = ({navbarPage, setNavbarPage}: {navbarPage:number; setNavbarPag
 
     const router = useRouter()
     const dispatch = useAppDispatch()
-    const showNotificationDropDown = useAppSelector( state => state.status.showNotificationDropDown)
 
     const setPage1 = () => {
         dispatch(setShowDropDownNotification(false))

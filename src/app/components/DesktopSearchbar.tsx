@@ -12,12 +12,14 @@ const DesktopSearchbar = () => {
     const [searchValue, setSearchValue] = useState('')
     const dispatch = useAppDispatch()
     const router = useRouter()
+
     const setPage1 = () => {
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
+        dispatch(setNavbarPage(1))
         router.push('/')
-        setNavbarPage(1)
     }
+    
 
     return(
         <div className="d-none d-sm-flex align-items-center gap-3">

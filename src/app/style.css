@@ -12758,7 +12758,7 @@ textarea.form-control-lg {
   background-size: 75px 175px, 100% 100px, 100% 16px, 100% 30px;
   background-position: -185px 0, center 0, center 115px, center 142px;
   box-sizing: border-box;
-  animation: animloader 1s linear infinite;
+  animation: marketplaceSpinnerAnimation 1s linear infinite;
 }
 
 @keyframes marketplaceSpinnerAnimation {
