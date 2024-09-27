@@ -10,7 +10,9 @@ const MarketplacePostCard = ({post}:{post: Post}) => {
     if(typeof post.body === "object" && 'marketplacePhotoUrl' in post.body){
         return(
             <div className="card mb-3 col-6 col-md-4 col-lg-3 col-xl-2 p-1 bg-transparent border-0 d-flex flex-column">
+                <Link href={`/userprofile/${post.author.userName}/${post.id}`} className="m-0 p-0">
                 <Image src={post.body.marketplacePhotoUrl} alt="Marketplace Post Image" className="card-img-top rounded-3" width={200} height={200} />
+                </Link>
                 <div className="p-1">
                     <Link href={`/userprofile/${post.author.userName}/${post.id}`} className="text-decoration-none text-black underline-hover">
                     <p className="p-0 m-0 fs-5 fw-semibold">{post.body.marketplacePrice}</p>
