@@ -10,6 +10,7 @@ import { FaFacebookMessenger } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa";
 import { BiSolidAddToQueue } from "react-icons/bi";
 import { RiUserAddFill } from "react-icons/ri";
+import ProfilePageBarButton from "./ProfilePageBarButton"
 
 const ProfileImageResponsiveComponent = (
     {profilePicture, userName}:
@@ -18,6 +19,7 @@ const ProfileImageResponsiveComponent = (
     const humanUserCredentials = useAppSelector(state => state.userCredentials)
     const friendsNum = useAppSelector(state => state.friendList.friends.length)
     const [profileBarState, setProfileBarState] = useState(1)
+    const [profileBarNum, setProfileBarNum] = useState(1)
     return(
             <>
             {/* desktop */}
@@ -40,7 +42,8 @@ const ProfileImageResponsiveComponent = (
                     </div>
 
                     <div className="ms-auto d-flex align-items-center gap-2">
-{                        (humanUserCredentials.userName === userName && humanUserCredentials.profilepictureUrl === profilePicture) ?
+                    {                        
+                        (humanUserCredentials.userName === userName && humanUserCredentials.profilepictureUrl === profilePicture) ?
                         <>
                             <Button variant="primary" className="fw-semibold fs-5 ">
                                     + Add a story
@@ -100,8 +103,18 @@ const ProfileImageResponsiveComponent = (
                         <FriendsImagesRow/>
                     </div>
                     <div>
-                    <hr/>
-                    posts about  more
+                    <hr className="w-100" style={{transform:'scale(1.5, 1)'}}/>
+                    <div className="d-flex">
+                        <ProfilePageBarButton text={"Posts"} selected={profileBarNum===1} setSelected={function (): void {
+                            setProfileBarNum(1);
+                        } }/>
+                        <ProfilePageBarButton text={"About"} selected={profileBarNum===2} setSelected={function (): void {
+                            setProfileBarNum(2);
+                        } }/>
+                        <ProfilePageBarButton text={"More"} selected={profileBarNum===3} setSelected={function (): void {
+                            setProfileBarNum(3);
+                        } }/>
+                    </div>
                 </div>
             </div>
 
