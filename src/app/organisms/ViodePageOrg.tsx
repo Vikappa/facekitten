@@ -59,7 +59,7 @@ const VideoPageOrg = () =>{
                             <DesktopReelSidebar/>
                         </div>
                     </div>
-                    <div className="d-flex p-md-5 flex-column align-items-center" style={{wminidth: '130%'}}>
+                    <div className="d-flex p-md-5 flex-column align-items-center">
                         {
                             reels.map(reel => (
                                 <ReelCard key={reel.id} reel={reel} />
