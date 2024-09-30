@@ -4,6 +4,9 @@ import { useAppSelector } from "../lib/hooks"
 import FriendsImagesRow from "../components/FriendsImagesRow"
 import ProfilePageBar from "../components/ProfilePageBar"
 import { useState } from "react"
+import { Button } from "react-bootstrap"
+import { FaPencilAlt } from "react-icons/fa";
+import { FaAngleDown } from "react-icons/fa";
 
 const ProfileImageResponsiveComponent = (
     {profilePicture, userName}:
@@ -32,8 +35,16 @@ const ProfileImageResponsiveComponent = (
                         <FriendsImagesRow/>
                     </div>
 
-                    <div className="ms-auto">
-                        add story edit profile
+                    <div className="ms-auto d-flex align-items-center gap-2">
+                        <Button variant="primary" className="fw-semibold fs-5 ">
+                            + Add a story
+                        </Button>
+                        <Button variant="quinary" className="fw-semibold fs-5" style={{color:'#1D1F23'}}>
+                        <FaPencilAlt /> Edit profile
+                        </Button>
+                        <Button variant="quinary" className="fw-semibold fs-5"  style={{color:'#1D1F23'}}>
+                        <FaAngleDown />
+                        </Button>
                     </div>
                 </div>
                 <div>

@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import '../../style.css'
 import Navbar from "../../components/NavBar"
 import ModaleNotificationMobileModale from "../../modali/ModaleNotificationMobileModale"
@@ -10,27 +10,30 @@ import { setNavbarPage } from '@/app/lib/slices/appStateSlice'
 import BotProfileRenderer from '@/app/organisms/BotProfileRenderer'
 
 const UserBotPage = () => {
-    // Verifica che siamo in ambiente browser e ottieni il path
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-    console.log(pathname)
+    const isLogged = useAppSelector(state => state.userCredentials.userName.length > 0)    
+    const segments = pathname.split('/')
+    const router = useRouter()
+
+    const encodedName = segments[segments.length - 1]
     
-    // Spezza l'URL in segmenti
-    const segments = pathname.split('/');
-    
-    // Ottieni il penultimo segmento che contiene il nome
-    const encodedName = segments[segments.length - 2]; // penultimo segmento
-    
-    // Decodifica il nome per rimuovere %20 e altri caratteri codificati
     const userNameString = decodeURIComponent(encodedName);
 
     const userCredential = useAppSelector(state => 
         state.sessionGeneratedAccounts.acc.find(account => account.name === userNameString)
-    );
+    )
+
+    useEffect(() => {
+        if(!isLogged){
+            router.push('/')
+        }
+    }, [isLogged])
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(setNavbarPage(20));
+        dispatch(setNavbarPage(20))
+        console.log(userNameString)
     }, [dispatch]);
 
     if (userCredential) {
@@ -44,7 +47,7 @@ const UserBotPage = () => {
         );
     }
 
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
 }
 
-export default UserBotPage;
+export default UserBotPage
