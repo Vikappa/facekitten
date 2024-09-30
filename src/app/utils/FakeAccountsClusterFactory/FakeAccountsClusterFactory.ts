@@ -31,15 +31,18 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
             body: JSON.stringify({ news: getCasualNewsArray() })
         }
     )
+
     if (response.ok) {
         const data = await response.json()
         const postStrings = [...data]
+        
         for (let index = 0; index < postStrings.length; index++) {
             const newPostBody:NormalPostBody = {
                 normalPostTex: postStrings[index]
             }
             postTexts.push(newPostBody)
         }
+
     } else {
         for (let index = 0; index < 30; index++) {
             postTexts.push(FakePostTextFactory())            
@@ -76,18 +79,21 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
         })
     }
 
+    const muteImages = generateXMutedImagePosts(3, fakeAccounts)
+
+    for (let index = 0; index < muteImages.length; index++) {
+        fakeAccounts.find(account => account.name === muteImages[index].author.userName)?.posts.push(muteImages[index])
+    }
+
     const reels = await generateXVideoPosts(3, fakeAccounts);
     
     for (let index = 0; index < reels.length; index++) {
         fakeAccounts.find(account => account.name === reels[index].author.userName)?.posts.push(reels[index])
     }
 
-    const muteImages = generateXMutedImagePosts(3, fakeAccounts)
-    for (let index = 0; index < muteImages.length; index++) {
-        fakeAccounts.find(account => account.name === muteImages[index].author.userName)?.posts.push(muteImages[index])
-    }
 
     const textedImagePostPosts = await fetchTextedImgPosts(fakeAccounts)
+    
     for (let index = 0; index < textedImagePostPosts.length; index++) {
         fakeAccounts.find(account => account.name === textedImagePostPosts[index].author.userName)?.posts.push(textedImagePostPosts[index])
     }

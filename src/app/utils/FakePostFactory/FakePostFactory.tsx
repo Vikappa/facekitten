@@ -376,6 +376,7 @@ export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):P
 
   const minIntervalInHours = 1000 * 60 * 60 * 3;  // 3 ore
   const maxIntervalInDays = 86400000 * 2;   // 2 giorni
+  let postsNumber:number = inputAuthors.reduce((total, author) => total + author.posts.length, 0)
 
   let lastPostTime = new Date().getTime();
   lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays);
@@ -396,7 +397,7 @@ export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):P
       imagePostText: muted?'':FakePostCommentTextFactory()
     }
     const newPost:Post = {
-      id: inputAuthors[index].posts.length,
+      id: postsNumber,
       author: {
         userName: inputAuthors[index].name,
         profilepicture: inputAuthors[index].profilePic,
@@ -409,6 +410,7 @@ export const generateXMutedImagePosts = (x:number, inputAuthors: CasualUser[]):P
       userliked: false,
       likeProfiles: []
     }
+    postsNumber++
     returnArray.push(newPost)
     lastPostTime -= generateRandomInterval(minIntervalInHours, maxIntervalInDays)
   }
