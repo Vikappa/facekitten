@@ -8,7 +8,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import ProfileRoundButton from "../atoms/ProfileRoundButton";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { setShowDropDownNotification, setShowMessengerDropDown, setShowNotificationModal, setShowProfileDropDown, updateShowMessengerDropDown } from "../lib/slices/appStateSlice";
+import { setShowDropDownNotification, setShowMessengerDropDown, setShowMobileSearch, setShowNotificationModal, setShowProfileDropDown, updateShowMessengerDropDown, updateShowOptionsModal } from "../lib/slices/appStateSlice";
 import NotificationButton from "../atoms/NotificationButton";
 import MessengerButton from "./MessengerButton";
 
@@ -20,16 +20,18 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
     const showProfileDropDown = useAppSelector (state => state.status.showNotificationDropDown)
 
     const handleFirstButton = () => {
+        setSelected(8)
+        dispatch(updateShowOptionsModal())
+        dispatch(setShowNotificationModal(false))
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
-        dispatch(setShowMessengerDropDown(false))
+        dispatch(setShowMobileSearch(false))
     }
 
     const handleSecondButton = () => {
         dispatch(setShowDropDownNotification(false))
         dispatch(setShowProfileDropDown(false))
         dispatch(updateShowMessengerDropDown())
-
     }
     
     const handleThirdButtonButton = () => {
@@ -46,7 +48,7 @@ const DesktopProfileSection = ({selected, setSelected}: {selected: number; setSe
             <RoundGreyBorderLess 
             iconSelected={<PiSquaresFourFill />} 
             iconUnselected={<PiSquaresFourThin/>} 
-            selected={(selected === 5)} 
+            selected={(selected === 8)} 
             onClick={handleFirstButton}
             bgSelected="bg-quinary"
             bgNotSelected="bg-grayBg"

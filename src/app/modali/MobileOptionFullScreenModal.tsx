@@ -22,7 +22,6 @@ const MobileOptionFullScreenModal = () => {
           dispatch(setNavbarPage(0))
           dispatch(hideOptionsModal())
         }}>
-        {/* Fixato l'header con position sticky e z-index */}
         <div 
           className="p-2 px-3 bg-grayBg d-flex justify-content-between position-sticky" 
           style={{ top: 0, zIndex: 1050 }}>
@@ -41,10 +40,9 @@ const MobileOptionFullScreenModal = () => {
             }} />
           </div>
         </div>
-        {/* Aggiunto padding top per il body in modo che non venga coperto */}
         <Modal.Body 
           className="bg-grayBg d-flex flex-column align-items-center justify-content-md-start p-3"
-          style={{ paddingTop: '80px' }}> {/* Aggiunto paddingTop */}
+          > 
           <MobileOptProfileRectangle/>
           <TastieraFunzioni/>
           <MobileOptionAccordion/>
