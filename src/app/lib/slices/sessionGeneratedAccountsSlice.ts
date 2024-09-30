@@ -79,10 +79,18 @@ const userCredentialsSlice = createSlice({
     addPostsToOriginalAccount: (state, action: PayloadAction<Post[]>) => {
       const newPosts = action.payload;
       newPosts.forEach(newPost => {
-        const targetUser = state.acc.find(suser => suser.name === newPost.author.userName);
-        if (targetUser) {
-          targetUser.posts.push(newPost);
+        const targetUser = state.acc.find(suser => suser.name === newPost.author.userName)
+        let found = false 
+        targetUser?.posts.forEach(post => {
+          console.error('Id posts ripetuti, impossibile aggiungere gli id; Post trovato:', post.id, ' Post da aggiungere:', newPost.id, post, newPost)
+          if (post.id === newPost.id) {
+            found = true
+          }
+        })
+        if (!found) {
+          targetUser?.posts.push(newPost)
         }
+
       })
     }
  },
