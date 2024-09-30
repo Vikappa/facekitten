@@ -11,22 +11,26 @@ import { useDispatch } from 'react-redux';
 import { setNavbarPage } from './lib/slices/appStateSlice';
 
 export default function Home() {
-  const userCredentials = useAppSelector(state => state.userCredentials)
-  const dispatch = useDispatch()
-  const navbarPage = useAppSelector(state => state.status.shownpage)
+  const userCredentials = useAppSelector(state => state.userCredentials);
+  const dispatch = useDispatch();
+  const navbarPage = useAppSelector(state => state.status.shownpage);
+
+  useEffect(() => {
+    if (navbarPage !== 1) {
+      dispatch(setNavbarPage(1));
+    }
+  }, [navbarPage, dispatch]);
+
   if (userCredentials.userName === '') {
     return (
-      <main className={'container py-5 bg-grayBg'} style={{maxWidth: '100vw'}}>
+      <main className={'container py-5 bg-grayBg'} style={{ maxWidth: '100vw' }}>
         <LoginPage />
       </main>
     );
   } else {
-    if(navbarPage!==1){
-      dispatch(setNavbarPage(1))
-    }
     return (
       <>
-        <NavBar/>  
+        <NavBar />
         <ModaleNotificationMobileModale />
         <HomePage />
         <ChatsRenderer />
