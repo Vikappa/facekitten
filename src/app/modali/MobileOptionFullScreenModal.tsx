@@ -21,32 +21,34 @@ const MobileOptionFullScreenModal = () => {
         onHide={() => {
           dispatch(setNavbarPage(0))
           dispatch(hideOptionsModal())
-        }
-        }>
-        <Modal.Header className="p-2 px-3 bg-grayBg d-flex justify-content-between">
+        }}>
+        {/* Fixato l'header con position sticky e z-index */}
+        <div 
+          className="p-2 px-3 bg-grayBg d-flex justify-content-between position-sticky" 
+          style={{ top: 0, zIndex: 1050 }}>
           <div className="d-flex justify-content-between align-items-center w-100 bg-grayBg">
             <div className="d-flex align-items-center justify-content-center gap-3">
-            <FaArrowLeft  onClick={() => {
-          dispatch(setNavbarPage(0))
-          dispatch(hideOptionsModal())
-        }}/>
-            <Modal.Title className="bg-grayBg" style={{fontWeight:'bold'}}>Menu</Modal.Title>
+              <FaArrowLeft  onClick={() => {
+                dispatch(setNavbarPage(0))
+                dispatch(hideOptionsModal())
+              }}/>
+              <div className="bg-grayBg" style={{ fontWeight: 'bold' }}>Menu</div>
             </div>
-          <FaSearch onClick={() => {
-          dispatch(setNavbarPage(0))
-          dispatch(hideOptionsModal())
-          dispatch(setShowMobileSearch(true))
-        }} />
+            <FaSearch onClick={() => {
+              dispatch(setNavbarPage(0))
+              dispatch(hideOptionsModal())
+              dispatch(setShowMobileSearch(true))
+            }} />
           </div>
-        </Modal.Header>
+        </div>
+        {/* Aggiunto padding top per il body in modo che non venga coperto */}
         <Modal.Body 
-        className="bg-grayBg
-        d-flex flex-column align-items-center justify-content-center p-3
-        ">
+          className="bg-grayBg d-flex flex-column align-items-center justify-content-md-start p-3"
+          style={{ paddingTop: '80px' }}> {/* Aggiunto paddingTop */}
           <MobileOptProfileRectangle/>
           <TastieraFunzioni/>
           <MobileOptionAccordion/>
-          </Modal.Body>
+        </Modal.Body>
       </Modal>
     )
 }

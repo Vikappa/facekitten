@@ -19,6 +19,12 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
     const dispatch = useAppDispatch()
     const router = useRouter()
 
+    const goToAuthorPage = () => {
+        dispatch(setNavbarPage(30))
+        dispatch(setShowProfileDropDown(false))
+        router.push('/aboutme')
+    }
+
     const logOutFunction = () => {
         localStorage.removeItem('persist:root')
         window.location.reload();
@@ -72,7 +78,7 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
                         onClick={function (): void { }}
                         size={8} />
                 </div>
-                <p className='p-0 m-0 ps-5'>Help and support!</p>
+                <p className='p-0 m-0 ps-5'>About the author</p>
             </ListGroup.Item>
             <ListGroup.Item style={{cursor:'pointer'}} className='d-flex align-content-center align-items-center gap-2 m-1  rounded-2 border-0 liHoverEffect'>
                 <div style={{ transform: 'scale(0.7)', position: 'absolute' }}>
@@ -82,7 +88,7 @@ const DeskTopProfileDropdown = ({show}: {show:boolean}) => {
                         iconSelected={<TbZoomExclamationFilled />}
                         iconUnselected={<TbZoomExclamationFilled />}
                         selected={false}
-                        onClick={function (): void { }}
+                        onClick={goToAuthorPage}
                         size={8} />
                 </div>
                 <p className='p-0 m-0 ps-5'>Give Feedback</p>

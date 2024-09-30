@@ -21,8 +21,8 @@ const MobileOptProfileRectangle = () => {
     <div 
     onClick={handleClick}
     className="
-    bg-white w-100 p-2 mt-3 px-3 d-flex align-items-center gap-3
-    rounded-3 
+    bg-white w-100 p-2 px-3 d-flex align-items-center gap-3
+    rounded-3
     "
     style={{
         border:'1px solid var(--bs-quinary)'

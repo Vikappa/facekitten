@@ -14,7 +14,7 @@ import { FaCalendar } from "react-icons/fa";
 import { IoBrowsers } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/app/lib/hooks";
-import { setShowProfileDropDown } from "@/app/lib/slices/appStateSlice";
+import { setNavbarPage, setShowProfileDropDown, updateShowOptionsModal } from "@/app/lib/slices/appStateSlice";
 
 const TastieraFunzioni = () => {
     const router = useRouter()
@@ -22,6 +22,13 @@ const TastieraFunzioni = () => {
     const pushToAmici = () => {
         dispatch(setShowProfileDropDown(false))
         router.push('/amici')
+    }
+
+    const goToAuthorPage = () => {
+        dispatch(setNavbarPage(30))
+        dispatch(setShowProfileDropDown(false))
+        dispatch(updateShowOptionsModal())
+        router.push('/aboutme')
     }
 
     const logOutFunction = () => {
@@ -35,96 +42,91 @@ const TastieraFunzioni = () => {
 
     return(
     <div className="row">
-        <div className="col-6">
 
             <SquaredOptButton 
             text="Reels" 
+            color="red"
             icon={<BsCameraReelsFill />} 
             onClick={fakeFunction} 
             />
             
-            
-            <SquaredOptButton 
-            text="Gruppi" 
-            icon={<MdGroups />} 
-            onClick={fakeFunction} 
-            />
-            
-            
-            <SquaredOptButton 
-            text="Video" 
-            icon={<FaVideo />} 
-            onClick={fakeFunction} 
-            />
-            
-            
-            <SquaredOptButton 
-            text="Pagine" 
-            icon={<IoFlagSharp />} 
-            onClick={fakeFunction} 
-            />
-            
-            
-            <SquaredOptButton 
-            text="Ricordi" 
-            icon={<RiMemoriesFill />} 
-            onClick={fakeFunction} 
-            />
-            
-            
-            <SquaredOptButton 
-            text="Log Out" 
-            icon={<IoSadSharp />} 
-            onClick={logOutFunction} 
-            />
-            
-
-        </div>
-        <div className="col-6">
-
             <SquaredOptButton 
             text="Messenger" 
+            color="purple"
             icon={<FaFacebookMessenger />} 
             onClick={fakeFunction} 
             />
             
+            <SquaredOptButton 
+            text="Gruppi" 
+            color="blue"
+            icon={<MdGroups />} 
+            onClick={fakeFunction} 
+            />
             
             <SquaredOptButton 
             text="A-Mici" 
+            color="blue"
             icon={<FaUserFriends />} 
             onClick={pushToAmici} 
             />
-            
+
+            <SquaredOptButton 
+            text="Video" 
+            color="skyblue"
+            icon={<FaVideo />} 
+            onClick={fakeFunction} 
+            />
             
             <SquaredOptButton 
             text="Marketplace" 
+            color="green"
             icon={<BsShop />} 
             onClick={fakeFunction} 
             />
-            
-            
+
             <SquaredOptButton 
-            text="Salvati" 
-            icon={<IoBookmarkSharp />} 
+            text="Pagine" 
+            color="orange"
+            icon={<IoFlagSharp />} 
             onClick={fakeFunction} 
             />
             
-            
+            <SquaredOptButton 
+            text="Salvati" 
+            color='violet'
+            icon={<IoBookmarkSharp />} 
+            onClick={fakeFunction} 
+            />
+
+            <SquaredOptButton 
+            text="Ricordi" 
+            color='blue'
+            icon={<RiMemoriesFill />} 
+            onClick={fakeFunction} 
+            />
+                        
             <SquaredOptButton 
             text="Events" 
+            color='red'
             icon={<FaCalendar />} 
             onClick={fakeFunction} 
             />
             
-            
             <SquaredOptButton 
-            text="Feeds" 
-            icon={<IoBrowsers />} 
-            onClick={fakeFunction} 
+            text="Log Out" 
+            color='blue'
+            icon={<IoSadSharp />} 
+            onClick={logOutFunction} 
             />
             
-
-        </div>
+            <SquaredOptButton 
+            text="About me" 
+            icon={<IoBrowsers />} 
+            color='orange'
+            onClick={goToAuthorPage} 
+            />
+            
     </div>
     )
 }
