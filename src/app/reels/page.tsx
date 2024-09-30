@@ -31,8 +31,10 @@ const ReelPage = () => {
 
     return(
     <>
+    <div className="p-0 m-0 top-0 w-100 d-none d-md-block sticky-top">
       <NavBar />
-      <div className="container">
+    </div>
+      <div className="container-fluid p-0">
         <VideoPageOrg/>
       </div>
       </>

@@ -17,7 +17,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="d-flex flex-column justify-content-center align-items-center bg-white shadow-sm w-100 position-sticky top-0" style={{ zIndex: '80' }}>
+    <div className="d-flex flex-column justify-content-center align-items-center bg-white shadow-sm w-100 position-sticky top-0" style={{ zIndex: '101' }}>
       <div className="d-flex justify-content-between align-items-center bg-white shadow-sm p-1 px-3 w-100">
         <DesktopSearchbar />
         <MobileSearchBar setSelected={setNavbarPage} />
