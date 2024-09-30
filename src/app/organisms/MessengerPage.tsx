@@ -14,16 +14,16 @@ const MessengerPageOrg = ({ remainingHeight }: { remainingHeight: number }) => {
     const allChats = useAppSelector((state) => state.chats.chats);
     const [chatFormHeight, setChatFormHeight] = useState<number>(0);
     const chatFormRef = useRef<HTMLDivElement | null>(null);
-    const headerContainer = useRef<HTMLDivElement | null>(null);  // Aggiungiamo il ref per l'header
+    const headerContainer = useRef<HTMLDivElement | null>(null)
+
+    const handleResize = () => {
+        if (chatFormRef.current) {
+            const newChatFormHeight = chatFormRef.current.clientHeight;
+            setChatFormHeight(newChatFormHeight);
+        }
+    };
 
     useEffect(() => {
-        const handleResize = () => {
-            if (chatFormRef.current) {
-                const newChatFormHeight = chatFormRef.current.clientHeight;
-                setChatFormHeight(newChatFormHeight);
-            }
-        };
-
         window.addEventListener("resize", handleResize);
         handleResize();  
 
@@ -31,9 +31,14 @@ const MessengerPageOrg = ({ remainingHeight }: { remainingHeight: number }) => {
     }, []);
 
     const chat = useMemo(() => {
-        if (!selectedUser) return null;
-        return allChats.find(fchat => fchat.chatWith.userName === selectedUser.userName);
+        if (!selectedUser) return null
+        return allChats.find(fchat => fchat.chatWith.userName === selectedUser.userName)
     }, [allChats, selectedUser]);
+
+    useEffect(() => {
+        handleResize()
+    }, [handleResize])
+    
 
 
     return (

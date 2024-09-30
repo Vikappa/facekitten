@@ -13,20 +13,22 @@ const MessengerPage = () => {
     const [remainingHeight, setRemainingHeight] = useState<number>(0)
     const navbarPage = useAppSelector(state => state.status.shownpage)
     const dispatch = useAppDispatch()
+
+    const handleResize = () => {
+        if (navBarRef.current) {
+            const navbarHeight = navBarRef.current.clientHeight;  
+            setRemainingHeight(window.innerHeight - navbarHeight);  
+        }
+    };
+    
     useEffect(() => {
         if(navbarPage !== 9){
             dispatch(setNavbarPage(9))
         }
+        handleResize()
     }, [])
-    
 
     useEffect(() => {
-        const handleResize = () => {
-            if (navBarRef.current) {
-                const navbarHeight = navBarRef.current.clientHeight;  
-                setRemainingHeight(window.innerHeight - navbarHeight);  
-            }
-        };
 
         window.addEventListener("resize", handleResize);
         handleResize();  
@@ -48,4 +50,4 @@ const MessengerPage = () => {
     );
 }
 
-export default MessengerPage;
+export default MessengerPage
