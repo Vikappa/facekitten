@@ -8,7 +8,7 @@ const ReelCard = ({reel}:{reel:Post}) => {
     if(reel.body !== undefined && typeof reel.body === 'object' && 'videoText' in reel.body){
         return(
                 <div
-                    className="rounded-3 shadow-sm rounded-md-4 position-relative" 
+                    className="rounded-3 shadow-sm rounded-md-4 position-relative my-md-3 mb-md-5" 
                     style={{
                         zIndex: 3,
                         width: '100%',

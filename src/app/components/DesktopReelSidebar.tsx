@@ -11,7 +11,7 @@ const DesktopReelSidebar = () => {
 
     return(
         <ul className="
-        p-0
+        p-0 
         ">
             <ReelLi titolo={'Home'} icona={<PiVideoFill />}/>
             <ReelLi titolo={'Live'} icona={<RiLiveFill />}/>
