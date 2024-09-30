@@ -63,10 +63,12 @@ export interface Friend {
 }
 
 export interface CasualUser {
+    id:number;
     name: string;
     profilePic: string;
     posts: Post[]
     coverPhotoUrl: string;
+    friends: []
 }
 
 export interface UserDetails{

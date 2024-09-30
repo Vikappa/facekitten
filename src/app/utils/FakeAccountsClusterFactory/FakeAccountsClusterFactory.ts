@@ -1,4 +1,4 @@
-import { generateRandomInterval, MakeFakeAccount, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
+import { generateRandomInterval, MakeFakeAccountNoPosts } from "../FakeAccountFactory/FakeAccountFactory"
 import { FakePostTextFactory, fetchTextedImgPosts, generateXMutedImagePosts, generateXVideoPosts } from "../FakePostFactory/FakePostFactory"
 import { CasualUser, NormalPostBody } from "../StorageDataTypes"
 
@@ -50,7 +50,7 @@ export const CreateInitialCluster = async (): Promise<CasualUser[]> => {
     }
 
     for (let index = 0; index < 10; index++) {
-        fakeAccounts.push(await MakeFakeAccountNoPosts())        
+        fakeAccounts.push(await MakeFakeAccountNoPosts(fakeAccounts))        
     }
 
     for (let index = 0; index < postTexts.length; index++) {

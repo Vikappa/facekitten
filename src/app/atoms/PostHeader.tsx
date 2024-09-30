@@ -1,41 +1,41 @@
 'use client'
 import Image from "next/image"
 import { UserDetails } from "../utils/StorageDataTypes"
-import { FaUserFriends } from "react-icons/fa";
-import { HiDotsHorizontal } from "react-icons/hi";
-import { IoCloseOutline } from "react-icons/io5";
-import Link from "next/link";
-import { useAppSelector } from "../lib/hooks";
+import { FaUserFriends } from "react-icons/fa"
+import { HiDotsHorizontal } from "react-icons/hi"
+import { IoCloseOutline } from "react-icons/io5"
+import Link from "next/link"
+import { useAppSelector } from "../lib/hooks"
 
 const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undefined}) => {
     const humanUserName = useAppSelector(state => state.userCredentials.userName)
     const timeDifference = ():string => {
-        if (!time) return "Adesso";
-        const timeDifference = new Date().getTime() - new Date(time).getTime();
-        const seconds = Math.floor(timeDifference / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-        const months = Math.floor(days / 30);
-        const years = Math.floor(months / 12);
+        if (!time) return "Adesso"
+        const timeDifference = new Date().getTime() - new Date(time).getTime()
+        const seconds = Math.floor(timeDifference / 1000)
+        const minutes = Math.floor(seconds / 60)
+        const hours = Math.floor(minutes / 60)
+        const days = Math.floor(hours / 24)
+        const months = Math.floor(days / 30)
+        const years = Math.floor(months / 12)
 
         if(seconds < 60){
-            return "Adesso";
+            return "Adesso"
         }
         else if(minutes < 60){
-            return `${minutes}minuti fa`;
+            return `${minutes}minuti fa`
         }
         else if(hours < 24){
-            return `${hours}ore fa`;
+            return `${hours}ore fa`
         }
         else if(days < 30){
-            return `${days}giorni fa`;
+            return `${days}giorni fa`
         }
         else if(months < 12){
-            return `${months}mesi fa`;
+            return `${months}mesi fa`
         }
         else{
-            return `${years}anni fa`;
+            return `${years}anni fa`
         }
     }
 
@@ -72,6 +72,6 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undef
             </div>
         )
     }
-    return null;
+    return null
 }
 export default PostHeader
