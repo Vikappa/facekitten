@@ -47,14 +47,22 @@ const TastieraFunzioni = () => {
             text="Reels" 
             color="red"
             icon={<BsCameraReelsFill />} 
-            onClick={fakeFunction} 
+            onClick={() => {
+                dispatch(setShowProfileDropDown(false))
+                router.push('/reels')
+            }} 
             />
             
             <SquaredOptButton 
             text="Messenger" 
             color="purple"
             icon={<FaFacebookMessenger />} 
-            onClick={fakeFunction} 
+            onClick={
+                () => {
+                    dispatch(setShowProfileDropDown(false))
+                    router.push('/messenger')
+                }
+            } 
             />
             
             <SquaredOptButton 
@@ -68,21 +76,36 @@ const TastieraFunzioni = () => {
             text="A-Mici" 
             color="blue"
             icon={<FaUserFriends />} 
-            onClick={pushToAmici} 
+            onClick={
+                () => {
+                    dispatch(setShowProfileDropDown(false))
+                    router.push('/amici')
+                }
+            } 
             />
 
             <SquaredOptButton 
             text="Video" 
             color="skyblue"
             icon={<FaVideo />} 
-            onClick={fakeFunction} 
+            onClick={
+                () => {
+                    dispatch(setShowProfileDropDown(false))
+                    router.push('/reels')
+                }
+            } 
             />
             
             <SquaredOptButton 
             text="Marketplace" 
             color="green"
             icon={<BsShop />} 
-            onClick={fakeFunction} 
+            onClick={
+                () => {
+                    dispatch(setShowProfileDropDown(false))
+                    router.push('/marketplace')
+                }
+            } 
             />
 
             <SquaredOptButton 

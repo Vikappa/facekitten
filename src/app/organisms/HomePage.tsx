@@ -84,7 +84,12 @@ const HomePage = () => {
               <Image src={profilepictureUrl} alt={userName} height={40} width={40} className="rounded-circle" />
               {userName}
             </li>
-            <HomePageSideLi icon={<FaUserFriends style={{ color: "#23ADFD" }} size={35} />} text={"Friends"} funzione={fakeFunction} />
+            <HomePageSideLi icon={<FaUserFriends style={{ color: "#23ADFD" }} size={35} />} text={"Friends"} funzione={
+              () => {
+                dispatch(setNavbarPage(20))
+                router.push('/amici')
+              }
+            } />
             <HomePageSideLi icon={<FaClockRotateLeft size={35} style={{ color: "#1877F2" }} />} text={"Memories"} funzione={fakeFunction} />
             <HomePageSideLi icon={<IoBookmarkSharp size={35} style={{ color: "#AE4FD8" }} />} text={"Saved"}funzione={fakeFunction}  />
             <HomePageSideLi icon={<MdGroups size={35} style={{ color: "#209CFA" }} />} text={"Groups"}funzione={fakeFunction}  />
@@ -92,8 +97,18 @@ const HomePage = () => {
               dispatch(setNavbarPage(10))
               router.push("/reels")
             }} />
-            <HomePageSideLi icon={<FaShop size={35} style={{ color: "#55C7D5" }} />} text={"Marketplace"} funzione={fakeFunction} />
-            <HomePageSideLi icon={<SiFeedly size={35} style={{ color: "#209DF9" }} />} text={"Feed"} funzione={fakeFunction}  />
+            <HomePageSideLi icon={<FaShop size={35} style={{ color: "#55C7D5" }} />} text={"Marketplace"} funzione={
+              () => {
+                dispatch(setNavbarPage(10))
+                router.push("/marketplace")
+              }
+            } />
+            <HomePageSideLi icon={<SiFeedly size={35} style={{ color: "#209DF9" }} />} text={"About the author"} funzione={
+              () => {
+                dispatch(setNavbarPage(10))
+                router.push("/aboutme")
+              }
+            }  />
           </ul>
         </div>
 
