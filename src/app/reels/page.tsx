@@ -7,6 +7,7 @@ import VideoPageOrg from "../organisms/ViodePageOrg"
 import { useAppDispatch, useAppSelector } from "../lib/hooks"
 import { setNavbarPage, setShowNotificationModal } from "../lib/slices/appStateSlice"
 import { useRouter } from "next/navigation"
+import MobileOptionFullScreenModal from "../modali/MobileOptionFullScreenModal"
 
 const ReelPage = () => {
 
@@ -35,6 +36,7 @@ const ReelPage = () => {
       <NavBar />
     </div>
       <div className="container-fluid p-0">
+        <MobileOptionFullScreenModal/>
         <VideoPageOrg/>
       </div>
       </>

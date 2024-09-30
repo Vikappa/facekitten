@@ -6,12 +6,16 @@ import ProfilePageBar from "../components/ProfilePageBar"
 import { useState } from "react"
 import { Button } from "react-bootstrap"
 import { FaPencilAlt } from "react-icons/fa";
+import { FaFacebookMessenger } from "react-icons/fa";
 import { FaAngleDown } from "react-icons/fa";
+import { BiSolidAddToQueue } from "react-icons/bi";
+import { RiUserAddFill } from "react-icons/ri";
 
 const ProfileImageResponsiveComponent = (
     {profilePicture, userName}:
     {profilePicture: string, userName: string}
 ) => {
+    const humanUserCredentials = useAppSelector(state => state.userCredentials)
     const friendsNum = useAppSelector(state => state.friendList.friends.length)
     const [profileBarState, setProfileBarState] = useState(1)
     return(
@@ -36,15 +40,34 @@ const ProfileImageResponsiveComponent = (
                     </div>
 
                     <div className="ms-auto d-flex align-items-center gap-2">
-                        <Button variant="primary" className="fw-semibold fs-5 ">
-                            + Add a story
-                        </Button>
-                        <Button variant="quinary" className="fw-semibold fs-5" style={{color:'#1D1F23'}}>
-                        <FaPencilAlt /> Edit profile
-                        </Button>
-                        <Button variant="quinary" className="fw-semibold fs-5"  style={{color:'#1D1F23'}}>
-                        <FaAngleDown />
-                        </Button>
+{                        (humanUserCredentials.userName === userName && humanUserCredentials.profilepictureUrl === profilePicture) ?
+                        <>
+                            <Button variant="primary" className="fw-semibold fs-5 ">
+                                    + Add a story
+                            </Button>
+                            <Button variant="quinary" className="fw-semibold fs-5" style={{ color: '#1D1F23' }}>
+                                <FaPencilAlt /> Edit profile
+                            </Button>
+                            <Button variant="quinary" className="fw-semibold fs-5" style={{ color: '#1D1F23' }}>
+                                <FaAngleDown />
+                            </Button>
+                        </>
+                        :
+                        <>
+                            <Button variant="quinary" className="fw-semibold fs-5" style={{ color: '#1D1F23' }}>
+                                <FaFacebookMessenger /> Message
+                            </Button>
+                            <Button variant="primary" className="fw-semibold fs-5 ">
+                                <BiSolidAddToQueue />    + Follow 
+                            </Button>
+                            <Button variant="quinary" className="fw-semibold fs-5" style={{ color: '#1D1F23' }}>
+                                <RiUserAddFill /> Add Friend
+                            </Button>
+                            <Button variant="quinary" className="fw-semibold fs-5" style={{ color: '#1D1F23' }}>
+                                <FaAngleDown />
+                            </Button>
+                        </>                        
+                    }
                     </div>
                 </div>
                 <div>
