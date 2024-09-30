@@ -5,8 +5,10 @@ import { FaUserFriends } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { IoCloseOutline } from "react-icons/io5";
 import Link from "next/link";
+import { useAppSelector } from "../lib/hooks";
 
 const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undefined}) => {
+    const humanUserName = useAppSelector(state => state.userCredentials.userName)
     const timeDifference = ():string => {
         if (!time) return "Adesso";
         const timeDifference = new Date().getTime() - new Date(time).getTime();
@@ -44,7 +46,7 @@ const PostHeader = ({user, time}: {user:UserDetails|undefined; time:string|undef
                 className="rounded-circle"
                 />
                 <div>
-                <Link href={"/userprofile/" + encodeURIComponent(user.userName)}
+                <Link href={"/userprofile/" + (humanUserName !== user.userName ? encodeURIComponent(user.userName):'')}
                 style={{
                         textDecoration:'none',
                         color:'#000',
