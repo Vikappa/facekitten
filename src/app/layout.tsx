@@ -10,6 +10,10 @@ const GAID = process.env.GAID
 export const metadata: Metadata = {
   title: "Facekitten",
   description: "Prrrrr mau??",
+  manifest: "/wepappmanifest.json", 
+  icons: {
+    icon: "/img/facekittenlogo.png",
+  }
 };
 
 export default function RootLayout({
