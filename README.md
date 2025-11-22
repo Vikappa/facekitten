@@ -1,6 +1,6 @@
 # Facekitten — Il social network dei gatti che non sapevi di volere
 <div align="center">
-  <img src="/public/img/facekittenlogo.png" alt="Facekitten banner" style="max-width: 200px; width: 100%; border-radius: 12px;">
+  <img src="/public/img/facekittenlogo.png" alt="Facekitten banner" style="max-width: 100px; width: 100%; border-radius: 12px;">
   <p><em>Un universo social dominato dai gatti, generato dall’AI.</em></p>
 </div>
 Benvenuto su **Facekitten**, il social network dedicato ai gatti dove l’AI fa il duro lavoro e tu ti limiti a ridere, osservare e chiederti come sia possibile che un progetto del genere esista davvero.
