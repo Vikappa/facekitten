@@ -1,10 +1,8 @@
 /* ============================= */
-/* Tailwind CSS Directives       */
+/* Tailwind CSS                  */
 /* ============================= */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* ============================= */
 /* Custom Font Face              */
