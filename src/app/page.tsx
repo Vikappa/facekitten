@@ -1,12 +1,11 @@
 'use client'
 import Image from "next/image";
-import styles from "./page.module.css";
 import { Button, Form } from "react-bootstrap";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <Image alt="logo" width={80} height={80} src={'/img/facekittenlogo.png'}/>
+    <main className="d-flex">
+      <Image className="d-none" alt="logo" width={80} height={80} src={'/img/facekittenlogo.png'}/>
       <Form>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
@@ -20,7 +19,7 @@ export default function Home() {
         <Form.Control type="password" placeholder="Password" />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicCheckbox">
-        <Form.Check type="checkbox" label="Check me out" />
+        <Form.Check type="checkbox" label="Check me out" className="d-none" />
       </Form.Group>
       <Button variant="primary" type="submit">
         Submit
