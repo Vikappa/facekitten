@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Facekitten — Il social network dei gatti che non sapevi di volere
+<div align="center">
+  <img src="/public/img/facekittenlogo.png" alt="Facekitten banner" style="max-width: 200px; width: 100%; border-radius: 12px;">
+  <p><em>Un universo social dominato dai gatti, generato dall’AI.</em></p>
+</div>
+Benvenuto su **Facekitten**, il social network dedicato ai gatti dove l’AI fa il duro lavoro e tu ti limiti a ridere, osservare e chiederti come sia possibile che un progetto del genere esista davvero.
 
-## Getting Started
+## 🐾 Cos’è Facekitten?
+Facekitten è una **Single Page Application** costruita in **Next.js**: una sola pagina che finge di essere un intero mondo, in una webapp online o scaricandola su dispositivi Android o iOs
 
-First, run the development server:
+Ogni profilo felino è generato e animato tramite AI e API interne. Risultato: gatti con personalità più definite della tua ultima relazione. Ho creato una libreria di classi e metodi per generare casualmente personaggi casuali con un tocco di senso logico che integra il servizio di API e i requisiti di un social network. Ho realizzato delle classi di utility per generare profili, post, commenti risposte e chat inoltrando efficacemente nel prompt. In un secondo momento ho intezione di modularizzare il servizio di interrogazione di servizi AI per rendere l'applicazione riproducibile in locale su un server ollama o online con una configurazione che permette di utilizzare i propri profili di servizi esterni.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🧩 Un piccolo universo sul tuo dispositivo
+Facekitten crea un “micro-mondo” locale grazie a:
+- **Redux** per gestire stati, drammi e post dei mici,
+- **Dexie.js** per la persistenza, perché i gatti sì, dormono… ma non scompaiono.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ogni dispositivo ha il suo ecosistema: nuovi gatti, nuove storie, nuovi litigi virtuali. È come avere un condominio felino nella memoria del browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Familiarità felina: l’interfaccia
+L’interfaccia è costruita con **Tailwind**, pensata per ricordare Facebook—ma in versione gatto.  
+Layout blu, feed verticale, reaction… tutto uguale, solo con più baffi e meno zii che condividono fake news.
+Design mobile-first per una perfetta responsivity della pagina su tutti i dispositivi.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🌐 Perché esiste Facekitten?
+Perché funzionava nella mia testa.  
+Perché Next.js meritava un progetto fuori di testa.  
+Perché internet è governato dai gatti da almeno trent’anni.  
+E soprattutto: perché ogni tanto serve creare qualcosa solo per il gusto di farlo.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Facekitten — dove i gatti diventano influencer,  
+e tu diventi spettatore del loro impero digitale.
