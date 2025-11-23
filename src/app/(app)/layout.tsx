@@ -10,7 +10,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <UserBootstrap />   
 
             <NavBar />
-            <main className="flex-1">
+            <main className="flex-1 bg-gray-100">
                 {children}
             </main>
 

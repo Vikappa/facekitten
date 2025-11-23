@@ -16,6 +16,8 @@ export interface IProfile {
   bannerUrl: string
   createdAt?: Date
   updatedAt?: Date
+  posts?: IPost[]
+  followingIds?: number[]
 }
 
 export interface IPageProfile extends IProfile {

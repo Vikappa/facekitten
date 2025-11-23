@@ -6,13 +6,15 @@ import type { AppDispatch } from "@/lib/store";
 import { FaceKittenDB, IProfile } from "@/lib/db";
 import { setUser } from "@/lib/features/userData/userDataSlice";
 import { UserData } from "@/lib/interfaces/CommonInterfaces";
+import { addProfiles } from "@/lib/features/profiles/profilesSlice";
+import { initializeChats } from "@/lib/features/chats/chatSlice";
 
 export function UserBootstrap() {
   const dispatch = useDispatch<AppDispatch>();
+  const db = new FaceKittenDB();
 
   useEffect(() => {
     const loadUser = async () => {
-      const db = new FaceKittenDB();
       const profile: IProfile | undefined = await db.userProfile.get(0);
       if (!profile) return;
 
@@ -28,6 +30,14 @@ export function UserBootstrap() {
       dispatch(setUser(userData));
     };
 
+    const loadProfiles = async () => {
+      const profilesData = await db.profiles.toArray();
+
+      dispatch(addProfiles(profilesData));
+    };
+
+    dispatch(initializeChats());
+    loadProfiles();
     loadUser();
   }, [dispatch]);
 

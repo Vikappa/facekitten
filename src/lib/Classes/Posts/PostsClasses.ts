@@ -1,5 +1,6 @@
 import { Profile } from "@/lib/Classes/Profile/Profile";
 import { PostComment } from "./Comments";
+import { IPost } from "@/lib/db";
 
 export class Post {
     id: number = 0;
@@ -7,6 +8,15 @@ export class Post {
     content: string = "";
     createdAt: Date = new Date();
     comments: PostComment[] = [];
+
+    public ToInterface(): IPost {
+        return {
+            authorId: this.id,
+            content: this.content,
+            createdAt: new Date(),
+            type: "text"
+        }
+    }
 }
 
 export class ImagePost extends Post {
