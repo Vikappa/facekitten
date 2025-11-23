@@ -6,6 +6,7 @@ import { FaFacebookMessenger, FaBell } from "react-icons/fa";
 import { NavBarSearchPill } from "./NavBarSearchPill";
 import { useState } from "react";
 import { MdOutlineArrowBack } from "react-icons/md";
+import { NavBarUserButton } from "./NavBarUserButton";
 
 export function NavBar() {
     const [isSearching, setIsSearching] = useState(false);
@@ -52,6 +53,7 @@ export function NavBar() {
                         className="p-1"
                         ringClassName="p-1 bg-gray-200 rounded-full"
                     />
+                    <NavBarUserButton size={40}/>
                 </div>
             </div>
         </div>
