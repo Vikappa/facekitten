@@ -43,6 +43,11 @@ export function useProfile(id: number) {
   return profile
 }
 
+export function useTryGetUserProfile(){
+  const userProfile = useLiveQuery(() => db.userProfile.get(0),[0])
+  return userProfile
+}
+
 /**
  * Hook: useProfileByUsername
  * Get profile by username

@@ -130,7 +130,7 @@ export class FaceKittenDB extends Dexie {
   groupChats!: Table<IGroupChat>
   messages!: Table<IChatMessage>
   chatLinks!: Table<IChatLink>
-
+  userProfile!: Table<IProfile>
   constructor() {
     super('FaceKittenDB')
     this.version(1).stores({
@@ -143,6 +143,9 @@ export class FaceKittenDB extends Dexie {
       imagePosts: '++id, authorId, createdAt',
       videoPosts: '++id, authorId, createdAt',
       marketplacePosts: '++id, authorId, createdAt, price',
+      
+      // 👇 singleton user profile (id fisso, niente auto-incremento)
+      userProfile: 'id, username',
 
       // Comment tables
       comments: '++id, postId, authorId, createdAt',

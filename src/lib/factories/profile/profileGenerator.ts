@@ -1,16 +1,34 @@
 import { Profile } from "@/lib/Classes/Profile/Profile";
 import { FaceKittenDB, IProfile } from "@/lib/db";
 import { DoVisionRequest, DoPromptRequest } from "@/lib/services/Gemini API/GeminiAPInterrogation";
-import { getRandomCoverPhotoFromFacekittenLibrary, getRandomProfilePictureFromFacekittenLibrary, imageUrlToBase64 } from "@/lib/utils";
+import { imageUrlToBase64 } from "@/lib/utils";
 
 export async function GenerateProfile(): Promise<Profile> {
 
     const db = new FaceKittenDB();
     const profile = new Profile();
 
-    profile.avatarUrl = getRandomProfilePictureFromFacekittenLibrary();
+    const AvatarUrl = await fetch("/api/get/randomProfilePicture", {
+        credentials: "include",
+    })
+        .then(r => {
+            if (!r.ok) throw new Error("Unauthorized");
+            return r.json();
+        })
+        .then(data => data.url);
+
+    const BannerUrl = await fetch("/api/get/randomCoverPhoto", {
+        credentials: "include",
+    })
+        .then(r => {
+            if (!r.ok) throw new Error("Unauthorized");
+            return r.json();
+        })
+        .then(data => data.url);
+
+    profile.avatarUrl = AvatarUrl;
     profile.username = await createRandomUserName(db);
-    profile.bannerUrl = getRandomCoverPhotoFromFacekittenLibrary();
+    profile.bannerUrl = BannerUrl;
 
     const ProfileVisionDTO: DoMyBioRequestDTO = {
         avatarImageBase64: await imageUrlToBase64(profile.avatarUrl) as string
@@ -29,7 +47,7 @@ export async function GenerateProfile(): Promise<Profile> {
 
     const response: DoMyBioResponseDTO = await InterrogateGoogleVisionForProfileBIO(
         ProfileVisionDTO,
-        BioResponseSchema, 
+        BioResponseSchema,
         `Su un social network per soli gatti, crea una breve biografia per questo profilo basata sull'immagine fornita. Ti chiami ${profile.username}. La biografia dovrebbe riflettere la personalità e l'umore del gatto nell'immagine, essere accattivante e adatta a un pubblico di amanti dei gatti. Si ironico e memico.`
     )
 

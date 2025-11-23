@@ -20,7 +20,7 @@ export const userDataSlice = createSlice({
       state.user = null;
     },
     initializeUserData(state) {
-      state.user = { name: '', preferences: {} };
+      state.user = { username: '', avatarUrl: '', posts: [], bio: '', bannerUrl: '', following: [] };
     }
   },
 });

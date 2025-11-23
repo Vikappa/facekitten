@@ -1,7 +1,4 @@
-import {postImgIndexes} from "@/../../public/storedcatphotos/imgs/postImgIndexes"
-import {coverPhotoIndexes} from "@/../../public/storedcatcoverphotos/coverPhotoIndexes"
-import {marketplaceImgIndexes} from "@/../../public/storedcatmarketplacephotos/marketplacesImgIndexes"
-import {picIndexes} from "@/../../public/storedcatprofilepictures/imgs/fileindexer"
+import { FaceKittenDB, IProfile } from "./db"
 /**
  * Combines multiple class names into a single string
  * @param classes - Variable number of class names
@@ -54,21 +51,21 @@ export function merge<T extends Record<string, unknown>>(
   return objects.reduce((acc, obj) => ({ ...acc, ...obj }), {} as T)
 }
 
-export function getRandomImageFromFacekittenLibrary(width: number, height: number): string {
-    return postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)];
-}
+// export function getRandomImageFromFacekittenLibrary(width: number, height: number): string {
+//     return postImgIndexes[Math.floor(Math.random() * postImgIndexes.length)];
+// }
 
-export function getRandomProfilePictureFromFacekittenLibrary(): string {
-    return picIndexes[Math.floor(Math.random() * picIndexes.length)];
-}
+// export function getRandomProfilePictureFromFacekittenLibrary(): string {
+//     return picIndexes[Math.floor(Math.random() * picIndexes.length)];
+// }
 
-export function getRandomCoverPhotoFromFacekittenLibrary(): string {
-    return coverPhotoIndexes[Math.floor(Math.random() * coverPhotoIndexes.length)];
-}
+// export function getRandomCoverPhotoFromFacekittenLibrary(): string {
+//     return coverPhotoIndexes[Math.floor(Math.random() * coverPhotoIndexes.length)];
+// }
 
-export function getRandomMarketplaceImageFromFacekittenLibrary(): string {
-    return marketplaceImgIndexes[Math.floor(Math.random() * marketplaceImgIndexes.length)];
-}
+// export function getRandomMarketplaceImageFromFacekittenLibrary(): string {
+//     return marketplaceImgIndexes[Math.floor(Math.random() * marketplaceImgIndexes.length)];
+// }
 
 // Source - https://stackoverflow.com/a
 // Posted by Hai Alaluf, modified by community. See post 'Timeline' for change history
@@ -88,3 +85,15 @@ export const imageUrlToBase64 = async (url: string) => {
   });
 };
 
+export async function saveLocalUserProfile(profile: IProfile, db: FaceKittenDB) {
+  await db.userProfile.put({
+    ...profile,
+    id: 0,
+    updatedAt: new Date(),
+    createdAt: profile.createdAt ?? new Date(),
+  })
+}
+
+export async function getLocalUserProfile(db: FaceKittenDB): Promise<IProfile | undefined> {
+  return db.userProfile.get(0)
+}

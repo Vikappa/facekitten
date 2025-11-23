@@ -1,0 +1,19 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { NavBar } from "../components/organisms/Navbar/Navbar";
+import { UserBootstrap } from "../components/atoms/UserBootStrap";
+
+export default function AppLayout({ children }: { children: ReactNode }) {
+    return (
+        <div className="min-h-screen flex flex-col">
+            <UserBootstrap />   
+
+            <NavBar />
+            <main className="flex-1">
+                {children}
+            </main>
+
+        </div>
+    );
+}

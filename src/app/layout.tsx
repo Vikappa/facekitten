@@ -6,14 +6,14 @@ import StoreProvider from "./StoreProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FaceKitten - Connect with Cats",
-  description: "A social platform for cat lovers to connect, share, and discover amazing feline friends",
+  title: "FaceKitten",
+  description: "Facekitten ti aiuta a connetterti e rimanere in contatto con i micetti della tua vita.",
   keywords: ["cats", "social", "community", "pets"],
   authors: [{ name: "FaceKitten Team" }],
   creator: "FaceKitten",
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "it-IT",
     url: "https://facekitten.com",
     title: "FaceKitten",
     description: "A social platform for cat lovers",
@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="it" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" href="/img/facekittenlogo.png" />
