@@ -3,14 +3,26 @@ import Image from "next/image";
 import { useState } from "react";
 import { IoLogoOctocat } from "react-icons/io";
 import { CiSquarePlus } from "react-icons/ci";
+import { Modal } from "./components/organisms/Modal";
+import { ResponsiveLoginForm } from "./components/organisms/ResponsiveLoginForm";
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <>
+
+      <Modal 
+      open={showModal}
+      submitText="Miao"
+      closeText="Miao"
+      title="Non hai rrrrrealmente bisogno di un account"
+      body="Inventa un nome e spara una password a caso: non ti verrà mai più richiesta."
+      onSubmit={() => setShowModal(false)}
+      onClose={() => setShowModal(false)} 
+      />
       <main className="flex flex-col lg:flex-row items-center justify-between min-h-screen sm:p-5 md:p-15 lg:min-h-0 gap-8 p-4 md:bg-gray-100 lg:p-x-60 lg:py-30 md:justify-center">
         <span className="md:hidden"></span>
         <Image className="sm:hidden" alt="logo" width={70} height={70} src={'/img/facekittenlogo.png'} priority />
@@ -18,49 +30,18 @@ export default function Home() {
           <h2 className="text-[64px] text-blue-600 font-bold">facekitten</h2>
           <p className="sm:max-w-1/2 text-2xl mx-auto lg:mx-0">Facekitten ti aiuta a connetterti e rimanere in contatto con i micetti della tua vita.</p>
         </div>
-        <form className="space-y-4 w-full max-w-md md:bg-white md:shadow-xl md:p-6 md:rounded-lg md:align-middle md:justify-center text-center">
-          <div className="mb-3">
 
-            <input
-              id="email"
-              type="email"
-              placeholder="Numero di cellulare o e-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 py-4 lg:focus:ring-[0.9px]"
-            />
-            <p className="text-sm text-gray-500 mt-1"></p>
-          </div>
-
-          <div className="mb-3">
-            <input
-              id="password"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 py-4 lg:focus:ring-[0.9px]"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-full font-medium hover:bg-blue-700 transition-colors py-3 m-0 md:rounded-md lg:font-bold"
-          >
-            Accedi
-          </button>
-          <button
-            type="submit"
-            className="w-full text-black py-2 px-4 font-medium hover:bg-blue-700 transition-colors hover:bg-transparent hover:cursor-pointer lg:w-fit md:text-blue-600 py-3 m-0"
-          >
-            Password dimenticata?
-          </button>
-          <hr className="hidden md:block border-t border-gray-300" />
-          <input type="button" value="Crea un nuovo account" className="hidden md:block px-4 font-bold py-2 border-2 bg-green-500 text-white text-center rounded-lg hover:bg-green-700 mx-auto block py-3" />
-        </form>
+        <ResponsiveLoginForm
+          email={email}
+          password={password}
+          showModal={showModal}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          setShowModal={setShowModal}
+        />
 
         <div className="flex flex-col w-full md:hidden items-center gap-4">
-          <input type="button" value="Crea un nuovo account" className="px-4 font-bold py-2 border-2 border-blue-500 text-blue-500 w-full max-w-xs rounded-full hover:bg-blue-700" />
+          <input type="button" onClick={() => setShowModal(!showModal)} value="Crea un nuovo account" className="px-4 font-bold py-2 border-2 border-blue-500 text-blue-500 w-full max-w-xs rounded-full hover:bg-blue-700" />
           <div className="flex items-center justify-center gap-2 py-2"><IoLogoOctocat /><span>Mewta</span></div>
           <div className="flex items-center justify-center w-full pt-2">
             <span className="text-[10px] px-2 text-gray-500">Informazioni</span>
