@@ -2,9 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import { Profile } from '@/lib/Classes/Profile/Profile';
 import { Post } from '@/lib/Classes/Posts/PostsClasses';
 import { PostComment } from '@/lib/Classes/Posts/Comments';
+import { IProfile } from '@/lib/db';
 
 interface profilesState {
-  profiles: Profile[];
+  profiles: IProfile[];
 }
 
 const initialState: profilesState = {
@@ -30,24 +31,14 @@ export const profilesSlice = createSlice({
       const { profileId, postId } = action.payload;
       const profile = state.profiles.find((p) => p.id === profileId);
       if (profile) {
-        profile.posts.push(postId);
-      }
-    },
-    addCommentToPost(state, action) {
-      const { profileId, commentId, postId } = action.payload;
-      const profile = state.profiles.find((p: Profile) => p.id === profileId);
-      const post = profile?.posts.find((p: Post) => p.id === postId);
-      if (post) {
-        post.comments.push(commentId);
-      }
-    },
-    addReplyToComment(state, action) {
-      const { profileId, postId, commentId, replyId } = action.payload;
-      const profile = state.profiles.find((p) => p.id === profileId);
-      const post = profile?.posts.find((p: Post) => p.id === postId);
-      const comment = post?.comments.find((c: PostComment) => c.id === commentId);
-      if (comment) {
-        comment.replies.push(replyId);
+        if (profile.posts) {
+          profile.posts.push(postId.ToInterface());
+        } else {
+          profile.posts = [];
+          profile.posts.push(postId);
+        }
+      } else {
+        console.error("USER DATA NOT FOUND")
       }
     },
     initializeProfiles(state) {
@@ -59,48 +50,48 @@ export const profilesSlice = createSlice({
   },
 });
 
-const VipDefaultProfiles = (): Profile[] => {
+const VipDefaultProfiles = (): IProfile[] => {
 
-  const Pazuzu: Profile = {
-    id: 0,
-    username: 'Pazuzu',
-    avatarUrl: '',
-    posts: [],
-    bio: 'Gattino grigetto con la barba bianca e un solo occhio sano.',
-    bannerUrl: '',
-    following: []
-  };
-  const Lilith: Profile = {
-    id: 1,
-    username: 'Lilith',
-    avatarUrl: '',
-    posts: [],
-    bio: '',
-    bannerUrl: '',
-    following: []
-  };
-  const Moka: Profile = {
-    id: 2,
-    username: 'Moka',
-    avatarUrl: '',
-    posts: [],
-    bio: '',
-    bannerUrl: '',
-    following: []
-  };
-  const Mandarino: Profile = {
-    id: 3,
-    username: 'Mandarino',
-    avatarUrl: '',
-    posts: [],
-    bio: '',
-    bannerUrl: '',
-    following: []
-  };
+  const Pazuzu : IProfile = {
+    id : 1,
+    username : 'Pazuzu',
+    avatarUrl : '',
+    posts : [],
+    bio : 'Gattino grigetto con la barba bianca e un solo occhio sano.',
+    bannerUrl : ''
+  }
+
+  const Lilith : IProfile = {
+    id : 2,
+    username : 'Lilith',
+    avatarUrl : '',
+    posts : [],
+    bio : '',
+    bannerUrl : ''
+  }
+
+  const Moka : IProfile = {
+    id : 3,
+    username : 'Moka',
+    avatarUrl : '',
+    posts : [],
+    bio : '',
+    bannerUrl : ''
+  }
+
+  const Mandarino : IProfile = {
+    id : 4,
+    username : 'Mandarino',
+    avatarUrl : '',
+    posts : [],
+    bio : '',
+    bannerUrl : ''
+  }
+
 
 
   return [Pazuzu, Lilith, Moka, Mandarino]
 }
 
-export const { addProfile, removeProfile, addPostToProfile, addCommentToPost, addReplyToComment, initializeProfiles, setProfiles, addProfiles } = profilesSlice.actions;
+export const { addProfile, removeProfile, addPostToProfile, initializeProfiles, setProfiles, addProfiles } = profilesSlice.actions;
 export default profilesSlice.reducer;

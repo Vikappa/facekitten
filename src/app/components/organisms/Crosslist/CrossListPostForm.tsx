@@ -32,45 +32,36 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
 
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLInputElement>) {
         e.preventDefault();
 
         const userData: IProfile | undefined = await db.userProfile.get(0)
 
         if (userData === undefined) throw new Error("UserData non trovato")
 
-        if (userData?.followingIds) {
-            const followings = userData?.followingIds.map(async id => await db.pageProfiles.get(id)) ?? []
-            const userProfile: Profile = {
-                id: userData.id!,
-                username: userData.username,
-                avatarUrl: userData.avatarUrl,
-                posts: [],
-                bio: userData.bio,
-                bannerUrl: userData.bannerUrl,
-                following: []
-            }
+        const newPost = new Post();
+        newPost.content = postText;
+        newPost.createdAt = new Date().toString();
+        newPost.comments = [];
 
-            const newPost = new Post();
-            newPost.content = postText;
-            newPost.createdAt = new Date();
-            newPost.comments = [];
-            newPost.author = userProfile
+        const Proto = newPost.ToInterface(0);
+        Proto.id = await db.userProfile.get(0).then(up => up?.posts?.length || 0)
 
 
-            dispatch(addUserPost(newPost))
-            if (userData?.posts) {
-                userData.posts = userData?.posts?.concat(newPost.ToInterface())
-            }
 
+        if (userData?.posts) {
+            console.log("ADDING TO REDUX STORE")
+            userData.posts = userData?.posts?.concat(Proto)
+            db.userProfile.put(userData);
+            dispatch(addUserPost(Proto))
         }
 
-
+        setPostText("")
     }
 
 
     return (
-        <form className="flex p-2" onSubmit={(e) => handleSubmit(e)}>
+        <form className="flex p-2 py-3 my-2 bg-white shadow-md" onSubmit={(e) => handleSubmit(e)}>
             {userProfile?.avatarUrl && userProfile?.username ?
                 < >
                     <Image
@@ -79,7 +70,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                             height: `${size}px`,
                         }}
                         src={userProfile?.avatarUrl} alt={userProfile?.username} height={size} width={size} unoptimized className="object-cover rounded-full overflow-hidden " />
-                    <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} className="px-3 mx-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai pensando?" type="text" />
+                    <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai pensando?" type="text" />
                     <NavBarActionButton
                         icon={RiLiveFill}
                         size={20}

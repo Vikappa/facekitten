@@ -58,7 +58,10 @@ export const generateUserProfileInterface = async (username: string): Promise<IP
         username: username,
         avatarUrl: RandomPropic,
         bio: `Il profilo di ${username} è stato creato il ${new Date().toLocaleDateString()}. Benvenuto su FaceKitten!`,
-        bannerUrl: BannerUrl
+        bannerUrl: BannerUrl,
+        posts:[],
+        followingIds:[],
+        comments:[]
     };
     return userProfile;
 }

@@ -9,15 +9,16 @@ import Dexie, { Table } from 'dexie'
  */
 
 export interface IProfile {
-  id?: number
+  id: number
   username: string
   avatarUrl: string
   bio: string
   bannerUrl: string
   createdAt?: Date
   updatedAt?: Date
-  posts?: IPost[]
+  posts: IPost[]
   followingIds?: number[]
+  comments?: IPostComment[]
 }
 
 export interface IPageProfile extends IProfile {
@@ -26,14 +27,16 @@ export interface IPageProfile extends IProfile {
 }
 
 export interface IPost {
-  id?: number
+  id?: number | null
   authorId: number
   content: string
-  createdAt: Date
-  updatedAt?: Date
+  createdAt: string
+  updatedAt?: string
   type: 'text' | 'image' | 'video' | 'marketplace'
+  liked: boolean
   likeCount?: number
   commentCount?: number
+  comments: IPostComment[]
 }
 
 export interface IImagePost extends IPost {
@@ -51,13 +54,14 @@ export interface IMarketplacePost extends IPost {
 }
 
 export interface IPostComment {
-  id?: number
+  id: number
   postId: number
   authorId: number
   content: string
-  createdAt: Date
+  createdAt: string
   updatedAt?: Date
   replyCount?: number
+  replies?:IPostCommentReply[]
 }
 
 export interface IPostCommentReply {
@@ -146,7 +150,7 @@ export class FaceKittenDB extends Dexie {
       videoPosts: '++id, authorId, createdAt',
       marketplacePosts: '++id, authorId, createdAt, price',
       
-      // 👇 singleton user profile (id fisso, niente auto-incremento)
+      // singleton user profile (id fisso, niente auto-incremento)
       userProfile: 'id, username',
 
       // Comment tables

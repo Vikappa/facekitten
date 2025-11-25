@@ -12,7 +12,7 @@ export function NavBar() {
     const [isSearching, setIsSearching] = useState(false);
 
     return (
-        <div className="shadow-md w-full z-10">
+        <div className="shadow-lg w-full z-10">
             <div className="flex items-center justify-between gap-2 px-3 py-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                     {!isSearching && <FaceKittenLogoNavbar />}

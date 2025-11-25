@@ -3,20 +3,26 @@ import { PostComment } from "./Comments";
 import { IPost } from "@/lib/db";
 
 export class Post {
-    id: number = 0;
+    id?: number | undefined | null = 0;
     author: Profile | null = null;
     content: string = "";
-    createdAt: Date = new Date();
+    createdAt: string = new Date().toString();
     comments: PostComment[] = [];
+    liked: boolean = false;
+public ToInterface(authorId: number): IPost {
+    return {
+        id: this.id ?? undefined,
+        liked: this.liked,
+        authorId,
+        content: this.content,
+        createdAt: new Date().toISOString(),
+        type: "text",
+        comments: this.comments?.map(c =>
+            c.ToInterface(this.id ?? 0, authorId)
+        ) ?? []
+    };
+}
 
-    public ToInterface(): IPost {
-        return {
-            authorId: this.id,
-            content: this.content,
-            createdAt: new Date(),
-            type: "text"
-        }
-    }
 }
 
 export class ImagePost extends Post {
