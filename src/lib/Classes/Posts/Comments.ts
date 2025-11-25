@@ -1,5 +1,5 @@
 import { Profile } from "@/lib/Classes/Profile/Profile";
-import { IPostComment, IPostCommentReply } from "@/lib/db";
+import { FaceKittenDB, IPostComment, IPostCommentReply } from "@/lib/db";
 
 
 export class PostComment {
@@ -7,12 +7,16 @@ export class PostComment {
     author: Profile | null = null;
     comment: string = "";
     replies: PostCommentReply[] = [];
-    public ToInterface(PostCommentId: number, authorId: number): IPostComment {
+    static db: FaceKittenDB = new FaceKittenDB();
+
+    public async ToInterface(PostCommentId: number, authorId: number): Promise<IPostComment> {
+        const authorData = (authorId === 0) ? await PostComment.db.userProfile.get(0) : await PostComment.db.profiles.get(authorId)
         return {
             id: this.id,
             postId: PostCommentId,
             authorId: authorId,
             content: this.comment,
+            commentAuthorPropic: authorData?.avatarUrl ?? "Erro getting commentauthorpropic",
             createdAt: new Date().toISOString(),
             replies: this.replies?.map(c =>
                 c.ToInterface(this.id ?? 0, authorId)

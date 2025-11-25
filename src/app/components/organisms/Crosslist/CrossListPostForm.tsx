@@ -44,7 +44,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
         newPost.createdAt = new Date().toString();
         newPost.comments = [];
 
-        const Proto = newPost.ToInterface(0);
+        const Proto = await newPost.ToInterface(0);
         Proto.id = await db.userProfile.get(0).then(up => up?.posts?.length || 0)
 
 
@@ -70,7 +70,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                             height: `${size}px`,
                         }}
                         src={userProfile?.avatarUrl} alt={userProfile?.username} height={size} width={size} unoptimized className="object-cover rounded-full overflow-hidden " />
-                    <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai pensando?" type="text" />
+                    <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai fusando?" type="text" />
                     <NavBarActionButton
                         icon={RiLiveFill}
                         size={20}

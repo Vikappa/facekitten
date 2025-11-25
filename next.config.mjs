@@ -15,6 +15,7 @@ const nextConfig = {
         hostname: 'localhost',
       },
     ],
+      qualities: [100, 75],
   },
   headers: async () => {
     return [

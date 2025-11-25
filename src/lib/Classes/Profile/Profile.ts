@@ -10,14 +10,16 @@ export class Profile {
     bannerUrl: string = "";
     following: PageProfile[] = [];
 
-    public ToInterface(): IProfile {
+    public async ToInterface(): Promise<IProfile> {
         return {
             id: this.id,
             username: this.username,
             avatarUrl: this.avatarUrl,
             bio: this.bio,
             bannerUrl: this.bannerUrl,
-            posts: this.posts.map(p => p.ToInterface(this.id))
+            posts: await Promise.all(
+                (this.posts ?? []).map(p => p.ToInterface(this.id))
+            )
         }
     }
 }

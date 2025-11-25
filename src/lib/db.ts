@@ -37,6 +37,7 @@ export interface IPost {
   likeCount?: number
   commentCount?: number
   comments: IPostComment[]
+  authorAvatarUrl:string,
 }
 
 export interface IImagePost extends IPost {
@@ -62,6 +63,8 @@ export interface IPostComment {
   updatedAt?: Date
   replyCount?: number
   replies?:IPostCommentReply[]
+  commentAuthorPropic:string;
+
 }
 
 export interface IPostCommentReply {

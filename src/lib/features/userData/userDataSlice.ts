@@ -38,7 +38,8 @@ export const userDataSlice = createSlice({
         authorId,
         replies,
         replyCount,
-        createdAt
+        createdAt,
+        commentAuthorPropic
       } = action.payload;
 
       const post = state.user?.posts.find(p => p.id === postId)
@@ -55,7 +56,8 @@ export const userDataSlice = createSlice({
         authorId,
         replies,
         replyCount,
-        createdAt
+        createdAt,
+        commentAuthorPropic
       })
     },
     updateLikeToPost(state, action) {

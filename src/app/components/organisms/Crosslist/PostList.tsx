@@ -11,18 +11,25 @@ import { addProfile } from "@/lib/features/profiles/profilesSlice";
 import { addUserPost, addCommentToUserPost, updateLikeToPost } from "@/lib/features/userData/userDataSlice";
 import { PostCard, PostCardAuthorModel, PostCardCommentModel } from "./PostCard";
 
-// ---- SELECTOR REDUX BASE ----
+const selectUserData = (state: RootState) => state.userData;
+const selectProfilesState = (state: RootState) => state.profiles;
 
-export const selectUserPosts = (state: RootState): IPost[] =>
-    state.userData.user?.posts ?? [];
+export const selectUserPosts = createSelector(
+    [selectUserData],
+    (userData): IPost[] => userData.user?.posts ?? []
+);
 
-export const selectProfilePosts = (state: RootState): IPost[] =>
-    state.profiles.profiles.flatMap((p) => p.posts ?? []);
+export const selectProfilePosts = createSelector(
+    [selectProfilesState],
+    (profilesState): IPost[] =>
+        profilesState.profiles.flatMap((p) => p.posts ?? [])
+);
 
 export const selectAllPosts = createSelector(
     [selectUserPosts, selectProfilePosts],
     (userPosts, profilePosts): IPost[] => [...userPosts, ...profilePosts]
 );
+
 
 interface PostCardViewModel {
     id: number;
@@ -104,11 +111,14 @@ export function PostList() {
                                     id: 0,
                                     username: user.username,
                                     avatarUrl: user.avatarUrl,
+                                    commentAuthorPropic: user.avatarUrl
+
                                 }
                                 : {
                                     id: c.authorId,
                                     username: "Caricamento...",
                                     avatarUrl: "/default-avatar.png",
+                                    commentAuthorPropic: c.commentAuthorPropic
                                 });
 
                         return {
@@ -117,6 +127,8 @@ export function PostList() {
                             authorId: c.authorId,
                             authorName: cAuthor.username,
                             createdAt: c.createdAt,
+                            commentAuthorPropic: c.commentAuthorPropic ?? "FALLBACK STRING TODO"
+
                         };
                     }
                 );
@@ -200,6 +212,7 @@ export function PostList() {
                 replies: [],
                 replyCount: 0,
                 createdAt: new Date().toISOString(),
+                commentAuthorPropic : dbUser.avatarUrl
             };
 
             thisPostInDB.commentCount = (thisPostInDB.commentCount ?? 0) + 1;
