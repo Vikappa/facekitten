@@ -1,3 +1,13 @@
+/* ============================= */
+/* Tailwind CSS                  */
+/* ============================= */
+
+@import "tailwindcss";
+
+/* ============================= */
+/* Custom Font Face              */
+/* ============================= */
+
 @font-face {
   font-family: 'klavika';
   src: url('/assets/fonts/klavika-medium.otf') format('woff2');

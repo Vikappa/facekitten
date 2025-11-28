@@ -1,35 +1,53 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    async headers() {
-      return [
-        {
-          source: "/:path*",
-          headers: [
-            {
-              key: "Access-Control-Allow-Origin",
-              value: "*", 
-            },
-            {
-              key: "Access-Control-Allow-Methods",
-              value: "GET, POST, PUT, DELETE, OPTIONS",
-            },
-            {
-              key: "Access-Control-Allow-Headers",
-              value: "Content-Type, Authorization",
-            },
-          ],
-        },
-      ];
-    },
-    images: {
-      formats: ["image/avif", "image/webp"],
-      remotePatterns: [
-        {
-          hostname: "images.pexels.com",
-        },
-      ],
-    },
-  };
-  
-  export default nextConfig;
-  
+  reactStrictMode: true,
+  poweredByHeader: false,
+  compress: true,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+      qualities: [100, 75],
+  },
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ];
+  },
+  redirects: async () => {
+    return [];
+  },
+  rewrites: async () => {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
+};
+
+export default nextConfig;

@@ -1,19 +1,39 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
 import StoreProvider from "./StoreProvider";
-import { GoogleAnalytics } from '@next/third-parties/google'
-import { Analytics } from "@vercel/analytics/react"
 
-const GAID = process.env.GAID
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Facekitten",
-  description: "Prrrrr mau??",
-  manifest: "/wepappmanifest.json", 
-  icons: {
-    icon: "/img/facekittenlogo.png",
-  }
+  title: "FaceKitten",
+  description: "Facekitten ti aiuta a connetterti e rimanere in contatto con i micetti della tua vita.",
+  keywords: ["cats", "social", "community", "pets"],
+  authors: [{ name: "FaceKitten Team" }],
+  creator: "FaceKitten",
+  openGraph: {
+    type: "website",
+    locale: "it-IT",
+    url: "https://facekitten.com",
+    title: "FaceKitten",
+    description: "A social platform for cat lovers",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FaceKitten",
+    description: "A social platform for cat lovers",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
 export default function RootLayout({
@@ -22,13 +42,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en class">
-      <body className={`${inter.className} bg-grayBg`}>
+    <html lang="it" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <link rel="icon" href="/img/facekittenlogo.png" />
+      </head>
+      <body className={inter.className}>
         <StoreProvider>
           {children}
         </StoreProvider>
-        <Analytics/>
-        {GAID && <GoogleAnalytics gaId={GAID} />}
       </body>
     </html>
   );
