@@ -211,13 +211,13 @@ export function PostCard({
           )}
 
           {comments.length === 0 ? (
-            <span className="text-gray-500 text-[15px]">Nessun commento</span>
+            <span  onContextMenu={(e) => e.preventDefault()} className="text-gray-500 text-[15px] select-none touch-none">Nessun commento</span>
           ) : comments.length === 1 ? (
-            <span>1 commento</span>
+            <span className="text-[15px] select-none touch-none" onContextMenu={(e) => e.preventDefault()} >1 commento</span>
           ) : (
             <span
               onClick={() => setIsCommenting(!isCommenting)}
-              className="text-gray-500 text-[15px]"
+              className="text-gray-500 text-[15px] select-none touch-none"
             >
               {comments.length} commenti
             </span>
@@ -229,30 +229,32 @@ export function PostCard({
             onPointerDown={handlePressStart}
             onPointerUp={handlePressEnd}
             onPointerCancel={handlePressEnd}
-            className={`flex-1 text-center cursor-pointer`}
+            className={`flex-1 text-center cursor-pointer select-none touch-none`}
+             onContextMenu={(e) => e.preventDefault()}
           >
             {!reaction ? (
-              <span>Mi piace</span>
+              <span onContextMenu={(e) => e.preventDefault()} className='select-none touch-none'>Mi piace</span>
             ) : (
               <ReactionAtom type={reaction.type} size={24} />
             )}
           </span>
 
           {isReactionMartOpen && (
-            <div className="absolute left-0 top-full mt-1 z-20">
+            <div className="absolute left-0 top-full mt-1 z-20 select-none touch-none">
               <ReactionMart onHandleReaction={handleReactionSelect} />
             </div>
           )}
 
           <span
             onClick={() => setIsCommenting(!isCommenting)}
-            className={`flex-1 text-center cursor-pointer `
+             onContextMenu={(e) => e.preventDefault()}
+            className={`flex-1 text-center cursor-pointer select-none touch-none`
             }
           >
             Commenta
           </span>
 
-          <span className="flex-1 text-center hover:text-gray-800 cursor-pointer">
+          <span className="flex-1 text-center hover:text-gray-800 cursor-pointer select-none touch-none">
             Condividi
           </span>
         </div>
