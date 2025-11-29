@@ -1,6 +1,5 @@
 import { initializeHomePage } from "@/lib/factories/profile/userProfileGenerator";
 import { InputLoginForm } from "../atoms/ResponsiveLoginForm.tsx/InputLoginForm";
-import { AppDispatch } from "@/lib/store";
 
 export type ResponsiveLoginFormProps = {
     email: string;
@@ -9,12 +8,11 @@ export type ResponsiveLoginFormProps = {
     setEmail: (e: string) => void;
     setPassword: (e: string) => void;
     setShowModal: (s: boolean) => void;
-    dispatch: AppDispatch;
     onLoginSuccess?: () => void;
 
 };
 
-export function ResponsiveLoginForm({ email, password, showModal, setEmail, setPassword, setShowModal, dispatch, onLoginSuccess }: ResponsiveLoginFormProps) {
+export function ResponsiveLoginForm({ email, password, showModal, setEmail, setPassword, setShowModal, onLoginSuccess }: ResponsiveLoginFormProps) {
     const CreateUserProfile = async () => {
 
         if (email.length > 0) {
@@ -36,7 +34,7 @@ export function ResponsiveLoginForm({ email, password, showModal, setEmail, setP
                 return;
             }
 
-            await initializeHomePage(email, dispatch)
+            await initializeHomePage(email)
             onLoginSuccess?.();
         } else {
             alert("Per favore inserisci un'email valida.")

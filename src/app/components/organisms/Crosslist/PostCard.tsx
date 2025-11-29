@@ -1,10 +1,17 @@
 'use client';
 
-import { useState, useRef } from "react";
-import Image from "next/image";
-import { AiTwotoneLike } from "react-icons/ai";
-import { CiFaceSmile } from "react-icons/ci";
-import { EmojiMart } from "../EmojiMart";
+import { useState, useRef } from 'react';
+import Image from 'next/image';
+import { AiTwotoneLike } from 'react-icons/ai';
+import { CiFaceSmile } from 'react-icons/ci';
+import { EmojiMart } from '../../atoms/EmojiMart';
+import { FaceKittenDB, IReaction } from '@/lib/db';
+import { ReactionMart } from '../../atoms/ReactionMart';
+import { ReactionAtom } from '../../atoms/ReactionAtom';
+
+const LONG_PRESS_MS = 600;
+
+
 
 export interface PostCardAuthorModel {
   id: number;
@@ -26,11 +33,9 @@ export interface PostCardProps {
   content: string;
   createdAt: string;
   likeCount: number;
-  liked: boolean;
+  reaction?: IReaction | false;
   author: PostCardAuthorModel;
   comments: PostCardCommentModel[];
-  onToggleLike: () => void;
-  onSubmitComment: (text: string) => void;
 }
 
 export function PostCard({
@@ -38,36 +43,128 @@ export function PostCard({
   content,
   createdAt,
   likeCount,
-  liked,
+  reaction,
   author,
   comments,
-  onToggleLike,
-  onSubmitComment,
 }: PostCardProps) {
   const [isCommenting, setIsCommenting] = useState(false);
-  const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState('');
   const commentInputRef = useRef<HTMLInputElement | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isReactionMartOpen, setOpenReactionMart] = useState(false);
 
-  const commentCount = comments.length;
+  const hasReaction = reaction !== undefined && reaction !== false;
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const trimmed = commentText.trim();
     if (!trimmed) return;
 
-    onSubmitComment(trimmed);
-    setCommentText("");
-  }
+    const db = new FaceKittenDB();
+    const dbUser = await db.userProfile.get(0);
+    if (!dbUser) {
+      console.warn('[AddComment] dbUser not found (id=0)');
+      return;
+    }
+    dbUser.posts ??= [];
+    const thisPostInDB = dbUser.posts.find((p) => p?.id === id);
+    if (!thisPostInDB) {
+      console.warn(`[AddComment] post not found in user posts (id=${id})`);
+      return;
+    }
+    thisPostInDB.comments ??= [];
+    const newCommentId = thisPostInDB.comments.length;
+    const newComment = {
+      id: newCommentId,
+      postId: id,
+      content: trimmed,
+      authorId: dbUser.id ?? 0,
+      replies: [],
+      replyCount: 0,
+      createdAt: new Date().toISOString(),
+      commentAuthorPropic: dbUser.avatarUrl,
+    };
+    thisPostInDB.commentCount = (thisPostInDB.commentCount ?? 0) + 1;
+    thisPostInDB.comments.push(newComment);
+    await db.userProfile.put(dbUser);
+    setCommentText('');
+  };
 
-  function ToNavigateToCommentAuthor(e: React.MouseEvent<HTMLSpanElement>, authorId: number) {
+  const handleReactionSelect = async (reactionId: number) => {
+    const db = new FaceKittenDB();
+    const dbUser = await db.userProfile.get(0);
+    if (!dbUser?.posts) return;
+    const thisPostInDB = dbUser.posts.find((p) => p?.id === id);
+    if (!thisPostInDB) return;
 
-  }
+    if (thisPostInDB.reaction && thisPostInDB.reaction.id === reactionId) {
+      thisPostInDB.reaction = undefined;
+      thisPostInDB.reactCount = Math.max(0, (thisPostInDB.reactCount ?? 1) - 1);
+    } else {
+      if (!thisPostInDB.reaction) {
+        thisPostInDB.reactCount = (thisPostInDB.reactCount ?? 0) + 1;
+      }
+      thisPostInDB.reaction = { id: reactionId, type: reactionId as any };
+    }
+
+    await db.userProfile.put(dbUser);
+    setOpenReactionMart(false);
+  };
+
+
+  const pressRef = useRef<{
+    timeoutId: ReturnType<typeof setTimeout> | null;
+    longPressTriggered: boolean;
+  }>({
+    timeoutId: null,
+    longPressTriggered: false,
+  });
+
+  const handlePressStart = (e: React.PointerEvent<HTMLSpanElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    if (pressRef.current.timeoutId) {
+      clearTimeout(pressRef.current.timeoutId);
+    }
+
+    pressRef.current.longPressTriggered = false;
+
+    pressRef.current.timeoutId = setTimeout(() => {
+      pressRef.current.longPressTriggered = true;
+
+      setShowEmojiPicker(false);
+      setOpenReactionMart(true);
+    }, LONG_PRESS_MS);
+  };
+
+  const handlePressEnd = async (e: React.PointerEvent<HTMLSpanElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+
+    const { timeoutId, longPressTriggered } = pressRef.current;
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      pressRef.current.timeoutId = null;
+    }
+
+    if (!longPressTriggered) {
+      if (hasReaction && reaction && !!reaction === true) {
+        await handleReactionSelect(reaction.id);
+      } else {
+        await handleReactionSelect(0);
+      }
+
+      setOpenReactionMart(false);
+    }
+
+    pressRef.current.longPressTriggered = false;
+  };
+
 
   return (
-    <div className="w-full max-w-full bg-white rounded-xl shadow p-4 my-2 flex flex-col gap-3 border border-gray-200">
-
+    <div className="w-full max-w-full bg-white rounded-xl shadow p-4 my-2 py-3 pb-2 flex flex-col gap-3 border border-gray-200">
       <div className="flex items-center gap-3">
         <Image
           className="w-10 h-10 rounded-full bg-gray-300"
@@ -94,9 +191,9 @@ export function PostCard({
           overflow-hidden
         "
         style={{
-          wordBreak: "break-word",
-          overflowWrap: "break-word",
-          whiteSpace: "pre-wrap",
+          wordBreak: 'break-word',
+          overflowWrap: 'break-word',
+          whiteSpace: 'pre-wrap',
         }}
       >
         {content}
@@ -109,39 +206,62 @@ export function PostCard({
               <span className="text-sm">{likeCount}</span>
               <AiTwotoneLike className="text-blue-600 text-[16px] pb-1" />
             </span>
-          ) : <div></div>}
+          ) : (
+            <div></div>
+          )}
 
-          {commentCount === 0 ? (
+          {comments.length === 0 ? (
             <span className="text-gray-500 text-[15px]">Nessun commento</span>
-          ) : commentCount === 1 ? (
+          ) : comments.length === 1 ? (
             <span>1 commento</span>
           ) : (
-            <span onClick={() => setIsCommenting(!isCommenting)} className="text-gray-500 text-[15px]">{commentCount} commenti</span>
+            <span
+              onClick={() => setIsCommenting(!isCommenting)}
+              className="text-gray-500 text-[15px]"
+            >
+              {comments.length} commenti
+            </span>
           )}
         </div>
 
-        <div className="flex justify-between text-gray-500 text-sm pt-2 border-t border-gray-100">
+        <div className="flex text-gray-500 text-sm pt-2 border-t border-gray-100 relative">
           <span
-            onClick={onToggleLike}
-            className={liked ? "text-blue-600 cursor-pointer" : "text-gray-800 cursor-pointer"}
+            onPointerDown={handlePressStart}
+            onPointerUp={handlePressEnd}
+            onPointerCancel={handlePressEnd}
+            className={`flex-1 text-center cursor-pointer`}
           >
-            Mi piace
+            {!reaction ? (
+              <span>Mi piace</span>
+            ) : (
+              <ReactionAtom type={reaction.type} size={24} />
+            )}
           </span>
+
+          {isReactionMartOpen && (
+            <div className="absolute left-0 top-full mt-1 z-20">
+              <ReactionMart onHandleReaction={handleReactionSelect} />
+            </div>
+          )}
 
           <span
             onClick={() => setIsCommenting(!isCommenting)}
-            className="hover:text-gray-800 cursor-pointer"
+            className={`flex-1 text-center cursor-pointer `
+            }
           >
             Commenta
           </span>
 
-          <span className="hover:text-gray-800 cursor-pointer">Condividi</span>
+          <span className="flex-1 text-center hover:text-gray-800 cursor-pointer">
+            Condividi
+          </span>
         </div>
       </div>
 
+
       {isCommenting && (
         <>
-          <div className="relative mt-2">
+          <div className="relative">
             <form
               className="flex align-middle gap-2 bg-gray-100 rounded-full pe-2 mt-2"
               onSubmit={handleSubmit}
@@ -155,11 +275,14 @@ export function PostCard({
               />
               <CiFaceSmile
                 className="text-gray-500 cursor-pointer"
-                style={{ margin: "auto 0" }}
+                style={{ margin: 'auto 0' }}
                 size={24}
                 onClick={() => {
                   setIsCommenting(true);
+
+                  setOpenReactionMart(false);
                   setShowEmojiPicker(true);
+
                   requestAnimationFrame(() => {
                     commentInputRef.current?.focus();
                   });
@@ -189,18 +312,19 @@ export function PostCard({
                     unoptimized
                   />
                 </div>
-                <span onClick={(e) => ToNavigateToCommentAuthor(e, comment.authorId)} className="text-blue-600 text-sm font-semibold p-1" >{comment.authorName ?? "Caricamento..."}:</span>
-                <span className="text-sm p-1
-                          break-words
-                          whitespace-pre-wrap
-                          overflow-hidden
-                        "
+                <span className="text-blue-600 text-sm font-semibold p-1">
+                  {comment.authorName ?? 'Caricamento...'}:
+                </span>
+                <span
+                  className="text-sm p-1 break-words whitespace-pre-wrap overflow-hidden"
                   style={{
-                    wordBreak: "break-word",
-                    overflowWrap: "break-word",
-                    whiteSpace: "pre-wrap",
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
                   }}
-                >{comment.content}</span>
+                >
+                  {comment.content}
+                </span>
               </span>
             ))}
           </div>

@@ -1,246 +1,129 @@
+// PostList.tsx
 'use client';
 
-import { useEffect, useMemo, useCallback } from "react";
-import { useDispatch } from "react-redux";
-import { createSelector } from "@reduxjs/toolkit";
-
-import { useAppSelector } from "@/lib/hooks";
-import { RootState } from "@/lib/store";
-import { FaceKittenDB, IPost, IPostComment, IProfile } from "@/lib/db";
-import { addProfile } from "@/lib/features/profiles/profilesSlice";
-import { addUserPost, addCommentToUserPost, updateLikeToPost } from "@/lib/features/userData/userDataSlice";
-import { PostCard, PostCardAuthorModel, PostCardCommentModel } from "./PostCard";
-
-const selectUserData = (state: RootState) => state.userData;
-const selectProfilesState = (state: RootState) => state.profiles;
-
-export const selectUserPosts = createSelector(
-    [selectUserData],
-    (userData): IPost[] => userData.user?.posts ?? []
-);
-
-export const selectProfilePosts = createSelector(
-    [selectProfilesState],
-    (profilesState): IPost[] =>
-        profilesState.profiles.flatMap((p) => p.posts ?? [])
-);
-
-export const selectAllPosts = createSelector(
-    [selectUserPosts, selectProfilePosts],
-    (userPosts, profilePosts): IPost[] => [...userPosts, ...profilePosts]
-);
-
-
-interface PostCardViewModel {
-    id: number;
-    content: string;
-    createdAt: string;
-    likeCount: number;
-    liked: boolean;
-    author: PostCardAuthorModel;
-    comments: PostCardCommentModel[];
-}
-
+import { useLiveQuery } from 'dexie-react-hooks';
+import { FaceKittenDB, IPost } from '@/lib/db';
+import { PostCard, PostCardAuthorModel, PostCardCommentModel } from './PostCard';
 
 const db = new FaceKittenDB();
 
 export function PostList() {
-    const dispatch = useDispatch();
+  // 1) Hook SEMPRE nello stesso ordine
+  const profiles = useLiveQuery(() => db.profiles.toArray(), []);
+  const user = useLiveQuery(() => db.userProfile.get(0), []);
+  const posts = useLiveQuery(async () => {
+    const postsFromDb = await db.posts.toArray();
+    const dbUser = await db.userProfile.get(0);
+    const userPosts = dbUser?.posts ?? [];
 
-    const posts = useAppSelector(selectAllPosts);
-    const user = useAppSelector((state) => state.userData.user);
-    const profiles = useAppSelector((state) => state.profiles.profiles);
+    const merged = new Map<number, IPost>();
 
-    useEffect(() => {
-        const loadProfiles = async () => {
-            await db.profiles.each((p: IProfile) => dispatch(addProfile(p)));
+    postsFromDb.forEach((p) => {
+      if (p?.id != null) merged.set(p.id, p);
+    });
+    userPosts.forEach((p) => {
+      if (p?.id != null) merged.set(p.id, p);
+    });
 
-            const up = await db.userProfile.get(0);
-            up?.posts?.forEach((p) => dispatch(addUserPost(p)));
+    return Array.from(merged.values());
+  }, []);
+
+  // 2) Se una delle query è ancora in loading, non rendere niente
+  if (profiles === undefined || user === undefined || posts === undefined) {
+    return null; // metti loader qui se ti va
+  }
+
+  // 3) NIENTE hook qui sotto, solo logica “pura”
+
+  // Mappa degli autori
+  const authorsMap = new Map<number, PostCardAuthorModel>();
+
+  if (user) {
+    authorsMap.set(0, {
+      id: 0,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+    });
+  }
+
+  profiles.forEach((p) => {
+    if (p?.id != null) {
+      authorsMap.set(p.id, {
+        id: p.id,
+        username: p.username,
+        avatarUrl: p.avatarUrl,
+      });
+    }
+  });
+
+  // View model delle card
+  const safePosts = posts.filter(
+    (p): p is IPost & { id: number } => p.id !== null && p.id !== undefined
+  );
+
+  const cardModels = [...safePosts]
+    .reverse()
+    .map((post) => {
+      const author =
+        authorsMap.get(post.authorId) ??
+        {
+          id: post.authorId,
+          username: 'Sconosciuto',
+          avatarUrl: '/default-avatar.png',
         };
 
-        loadProfiles();
-    }, [dispatch]);
-
-    const authorsMap = useMemo(() => {
-        const map = new Map<number, PostCardAuthorModel>();
-
-        if (user) {
-            map.set(0, {
+      const comments: PostCardCommentModel[] = (post.comments ?? []).map((c) => {
+        const cAuthor =
+          authorsMap.get(c.authorId) ??
+          (c.authorId === 0 && user
+            ? {
                 id: 0,
                 username: user.username,
                 avatarUrl: user.avatarUrl,
-            });
-        }
+                commentAuthorPropic: user.avatarUrl,
+              }
+            : {
+                id: c.authorId,
+                username: 'Caricamento...',
+                avatarUrl: '/default-avatar.png',
+                commentAuthorPropic: c.commentAuthorPropic,
+              });
 
-        for (const p of profiles) {
-            if (!p?.id) continue;
-            map.set(p.id, {
-                id: p.id,
-                username: p.username,
-                avatarUrl: p.avatarUrl,
-            });
-        }
+        return {
+          id: c.id,
+          content: c.content,
+          authorId: c.authorId,
+          authorName: cAuthor.username,
+          createdAt: c.createdAt,
+          commentAuthorPropic: c.commentAuthorPropic ?? 'FALLBACK STRING TODO',
+        };
+      });
 
-        return map;
-    }, [user, profiles]);
+      return {
+        id: post.id!,
+        content: post.content,
+        createdAt: post.createdAt,
+        reactionCount: post.reactCount ?? 0,
+        reaction: post.reaction,
+        author,
+        comments,
+      };
+    });
 
-    const cardModels: PostCardViewModel[] = useMemo(() => {
-        const safePosts = posts.filter(
-            (p): p is IPost & { id: number } =>
-                p.id !== null && p.id !== undefined
-        );
-
-        return [...safePosts]
-            .reverse()
-            .map((post) => {
-                const author =
-                    authorsMap.get(post.authorId) ??
-                    {
-                        id: post.authorId,
-                        username: "Sconosciuto",
-                        avatarUrl: "/default-avatar.png",
-                    };
-
-                const comments: PostCardCommentModel[] = (post.comments ?? []).map(
-                    (c) => {
-                        const cAuthor =
-                            authorsMap.get(c.authorId) ??
-                            (c.authorId === 0 && user
-                                ? {
-                                    id: 0,
-                                    username: user.username,
-                                    avatarUrl: user.avatarUrl,
-                                    commentAuthorPropic: user.avatarUrl
-
-                                }
-                                : {
-                                    id: c.authorId,
-                                    username: "Caricamento...",
-                                    avatarUrl: "/default-avatar.png",
-                                    commentAuthorPropic: c.commentAuthorPropic
-                                });
-
-                        return {
-                            id: c.id,
-                            content: c.content,
-                            authorId: c.authorId,
-                            authorName: cAuthor.username,
-                            createdAt: c.createdAt,
-                            commentAuthorPropic: c.commentAuthorPropic ?? "FALLBACK STRING TODO"
-
-                        };
-                    }
-                );
-
-                return {
-                    id: post.id,
-                    content: post.content,
-                    createdAt: post.createdAt,
-                    likeCount: post.likeCount ?? 0,
-                    liked: post.liked ?? false,
-                    author,
-                    comments,
-                };
-            });
-    }, [posts, authorsMap, user]);
-
-
-    const handleToggleLike = useCallback(
-        async (postId: number) => {
-            const dbUser = await db.userProfile.get(0);
-            if (!dbUser?.posts) return;
-
-            const allPosts = dbUser.posts;
-            const thisPostInDB = allPosts.find((p) => p.id === postId);
-            if (!thisPostInDB) {
-                console.warn("POST WITH ID " + postId + " NOT FOUND IN DB");
-                return;
-            }
-
-            const newLiked = !thisPostInDB.liked;
-            const updatedPosts = allPosts.map((p) =>
-                p.id === postId
-                    ? {
-                        ...p,
-                        liked: newLiked,
-                        likeCount: Math.max(
-                            0,
-                            (p.likeCount ?? 0) + (newLiked ? 1 : -1)
-                        ),
-                    }
-                    : p
-            );
-
-            await db.userProfile.update(0, { posts: updatedPosts });
-
-            dispatch(updateLikeToPost(postId));
-        },
-        [dispatch]
-    );
-
-    const handleSubmitComment = useCallback(
-        async (postId: number, text: string) => {
-            const trimmed = text.trim();
-            if (!trimmed) return;
-
-            const dbUser = await db.userProfile.get(0);
-            if (!dbUser) {
-                console.warn("[AddComment] dbUser not found (id=0), abort");
-                return;
-            }
-
-            dbUser.posts ??= [];
-            const thisPostInDB = dbUser.posts.find((p) => p.id === postId);
-
-            if (!thisPostInDB) {
-                console.warn("[AddComment] post not found in dbUser.posts", {
-                    searchedId: postId,
-                    postsIds: dbUser.posts.map((p) => p.id),
-                });
-                return;
-            }
-
-            thisPostInDB.comments ??= [];
-            const newCommentId = thisPostInDB.comments.length;
-
-            const newComment: IPostComment = {
-                id: newCommentId,
-                postId,
-                content: trimmed,
-                authorId: dbUser.id ?? 0,
-                replies: [],
-                replyCount: 0,
-                createdAt: new Date().toISOString(),
-                commentAuthorPropic : dbUser.avatarUrl
-            };
-
-            thisPostInDB.commentCount = (thisPostInDB.commentCount ?? 0) + 1;
-            thisPostInDB.comments.push(newComment);
-
-            await db.userProfile.put(dbUser);
-
-            dispatch(addCommentToUserPost(newComment));
-        },
-        [dispatch]
-    );
-
-    return (
-        <div className="flex flex-col gap-2 bg-transparent mt-3">
-            {cardModels.map((card, index) => (
-                <PostCard
-                    key={card.id}
-                    id={index}
-                    content={card.content}
-                    createdAt={card.createdAt}
-                    likeCount={card.likeCount}
-                    liked={card.liked}
-                    author={card.author}
-                    comments={card.comments}
-                    onToggleLike={() => handleToggleLike(card.id)}
-                    onSubmitComment={(text) => handleSubmitComment(card.id, text)}
-                />
-            ))}
-        </div>
-    );
+  return (
+    <div className="flex flex-col gap-2 bg-transparent mt-3">
+      {cardModels.map((card) => (
+        <PostCard
+          key={card.id}
+          id={card.id}
+          content={card.content}
+          createdAt={card.createdAt}
+          likeCount={card.reactionCount}
+          reaction={card.reaction}
+          author={card.author}
+          comments={card.comments}
+        />
+      ))}
+    </div>
+  );
 }

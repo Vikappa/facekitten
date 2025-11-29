@@ -4,8 +4,6 @@ import { useState } from "react";
 import { IoLogoOctocat } from "react-icons/io";
 import { Modal } from "../organisms/Modal";
 import { ResponsiveLoginForm } from "../organisms/ResponsiveLoginForm";
-import { AppDispatch } from "@/lib/store";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 
 
@@ -13,7 +11,6 @@ export function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showModal, setShowModal] = useState(false);
-    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
 
     return (
@@ -42,7 +39,6 @@ export function LoginPage() {
                     setEmail={setEmail}
                     setPassword={setPassword}
                     setShowModal={setShowModal}
-                    dispatch={dispatch}
                     onLoginSuccess={() => router.push("/home")}
                 />
 

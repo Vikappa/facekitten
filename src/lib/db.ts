@@ -3,6 +3,7 @@
  */
 
 import Dexie, { Table } from 'dexie'
+import { ReactionType } from './Classes/Reaction/Reaction'
 
 /**
  * Type definitions for database tables
@@ -33,11 +34,16 @@ export interface IPost {
   createdAt: string
   updatedAt?: string
   type: 'text' | 'image' | 'video' | 'marketplace'
-  liked: boolean
-  likeCount?: number
+  reaction?: IReaction
+  reactCount?: number
   commentCount?: number
   comments: IPostComment[]
-  authorAvatarUrl:string,
+  authorAvatarUrl: string,
+}
+
+export interface IReaction {
+  id: number
+  type: ReactionType
 }
 
 export interface IImagePost extends IPost {
@@ -62,8 +68,8 @@ export interface IPostComment {
   createdAt: string
   updatedAt?: Date
   replyCount?: number
-  replies?:IPostCommentReply[]
-  commentAuthorPropic:string;
+  replies?: IPostCommentReply[]
+  commentAuthorPropic: string;
 
 }
 
@@ -80,13 +86,6 @@ export interface IFollower {
   id?: number
   profileId: number
   followerId: number
-  createdAt?: Date
-}
-
-export interface ILike {
-  id?: number
-  profileId: number
-  likerProfileId: number
   createdAt?: Date
 }
 
@@ -134,7 +133,7 @@ export class FaceKittenDB extends Dexie {
   comments!: Table<IPostComment>
   replies!: Table<IPostCommentReply>
   followers!: Table<IFollower>
-  likes!: Table<ILike>
+  reactions!: Table<IReaction>
   chats!: Table<IChat>
   groupChats!: Table<IGroupChat>
   messages!: Table<IChatMessage>
@@ -152,7 +151,7 @@ export class FaceKittenDB extends Dexie {
       imagePosts: '++id, authorId, createdAt',
       videoPosts: '++id, authorId, createdAt',
       marketplacePosts: '++id, authorId, createdAt, price',
-      
+
       // singleton user profile (id fisso, niente auto-incremento)
       userProfile: 'id, username',
 

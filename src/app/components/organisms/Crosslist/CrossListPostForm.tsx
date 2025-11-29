@@ -1,20 +1,15 @@
 'use client'
 
-import { UserData } from "@/lib/interfaces/CommonInterfaces"
 import Image from "next/image"
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
 import { CSSProperties, useState } from "react";
 import styles from "../Navbar/NavBarUserButton.module.css";
 import { RiLiveFill } from "react-icons/ri";
 import { IoMdPhotos } from "react-icons/io";
 import { FiSmile } from "react-icons/fi";
 import { NavBarActionButton } from "../Navbar/NavbarActionButton";
-import { useDispatch } from "react-redux";
-import { addUserPost } from "@/lib/features/userData/userDataSlice";
 import { FaceKittenDB, IProfile } from "@/lib/db";
 import { Post } from "@/lib/Classes/Posts/PostsClasses";
-import { PageProfile, Profile } from "@/lib/Classes/Profile/Profile";
+import { useLiveQuery } from "dexie-react-hooks";
 
 interface CrossListPostFormProps {
     size: number
@@ -22,12 +17,10 @@ interface CrossListPostFormProps {
 
 export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
-    const dispatch = useDispatch()
     const db = new FaceKittenDB
 
-    const userProfile = useSelector(
-        (state: RootState): UserData | null => state.userData.user
-    );
+    const userProfile = useLiveQuery(() => db.userProfile.get(0), []);
+
     const [postText, setPostText] = useState("")
 
 
@@ -53,7 +46,6 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
             console.log("ADDING TO REDUX STORE")
             userData.posts = userData?.posts?.concat(Proto)
             db.userProfile.put(userData);
-            dispatch(addUserPost(Proto))
         }
 
         setPostText("")

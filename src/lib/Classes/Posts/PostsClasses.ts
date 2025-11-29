@@ -1,6 +1,7 @@
 import { Profile } from "@/lib/Classes/Profile/Profile";
 import { PostComment } from "./Comments";
 import { IPost, IPostComment } from "@/lib/db";
+import { Reaction } from "../Reaction/Reaction";
 
 export class Post {
     id?: number | undefined | null = 0;
@@ -8,7 +9,7 @@ export class Post {
     content: string = "";
     createdAt: string = new Date().toString();
     comments: PostComment[] = [];
-    liked: boolean = false;
+    reaction?: Reaction;
 
     public async ToInterface(authorId: number): Promise<IPost> {
         const comments: IPostComment[] = await Promise.all(
@@ -19,7 +20,7 @@ export class Post {
 
         return {
             id: this.id ?? undefined,
-            liked: this.liked,
+            reaction: this.reaction && this.reaction.ToInterface(),
             authorId,
             authorAvatarUrl: this.author?.avatarUrl ?? "Error getting avatar url",
             content: this.content,

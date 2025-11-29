@@ -18,7 +18,7 @@ import {
   IPostComment,
   IPostCommentReply,
   IFollower,
-  ILike,
+  IReaction,
   IChat,
   IGroupChat,
   IChatMessage,
@@ -388,57 +388,6 @@ export function useRemoveFollower() {
   }, [])
 }
 
-/**
- * Hook: useLikes
- * Get all likes for a profile
- */
-export function useLikes(profileId: number) {
-  const likes = useLiveQuery(
-    () => db.likes.where('profileId').equals(profileId).toArray(),
-    [profileId]
-  )
-  return likes
-}
-
-/**
- * Hook: useAddLike
- * Add a like
- */
-export function useAddLike() {
-  return useCallback(async (like: ILike) => {
-    try {
-      const id = await db.likes.add(like)
-      return { success: true, id }
-    } catch (error) {
-      console.error('Error adding like:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
-
-/**
- * Hook: useRemoveLike
- * Remove a like
- */
-export function useRemoveLike() {
-  return useCallback(async (profileId: number, likerProfileId: number) => {
-    try {
-      const like = await db.likes
-        .where('profileId')
-        .equals(profileId)
-        .and((l) => l.likerProfileId === likerProfileId)
-        .first()
-
-      if (like?.id) {
-        await db.likes.delete(like.id)
-      }
-      return { success: true }
-    } catch (error) {
-      console.error('Error removing like:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
 
 /**
  * Hook: useClearAllData

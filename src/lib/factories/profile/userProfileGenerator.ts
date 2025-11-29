@@ -1,11 +1,9 @@
 import { FaceKittenDB, IProfile } from "@/lib/db";
 import { saveLocalUserProfile } from "@/lib/utils";
 import { UserData } from "@/lib/interfaces/CommonInterfaces";
-import { setUser } from "@/lib/features/userData/userDataSlice";
-import { AppDispatch } from "@/lib/store";
 
 
-export const initializeHomePage = async (username: string, dispatch: AppDispatch) => {
+export const initializeHomePage = async (username: string) => {
 
     const db = new FaceKittenDB();
 
@@ -30,7 +28,6 @@ export const initializeHomePage = async (username: string, dispatch: AppDispatch
     };
     
     console.log("DISPACTH SET USER", userData)
-    dispatch(setUser(userData));
 
 }
 
