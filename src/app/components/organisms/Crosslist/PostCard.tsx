@@ -211,13 +211,13 @@ export function PostCard({
           )}
 
           {comments.length === 0 ? (
-            <span  onContextMenu={(e) => e.preventDefault()} className="text-gray-500 text-[15px] select-none touch-none">Nessun commento</span>
+            <span  onContextMenu={(e) => e.preventDefault()} className="text-gray-500 text-[12px] select-none touch-none">Nessun commento</span>
           ) : comments.length === 1 ? (
-            <span className="text-[15px] select-none touch-none" onContextMenu={(e) => e.preventDefault()} >1 commento</span>
+            <span className="text-[12px] text-gray-500 select-none touch-none" onContextMenu={(e) => e.preventDefault()} >1 commento</span>
           ) : (
             <span
               onClick={() => setIsCommenting(!isCommenting)}
-              className="text-gray-500 text-[15px] select-none touch-none"
+              className="text-gray-500 text-[12px] select-none touch-none"
             >
               {comments.length} commenti
             </span>
