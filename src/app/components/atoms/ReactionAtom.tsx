@@ -19,18 +19,18 @@ interface IReactionProp {
 
 const reactionConfig: Record<
   ReactionType,
-  { src: StaticImageData; alt: string }
+  { src: StaticImageData; alt: string, mod:number }
 > = {
-  [ReactionType.like]:   { src: likePng, alt: "Like" },
-  [ReactionType.love]:   { src: lovePng, alt: "Heart" },
-  [ReactionType.care]:   { src: carePng, alt: "Hug" },
-  [ReactionType.laugh]:  { src: laughPng, alt: "Laugh" },
-  [ReactionType.wow]:    { src: wowPng, alt: "Wow" },
-  [ReactionType.sad]:    { src: sadPng, alt: "Sad" },
-  [ReactionType.angry]:  { src: angryPng, alt: "Angry" },
-  [ReactionType.gay]:    { src: rainbowPng, alt: "Rainbow" },
-  [ReactionType.flower]: { src: flowerPng, alt: "Flower" },
-  [ReactionType.boom]:   { src: bombPng, alt: "Bomb" },
+  [ReactionType.like]:   { src: likePng, alt: "Like", mod:0.8 },
+  [ReactionType.love]:   { src: lovePng, alt: "Heart", mod:0.9 },
+  [ReactionType.care]:   { src: carePng, alt: "Hug", mod:0.9 },
+  [ReactionType.laugh]:  { src: laughPng, alt: "Laugh", mod:1 },
+  [ReactionType.wow]:    { src: wowPng, alt: "Wow", mod:0.95 },
+  [ReactionType.sad]:    { src: sadPng, alt: "Sad", mod:0.9 },
+  [ReactionType.angry]:  { src: angryPng, alt: "Angry", mod:1 },
+  [ReactionType.gay]:    { src: rainbowPng, alt: "Rainbow", mod:1 },
+  [ReactionType.flower]: { src: flowerPng, alt: "Flower", mod:1 },
+  [ReactionType.boom]:   { src: bombPng, alt: "Bomb", mod:0.8 },
 };
 
 export function ReactionAtom({ type, size }: IReactionProp) {
@@ -41,10 +41,11 @@ export function ReactionAtom({ type, size }: IReactionProp) {
     <Image
       src={cfg.src}
       alt={cfg.alt}
-      width={cfg.src === likePng ? size*2/3 : size}
-      height={cfg.src === likePng ? size*2/3 : size}
+      width={size*cfg.mod}
+      height={size*cfg.mod}
       loading="lazy"
       draggable={false}
+      className="overflow-clip"
     />
   );
 }
