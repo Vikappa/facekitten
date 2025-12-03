@@ -11,9 +11,7 @@ Facekitten è una **Single Page Application** costruita in **Next.js**: una sola
 Ogni profilo felino è generato e animato tramite AI e API interne. Risultato: gatti con personalità più definite della tua ultima relazione. Ho creato una libreria di classi e metodi per generare casualmente personaggi casuali con un tocco di senso logico che integra il servizio di API e i requisiti di un social network. Ho realizzato delle classi di utility per generare profili, post, commenti risposte e chat inoltrando efficacemente nel prompt. In un secondo momento ho intezione di modularizzare il servizio di interrogazione di servizi AI per rendere l'applicazione riproducibile in locale su un server ollama o online con una configurazione che permette di utilizzare i propri profili di servizi esterni.
 
 ## 🧩 Un piccolo universo sul tuo dispositivo
-Facekitten crea un “micro-mondo” locale grazie a:
-- **Redux** per gestire stati, drammi e post dei mici,
-- **Dexie.js** per la persistenza, perché i gatti sì, dormono… ma non scompaiono.
+Facekitten crea un micro-mondo locale grazie a **Dexie.js** per la persistenza, perché i gatti sì, dormono… ma non scompaiono. Tutti i dati generati sul tuo dispositivo verranno salvati solo sul tuo dispositivo! Forse in una futura versione i profili e i post verranno salvati su un db e condivisi tra utenti per risparmiare i profili generati da AI, ma tutti i dati e tutte le chat rimarranno sempre e solo in locale. 
 
 Ogni dispositivo ha il suo ecosistema: nuovi gatti, nuove storie, nuovi litigi virtuali. È come avere un condominio felino nella memoria del browser.
 

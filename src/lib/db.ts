@@ -34,7 +34,7 @@ export interface IPost {
   createdAt: string
   updatedAt?: string
   type: 'text' | 'image' | 'video' | 'marketplace'
-  reaction?: IReaction
+  reaction: IReaction[]
   reactCount?: number
   commentCount?: number
   comments: IPostComment[]
@@ -44,6 +44,7 @@ export interface IPost {
 export interface IReaction {
   id: number
   type: ReactionType
+  author: IProfile
 }
 
 export interface IImagePost extends IPost {

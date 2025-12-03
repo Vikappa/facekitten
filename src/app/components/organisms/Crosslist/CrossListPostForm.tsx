@@ -43,7 +43,6 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
 
         if (userData?.posts) {
-            console.log("ADDING TO REDUX STORE")
             userData.posts = userData?.posts?.concat(Proto)
             db.userProfile.put(userData);
         }

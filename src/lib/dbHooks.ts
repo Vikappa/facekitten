@@ -76,21 +76,21 @@ export function useAddProfile() {
   }, [])
 }
 
-/**
- * Hook: useUpdateProfile
- * Update an existing profile
- */
-export function useUpdateProfile() {
-  return useCallback(async (id: number, changes: Partial<IProfile>) => {
-    try {
-      await db.profiles.update(id, changes)
-      return { success: true }
-    } catch (error) {
-      console.error('Error updating profile:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
+// /**
+//  * Hook: useUpdateProfile
+//  * Update an existing profile
+//  */
+// export function useUpdateProfile() {
+//   return useCallback(async (id: number, changes: Partial<IProfile>) => {
+//     try {
+//       await db.profiles.update(id, changes)
+//       return { success: true }
+//     } catch (error) {
+//       console.error('Error updating profile:', error)
+//       return { success: false, error }
+//     }
+//   }, [])
+// }
 
 /**
  * Hook: useDeleteProfile
@@ -155,20 +155,20 @@ export function useAddPost() {
 }
 
 /**
- * Hook: useUpdatePost
- * Update an existing post
- */
-export function useUpdatePost() {
-  return useCallback(async (id: number, changes: Partial<IPost>) => {
-    try {
-      await db.posts.update(id, changes)
-      return { success: true }
-    } catch (error) {
-      console.error('Error updating post:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
+//  * Hook: useUpdatePost
+//  * Update an existing post
+//  */
+// export function useUpdatePost() {
+//   return useCallback(async (id: number, changes: Partial<IPost>) => {
+//     try {
+//       await db.posts.update(id, changes)
+//       return { success: true }
+//     } catch (error) {
+//       console.error('Error updating post:', error)
+//       return { success: false, error }
+//     }
+//   }, [])
+// }
 
 /**
  * Hook: useDeletePost

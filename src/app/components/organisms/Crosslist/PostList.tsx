@@ -1,4 +1,3 @@
-// PostList.tsx
 'use client';
 
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -8,7 +7,6 @@ import { PostCard, PostCardAuthorModel, PostCardCommentModel } from './PostCard'
 const db = new FaceKittenDB();
 
 export function PostList() {
-  // 1) Hook SEMPRE nello stesso ordine
   const profiles = useLiveQuery(() => db.profiles.toArray(), []);
   const user = useLiveQuery(() => db.userProfile.get(0), []);
   const posts = useLiveQuery(async () => {
@@ -28,14 +26,11 @@ export function PostList() {
     return Array.from(merged.values());
   }, []);
 
-  // 2) Se una delle query è ancora in loading, non rendere niente
   if (profiles === undefined || user === undefined || posts === undefined) {
-    return null; // metti loader qui se ti va
+    return null;// TODO LOADER
   }
 
-  // 3) NIENTE hook qui sotto, solo logica “pura”
 
-  // Mappa degli autori
   const authorsMap = new Map<number, PostCardAuthorModel>();
 
   if (user) {
@@ -56,7 +51,6 @@ export function PostList() {
     }
   });
 
-  // View model delle card
   const safePosts = posts.filter(
     (p): p is IPost & { id: number } => p.id !== null && p.id !== undefined
   );
@@ -118,10 +112,10 @@ export function PostList() {
           id={card.id}
           content={card.content}
           createdAt={card.createdAt}
-          likeCount={card.reactionCount}
-          reaction={card.reaction}
+          postReactions={card.reaction}
           author={card.author}
           comments={card.comments}
+          db= {db}
         />
       ))}
     </div>

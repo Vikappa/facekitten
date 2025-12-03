@@ -1,6 +1,6 @@
 import { Profile } from "@/lib/Classes/Profile/Profile";
 import { PostComment } from "./Comments";
-import { IPost, IPostComment } from "@/lib/db";
+import { IPost, IPostComment, IReaction } from "@/lib/db";
 import { Reaction } from "../Reaction/Reaction";
 
 export class Post {
@@ -9,7 +9,7 @@ export class Post {
     content: string = "";
     createdAt: string = new Date().toString();
     comments: PostComment[] = [];
-    reaction?: Reaction;
+    reaction: Reaction[] = [];
 
     public async ToInterface(authorId: number): Promise<IPost> {
         const comments: IPostComment[] = await Promise.all(
@@ -18,9 +18,16 @@ export class Post {
             )
         );
 
+        const reactions: IReaction[] = await Promise.all(
+            (this.reaction ?? []).map(r =>
+                r.ToInterface()
+            )
+        );
+
+
         return {
             id: this.id ?? undefined,
-            reaction: this.reaction && this.reaction.ToInterface(),
+            reaction: reactions,
             authorId,
             authorAvatarUrl: this.author?.avatarUrl ?? "Error getting avatar url",
             content: this.content,
@@ -30,6 +37,7 @@ export class Post {
         };
     }
 }
+
 
 
 export class ImagePost extends Post {

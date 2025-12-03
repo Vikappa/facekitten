@@ -1,28 +1,40 @@
-// ReactionMart.tsx
 'use client';
 
 import { ReactionAtom } from "./ReactionAtom";
+import { ReactionType } from "@/lib/Classes/Reaction/Reaction";
 
 interface ReactionMartProps {
-  onHandleReaction: (reactionId: number) => void;
+  onHandleReaction: (reactionType: ReactionType) => Promise<void>;
+  currentReactionStatus: ReactionType | undefined;
 }
 
-export function ReactionMart({ onHandleReaction }: ReactionMartProps) {
+export function ReactionMart({ onHandleReaction, currentReactionStatus }: ReactionMartProps) {
+
+  const buttons: ReactionType[] = [
+    ReactionType.like,
+    ReactionType.love,
+    ReactionType.care,
+    ReactionType.laugh,
+    ReactionType.wow,
+    ReactionType.sad,
+    ReactionType.angry,
+    ReactionType.gay,
+    ReactionType.flower,
+    ReactionType.boom,
+  ];
+
   return (
     <div className="flex flex-col bg-white shadow-lg rounded-xl border border-gray-200 p-2">
-      <div className="flex gap-2 mb-1">
-        <button onClick={() => onHandleReaction(0)}><ReactionAtom size={32} type={0}/></button>
-        <button onClick={() => onHandleReaction(1)}><ReactionAtom size={32} type={1}/></button>
-        <button onClick={() => onHandleReaction(2)}><ReactionAtom size={32} type={2}/></button>
-        <button onClick={() => onHandleReaction(3)}><ReactionAtom size={32} type={3}/></button>
-        <button onClick={() => onHandleReaction(4)}><ReactionAtom size={32} type={4}/></button>
-      </div>
-      <div className="flex gap-2">
-        <button onClick={() => onHandleReaction(5)}><ReactionAtom size={32} type={5}/></button>
-        <button onClick={() => onHandleReaction(6)}><ReactionAtom size={32} type={6}/></button>
-        <button onClick={() => onHandleReaction(7)}><ReactionAtom size={32} type={7}/></button>
-        <button onClick={() => onHandleReaction(8)}><ReactionAtom size={32} type={8}/></button>
-        <button onClick={() => onHandleReaction(9)}><ReactionAtom size={32} type={9}/></button>
+      <div className="grid grid-cols-5 gap-2">
+        {buttons.map((type) => (
+          <button
+            key={type}
+            onClick={() => onHandleReaction(type)}
+            className={type === currentReactionStatus ? "scale-110" : ""}
+          >
+            <ReactionAtom size={32} type={type} />
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -1,17 +1,28 @@
-import { IReaction } from "@/lib/db";
+import { FaceKittenDB, IReaction } from "@/lib/db";
 
-export class Reaction{
-    id:number = 0;
+export class Reaction {
+    db = new FaceKittenDB();
+    id: number = 0;
     reaction?: ReactionType;
-    public ToInterface():IReaction{
+    authorId: number;
+    public async ToInterface(): Promise<IReaction> {
+        const authorFull = await this.db.profiles.get(this.authorId)
+        if(!authorFull) throw new Error(`Cannot find Profile id ${this.authorId}`);
         return {
-            type:ReactionType.like,
-            id: this.id
+            type: ReactionType.like,
+            id: this.id,
+            author: authorFull
         }
+    }
+
+    constructor(authorId: number, type: ReactionType = ReactionType.like, id: number = 0) {
+        this.authorId = authorId;
+        this.reaction = type;
+        this.id = id;
     }
 }
 
-export enum ReactionType{
+export enum ReactionType {
     like,
     love,
     care,
