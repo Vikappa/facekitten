@@ -10,7 +10,7 @@ export const initializeHomePage = async (username: string) => {
 
     let userProfile;
     if (!storeUserProfile) {
-        userProfile = await generateUserProfileInterface(username);
+        userProfile = await generateUserProfileInterface(username, db);
         saveLocalUserProfile(userProfile, db);
     } else {
         userProfile = storeUserProfile
@@ -30,7 +30,7 @@ export const initializeHomePage = async (username: string) => {
     db.profiles.put(userProfile)
 }
 
-export const generateUserProfileInterface = async (username: string): Promise<IProfile> => {
+export const generateUserProfileInterface = async (username: string, db:FaceKittenDB): Promise<IProfile> => {
     const RandomPropic = await fetch("/api/get/randomProfilePicture", {
         credentials: "include",
     })
@@ -48,6 +48,23 @@ export const generateUserProfileInterface = async (username: string): Promise<IP
             return r.json();
         })
         .then(data => data.url);
+
+    const vipProfiles = await fetch("/api/getVIPs", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+            {
+                currentProfiles: []
+            },
+        ),
+    });
+
+    const data = await vipProfiles.json();
+
+
+    db.profiles.bulkAdd(data)
 
     const userProfile: IProfile = {
         id: "0",

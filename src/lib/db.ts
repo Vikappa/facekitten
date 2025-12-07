@@ -169,7 +169,6 @@ export class FaceKittenDB extends Dexie {
 
       userProfile: 'id',
       followers: 'id, profileId, followerId',
-      likes: 'id, profileId, likerProfileId',
     })
   }
 }
