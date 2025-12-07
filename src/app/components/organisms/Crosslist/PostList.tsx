@@ -57,6 +57,9 @@ export function PostList() {
 
               return {
                 id: cId,
+                postId: Comment.postId,
+                repliesIds:Comment.repliesIds,
+                reactionIds:Comment.reactionIds,
                 content: Comment.content,
                 authorId: Comment.authorId,
                 authorName: cAuthor.username,
@@ -74,6 +77,7 @@ export function PostList() {
             reactionIds: post.reactionIds,
             author,
             comments,
+            
           };
         })
       );

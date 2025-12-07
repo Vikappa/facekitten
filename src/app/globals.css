@@ -23,3 +23,7 @@
   -webkit-user-select: none;
   user-select: none;
 }
+
+body{
+  background-color: var(--color-gray-100);
+}

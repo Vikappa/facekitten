@@ -47,8 +47,8 @@ export function useProfile(id: string) {
   return profile
 }
 
-export function useTryGetUserProfile(){
-  const userProfile = useLiveQuery(() => db.userProfile.get(0),[0])
+export function useTryGetUserProfile() {
+  const userProfile = useLiveQuery(() => db.userProfile.get(0), [0])
   return userProfile
 }
 
@@ -134,12 +134,43 @@ export function usePost(id: number) {
  * Hook: usePostsByAuthor
  * Get all posts by a specific author
  */
-export function usePostsByAuthor(authorId: number) {
+export function usePostsByAuthor(authorId: string) {
   const posts = useLiveQuery(
     () => db.posts.where('authorId').equals(authorId).toArray(),
     [authorId]
   )
   return posts
+}
+
+
+export function usePostCommentRepliesByPostCommentId(postCommentId: string) {
+  const replies = useLiveQuery<IPostCommentReply[]>(
+    () => db.replies
+      .where('postCommentId')
+      .equals(postCommentId)
+      .toArray(),
+    [postCommentId]
+  );
+
+  return replies;
+}
+
+
+export function useProfileByPost(postId: string) {
+  return useLiveQuery(
+    () => db.profiles.where("postIds").equals(postId).first(),
+    [postId]
+  );
+}
+
+export function useProfileById(profileId: string | undefined) {
+  return useLiveQuery(
+    () => {
+      if (!profileId) return undefined;
+      return db.profiles.get(profileId);
+    },
+    [profileId]
+  );
 }
 
 /**

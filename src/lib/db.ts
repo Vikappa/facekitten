@@ -34,7 +34,7 @@ export interface IPost {
   updatedAt?: string
   type: 'text' | 'image' | 'video' | 'marketplace' | 'share' | 'externalLink'
   reactionIds: string[]
-  commentsIds:string[]
+  commentsIds: string[]
   authorAvatarUrl: string
 }
 
@@ -73,17 +73,26 @@ export interface IPostComment {
   content: string
   createdAt: string
   updatedAt?: Date
-  repliesIds?: string[]
+  repliesIds: string[]
+  reactionIds: string[]
   commentAuthorPropic: string;
 }
 
 export interface IPostCommentReply {
   id: string
-  commentId: number
-  authorId: number
+  postCommentId: string
+  authorId: string
   content: string
   createdAt: Date
   updatedAt?: Date
+  commentReactionsIds: string[]
+}
+
+export interface ICommentReaction {
+  reactionId: string
+  authorId: string;
+  commentId:string
+  reactionType:ReactionType
 }
 
 
@@ -117,7 +126,7 @@ export interface IGroupChat extends IChat {
   lastMessage?: string
 }
 
-export interface ICurrentUserPreferences{
+export interface ICurrentUserPreferences {
   someRandomData: string;
 }
 
@@ -141,7 +150,7 @@ export class FaceKittenDB extends Dexie {
   userProfile!: Table<ICurrentUserPreferences>
   constructor() {
     super('FaceKittenDB')
-    this.version(2).stores({
+    this.version(3).stores({
       // Profile tables
       profiles: 'id, username',
       pageProfiles: 'id, username',
@@ -149,14 +158,14 @@ export class FaceKittenDB extends Dexie {
       posts: 'id, authorId, createdAt',
 
       comments: 'id, postId, authorId, createdAt',
-      replies:  'id, commentId, authorId, createdAt',
+      replies: 'id, postCommentId, authorId, createdAt',
 
       reactions: 'id, authorId, type',
 
       chats: 'id, fromProfileId, toProfileId, createdAt',
       groupChats: 'id, groupName, createdAt',
       messages: 'id, senderId, chatId, timestamp',
-      chatLinks:'id, senderId, chatId, timestamp',
+      chatLinks: 'id, senderId, chatId, timestamp',
 
       userProfile: 'id',
       followers: 'id, profileId, followerId',

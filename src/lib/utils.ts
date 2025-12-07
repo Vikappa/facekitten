@@ -97,3 +97,36 @@ export async function saveLocalUserProfile(profile: IProfile, db: FaceKittenDB) 
 export async function getLocalUserProfile(db: FaceKittenDB): Promise<IProfile | undefined> {
   return db.profiles.get("0")
 }
+
+export function formatRelativeTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHrs = Math.floor(diffMin / 60);
+    const diffDays = Math.floor(diffHrs / 24);
+
+    if (diffSec < 60) return '1 min';
+    if (diffMin < 60) return `${diffMin} min`;
+    if (diffHrs < 24) return `${diffHrs}h`;
+
+    const isToday = diffDays === 0;
+    const isYesterday = diffDays === 1;
+
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    if (isToday) return `${hours}:${minutes}`;
+    if (isYesterday) return `ieri alle ${hours}:${minutes}`;
+
+    const day = date.getDate().toString();
+    const month = date.toLocaleString('it-IT', { month: 'short' });
+
+    if (date.getFullYear() === now.getFullYear()) {
+        return `${day} ${month} alle ${hours}:${minutes}`;
+    }
+
+    return date.toLocaleDateString('it-IT');
+}

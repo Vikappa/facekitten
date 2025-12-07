@@ -14,6 +14,7 @@ import {
 import { ReactionMart } from '../../atoms/ReactionMart';
 import { ReactionAtom } from '../../atoms/ReactionAtom';
 import { ReactionType } from '@/lib/interfaces/CommonInterfaces';
+import { PostComment } from '../../atoms/PostComment';
 
 const LONG_PRESS_MS = 600;
 
@@ -30,6 +31,9 @@ export interface PostCardCommentModel {
   authorName: string;
   createdAt: string;
   commentAuthorPropic: string;
+  postId: string
+  repliesIds: string[]
+  reactionIds: string[]
 }
 
 export interface PostCardProps {
@@ -141,6 +145,8 @@ export function PostCard({
       authorId: dbUser.id,
       createdAt: new Date().toISOString(),
       commentAuthorPropic: dbUser.avatarUrl,
+      repliesIds: [],
+      reactionIds: []
     };
 
     thisPostInDB.commentsIds = thisPostInDB.commentsIds ?? [];
@@ -408,34 +414,10 @@ export function PostCard({
           </div>
 
           <div className="flex flex-col mt-2">
-            {comments.map((comment) => (
-              <div className="flex items-center" key={comment.id}>
-                <div className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0">
-                  <Image
-                    src={comment.commentAuthorPropic}
-                    alt={comment.authorName}
-                    width={20}
-                    height={20}
-                    className="object-cover w-full h-full block"
-                    unoptimized
-                  />
-                </div>
+            {comments.toReversed().map((comment, key) => (
 
-                <span className="text-blue-600 text-sm font-semibold p-1">
-                  {comment.authorName ?? 'Caricamento...'}:
-                </span>
+              <PostComment comment={comment} key={key} db={db} />
 
-                <span
-                  className="text-sm p-1 break-words whitespace-pre-wrap overflow-hidden"
-                  style={{
-                    wordBreak: 'break-word',
-                    overflowWrap: 'break-word',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {comment.content}
-                </span>
-              </div>
             ))}
           </div>
 
