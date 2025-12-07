@@ -86,14 +86,14 @@ export const imageUrlToBase64 = async (url: string) => {
 };
 
 export async function saveLocalUserProfile(profile: IProfile, db: FaceKittenDB) {
-  await db.userProfile.put({
+  await db.profiles.put({
     ...profile,
-    id: 0,
+    id: "0",
     updatedAt: new Date(),
     createdAt: profile.createdAt ?? new Date(),
   })
 }
 
 export async function getLocalUserProfile(db: FaceKittenDB): Promise<IProfile | undefined> {
-  return db.userProfile.get(0)
+  return db.profiles.get("0")
 }

@@ -7,8 +7,7 @@ import { RiLiveFill } from "react-icons/ri";
 import { IoMdPhotos } from "react-icons/io";
 import { FiSmile } from "react-icons/fi";
 import { NavBarActionButton } from "../Navbar/NavbarActionButton";
-import { FaceKittenDB, IProfile } from "@/lib/db";
-import { Post } from "@/lib/Classes/Posts/PostsClasses";
+import { FaceKittenDB, IPost, IProfile } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 
 interface CrossListPostFormProps {
@@ -19,7 +18,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
     const db = new FaceKittenDB
 
-    const userProfile = useLiveQuery(() => db.userProfile.get(0), []);
+    const userProfile = useLiveQuery(() => db.profiles.get("0"), []);
 
     const [postText, setPostText] = useState("")
 
@@ -28,24 +27,37 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLInputElement>) {
         e.preventDefault();
 
-        const userData: IProfile | undefined = await db.userProfile.get(0)
+        const userData: IProfile | undefined = await db.profiles.get("0")
 
         if (userData === undefined) throw new Error("UserData non trovato")
 
-        const newPost = new Post();
+        const newPostID = crypto.randomUUID();
+
+        const newPost: IPost = {
+            id:newPostID,
+            authorId: "0",
+            content: "",
+            createdAt: Date.now.toString(),
+            type: "text",
+
+            authorAvatarUrl: "",
+            reactionIds: [],
+            commentsIds: []
+        };
         newPost.content = postText;
         newPost.createdAt = new Date().toString();
-        newPost.comments = [];
 
-        const Proto = await newPost.ToInterface(0);
-        Proto.id = await db.userProfile.get(0).then(up => up?.posts?.length || 0)
+        await db.posts.add(newPost)
 
-
-
-        if (userData?.posts) {
-            userData.posts = userData?.posts?.concat(Proto)
-            db.userProfile.put(userData);
+        if (!userData?.postIds) {
+            userData.postIds = []
         }
+
+
+        userData.postIds.push(newPostID)
+
+        await db.profiles.put(userData);
+
 
         setPostText("")
     }

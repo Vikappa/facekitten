@@ -1,7 +1,7 @@
 'use client';
 
+import { ReactionType } from "@/lib/interfaces/CommonInterfaces";
 import { ReactionAtom } from "./ReactionAtom";
-import { ReactionType } from "@/lib/Classes/Reaction/Reaction";
 
 interface ReactionMartProps {
   onHandleReaction: (reactionType: ReactionType) => Promise<void>;

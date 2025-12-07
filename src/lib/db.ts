@@ -3,23 +3,22 @@
  */
 
 import Dexie, { Table } from 'dexie'
-import { ReactionType } from './Classes/Reaction/Reaction'
-
+import { ReactionType } from './interfaces/CommonInterfaces'
 /**
  * Type definitions for database tables
  */
 
 export interface IProfile {
-  id: number
+  id: string
   username: string
   avatarUrl: string
   bio: string
   bannerUrl: string
   createdAt?: Date
   updatedAt?: Date
-  posts: IPost[]
-  followingIds?: number[]
-  comments?: IPostComment[]
+  postIds: string[]
+  followingIds?: string[]
+  commentsIds: string[]
 }
 
 export interface IPageProfile extends IProfile {
@@ -28,23 +27,21 @@ export interface IPageProfile extends IProfile {
 }
 
 export interface IPost {
-  id?: number | null
-  authorId: number
+  id: string | null
+  authorId: string
   content: string
   createdAt: string
   updatedAt?: string
-  type: 'text' | 'image' | 'video' | 'marketplace'
-  reaction: IReaction[]
-  reactCount?: number
-  commentCount?: number
-  comments: IPostComment[]
-  authorAvatarUrl: string,
+  type: 'text' | 'image' | 'video' | 'marketplace' | 'share' | 'externalLink'
+  reactionIds: string[]
+  commentsIds:string[]
+  authorAvatarUrl: string
 }
 
 export interface IReaction {
-  id: number
+  id: string
   type: ReactionType
-  author: IProfile
+  authorId: string
 }
 
 export interface IImagePost extends IPost {
@@ -60,22 +57,28 @@ export interface IMarketplacePost extends IPost {
   price: number
   description: string
 }
+export interface ISharePost extends IPost {
+  targetPostId: number;
+}
+
+export interface IExternalLinkPost extends IPost {
+  url: string;
+}
+
 
 export interface IPostComment {
-  id: number
-  postId: number
-  authorId: number
+  id: string
+  postId: string
+  authorId: string
   content: string
   createdAt: string
   updatedAt?: Date
-  replyCount?: number
-  replies?: IPostCommentReply[]
+  repliesIds?: string[]
   commentAuthorPropic: string;
-
 }
 
 export interface IPostCommentReply {
-  id?: number
+  id: string
   commentId: number
   authorId: number
   content: string
@@ -83,20 +86,14 @@ export interface IPostCommentReply {
   updatedAt?: Date
 }
 
-export interface IFollower {
-  id?: number
-  profileId: number
-  followerId: number
-  createdAt?: Date
-}
 
 export interface IChatMessage {
-  id?: number
+  id: number
   senderId: number
   content: string
   timestamp: Date
   mediaUrl?: string
-  chatId?: number
+  chatId: number
 }
 
 export interface IChatLink extends IChatMessage {
@@ -107,12 +104,11 @@ export interface IChatLink extends IChatMessage {
 }
 
 export interface IChat {
-  id?: number
+  id: number
   fromProfileId: number
   toProfileId: number
   createdAt?: Date
   updatedAt?: Date
-  messageCount?: number
 }
 
 export interface IGroupChat extends IChat {
@@ -121,8 +117,12 @@ export interface IGroupChat extends IChat {
   lastMessage?: string
 }
 
+export interface ICurrentUserPreferences{
+  someRandomData: string;
+}
+
 /**
- * Dexie Database Class
+ * Dexie Database id
  */
 export class FaceKittenDB extends Dexie {
   profiles!: Table<IProfile>
@@ -133,42 +133,34 @@ export class FaceKittenDB extends Dexie {
   marketplacePosts!: Table<IMarketplacePost>
   comments!: Table<IPostComment>
   replies!: Table<IPostCommentReply>
-  followers!: Table<IFollower>
   reactions!: Table<IReaction>
   chats!: Table<IChat>
   groupChats!: Table<IGroupChat>
   messages!: Table<IChatMessage>
   chatLinks!: Table<IChatLink>
-  userProfile!: Table<IProfile>
+  userProfile!: Table<ICurrentUserPreferences>
   constructor() {
     super('FaceKittenDB')
-    this.version(1).stores({
+    this.version(2).stores({
       // Profile tables
-      profiles: '++id, username',
-      pageProfiles: '++id, username',
+      profiles: 'id, username',
+      pageProfiles: 'id, username',
 
-      // Post tables
-      posts: '++id, authorId, createdAt',
-      imagePosts: '++id, authorId, createdAt',
-      videoPosts: '++id, authorId, createdAt',
-      marketplacePosts: '++id, authorId, createdAt, price',
+      posts: 'id, authorId, createdAt',
 
-      // singleton user profile (id fisso, niente auto-incremento)
-      userProfile: 'id, username',
+      comments: 'id, postId, authorId, createdAt',
+      replies:  'id, commentId, authorId, createdAt',
 
-      // Comment tables
-      comments: '++id, postId, authorId, createdAt',
-      replies: '++id, commentId, authorId, createdAt',
+      reactions: 'id, authorId, type',
 
-      // Relationship tables
-      followers: '++id, profileId, followerId',
-      likes: '++id, profileId, likerProfileId',
+      chats: 'id, fromProfileId, toProfileId, createdAt',
+      groupChats: 'id, groupName, createdAt',
+      messages: 'id, senderId, chatId, timestamp',
+      chatLinks:'id, senderId, chatId, timestamp',
 
-      // Chat tables
-      chats: '++id, fromProfileId, toProfileId, createdAt',
-      groupChats: '++id, groupName, createdAt',
-      messages: '++id, senderId, chatId, timestamp',
-      chatLinks: '++id, senderId, chatId, timestamp',
+      userProfile: 'id',
+      followers: 'id, profileId, followerId',
+      likes: 'id, profileId, likerProfileId',
     })
   }
 }

@@ -10,7 +10,7 @@ import angryPng from "@/../public/assets/reactionsIcons/6.png";
 import rainbowPng from "@/../public/assets/reactionsIcons/7.png";
 import flowerPng from "@/../public/assets/reactionsIcons/8.png";
 import bombPng from "@/../public/assets/reactionsIcons/9.png";
-import { ReactionType } from "@/lib/Classes/Reaction/Reaction";
+import { ReactionType } from "@/lib/interfaces/CommonInterfaces";
 
 interface IReactionProp {
   type: ReactionType | undefined | null;

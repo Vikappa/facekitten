@@ -15,7 +15,7 @@ interface NavbarUserButtonProps {
 const db = new FaceKittenDB();
 
 export function NavBarUserButton({ size, color }: NavbarUserButtonProps) {
-  const userProfile = useLiveQuery(() => db.userProfile.get(0), []);
+  const userProfile = useLiveQuery(() => db.profiles.get("0"), []);
   const UserButtonRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 

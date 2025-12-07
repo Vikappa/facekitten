@@ -17,7 +17,6 @@ import {
   IMarketplacePost,
   IPostComment,
   IPostCommentReply,
-  IFollower,
   IReaction,
   IChat,
   IGroupChat,
@@ -30,15 +29,20 @@ import {
  * Get all profiles from database
  */
 export function useProfiles() {
-  const profiles = useLiveQuery(() => db.profiles.toArray(), [])
+  const profiles = useLiveQuery(() => db.profiles.bulkGet, [])
   return profiles
 }
+
+export function useFirst15Profiles() {
+  return useLiveQuery(() => db.profiles.limit(15).toArray(), []);
+}
+
 
 /**
  * Hook: useProfile
  * Get a single profile by ID
  */
-export function useProfile(id: number) {
+export function useProfile(id: string) {
   const profile = useLiveQuery(() => db.profiles.get(id), [id])
   return profile
 }
@@ -324,69 +328,7 @@ export function useDeleteReply() {
   }, [])
 }
 
-/**
- * Hook: useFollowers
- * Get all followers of a profile
- */
-export function useFollowers(profileId: number) {
-  const followers = useLiveQuery(
-    () => db.followers.where('profileId').equals(profileId).toArray(),
-    [profileId]
-  )
-  return followers
-}
 
-/**
- * Hook: useFollowing
- * Get all profiles that a user is following
- */
-export function useFollowing(followerId: number) {
-  const following = useLiveQuery(
-    () => db.followers.where('followerId').equals(followerId).toArray(),
-    [followerId]
-  )
-  return following
-}
-
-/**
- * Hook: useAddFollower
- * Add a follower relationship
- */
-export function useAddFollower() {
-  return useCallback(async (follower: IFollower) => {
-    try {
-      const id = await db.followers.add(follower)
-      return { success: true, id }
-    } catch (error) {
-      console.error('Error adding follower:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
-
-/**
- * Hook: useRemoveFollower
- * Remove a follower relationship
- */
-export function useRemoveFollower() {
-  return useCallback(async (profileId: number, followerId: number) => {
-    try {
-      const follower = await db.followers
-        .where('profileId')
-        .equals(profileId)
-        .and((f) => f.followerId === followerId)
-        .first()
-
-      if (follower?.id) {
-        await db.followers.delete(follower.id)
-      }
-      return { success: true }
-    } catch (error) {
-      console.error('Error removing follower:', error)
-      return { success: false, error }
-    }
-  }, [])
-}
 
 
 /**

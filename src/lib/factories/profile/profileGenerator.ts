@@ -1,12 +1,19 @@
-import { Profile } from "@/lib/Classes/Profile/Profile";
 import { FaceKittenDB, IProfile } from "@/lib/db";
 import { DoVisionRequest, DoPromptRequest } from "@/lib/services/Gemini API/GeminiAPInterrogation";
 import { imageUrlToBase64 } from "@/lib/utils";
 
-export async function GenerateProfile(): Promise<Profile> {
+export async function GenerateProfile(): Promise<IProfile> {
 
     const db = new FaceKittenDB();
-    const profile = new Profile();
+    const profile: IProfile = {
+        id: crypto.randomUUID(),
+        username: "",
+        avatarUrl: "",
+        bio: "",
+        bannerUrl: "",
+        postIds: [],
+        commentsIds: []
+    };
 
     const AvatarUrl = await fetch("/api/get/randomProfilePicture", {
         credentials: "include",
