@@ -440,7 +440,7 @@ async function GetUserProfile(db: FaceKittenDB): Promise<IProfile> {
   );
 }
 
-async function upsertReaction(
+export async function upsertReaction(
   db: FaceKittenDB,
   postId: string,
   reactionType?: ReactionType

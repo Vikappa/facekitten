@@ -37,7 +37,13 @@ export function useFirstNProfiles(n:number) {
   return useLiveQuery(() => db.profiles.limit(n).toArray(), []);
 }
 
+export function useSharedPostFromId(id:string){
+  return useLiveQuery(()=> db.sharePosts.get(id))
+}
 
+export function usePostFromId(id:string){
+  return useLiveQuery(()=> db.posts.get(id))
+}
 /**
  * Hook: useProfile
  * Get a single profile by ID
