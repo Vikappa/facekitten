@@ -2,16 +2,15 @@
 
 import {
     FaceKittenDB,
-    IImagePost,
-    IMarketplacePost,
     IPost,
     IProfile,
-    IVideoPost,
+    ISharePost,
 } from "@/lib/db";
 import { formatRelativeTime } from "@/lib/utils";
 import Image from "next/image";
 import {
     createContext,
+    MouseEvent,
     ReactNode,
     useCallback,
     useContext,
@@ -65,6 +64,38 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
     const hasData =
         !!sharedPostAuthor?.username && !!sharedPost?.createdAt;
 
+    async function handleCondivisione(e: any) {
+        e.preventDefault()
+        if (sharedPost?.id && sharedPostAuthor?.avatarUrl) {
+
+            const newShareId = crypto.randomUUID();
+
+            const newSHarePost: ISharePost = {
+                targetPostId: sharedPost.id,
+                id: newShareId,
+                authorId: "0",
+                content: newSharePostContext,
+                createdAt: Date(),
+                type: "share",
+                reactionIds: [],
+                commentsIds: [],
+                authorAvatarUrl: sharedPostAuthor.avatarUrl
+            }
+
+            if(!sharedPostAuthor?.postIds) sharedPostAuthor.postIds = []
+
+            sharedPostAuthor.postIds.push(newShareId)
+            await db.profiles.put(sharedPostAuthor)
+            await db.sharePosts.add(newSHarePost)
+            setNewSharePostConstext("")
+        }
+
+
+        close()
+    }
+
+    const [newSharePostContext, setNewSharePostConstext] = useState("")
+
     return (
         <ShareModalContext.Provider
             value={{ isVisible, postId, openShareModal, close }}
@@ -78,7 +109,7 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
 
                         <div className="flex flex-col">
                             <form>
-                                <input placeholder="Scrivi cosa ne pensi.." className="w-full border-0 focus:ring-0 focus:outline-none hover:ring-0 rounded px-2 py-1 text-sm" />
+                                <input value={newSharePostContext} onChange={(e) => setNewSharePostConstext(e.target.value)} placeholder="Scrivi cosa ne pensi.." className="w-full border-0 focus:ring-0 focus:outline-none hover:ring-0 rounded px-2 py-1 text-sm" />
                             </form>
 
                             <div className="flex flex-col mt-2 border-1 border-gray-300 rounded-sm p-2">
@@ -111,13 +142,13 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={close}
-                                className="px-3 py-1 bg-gray-300 text-gray-900 rounded text-sm"
+                                className="px-3 py-1 bg-gray-300 text-gray-500 rounded text-sm"
                             >
                                 Annulla
                             </button>
                             <button
-                                onClick={close}
-                                className="px-3 py-1 bg-gray-900 text-white rounded text-sm"
+                                onClick={(e) => { handleCondivisione(e) }}
+                                className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
                             >
                                 Condividi
                             </button>

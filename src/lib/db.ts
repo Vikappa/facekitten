@@ -58,7 +58,7 @@ export interface IMarketplacePost extends IPost {
   description: string
 }
 export interface ISharePost extends IPost {
-  targetPostId: number;
+  targetPostId: string;
 }
 
 export interface IExternalLinkPost extends IPost {
@@ -137,6 +137,7 @@ export class FaceKittenDB extends Dexie {
   profiles!: Table<IProfile>
   pageProfiles!: Table<IPageProfile>
   posts!: Table<IPost>
+  sharePosts!: Table<ISharePost>
   imagePosts!: Table<IImagePost>
   videoPosts!: Table<IVideoPost>
   marketplacePosts!: Table<IMarketplacePost>
@@ -150,12 +151,13 @@ export class FaceKittenDB extends Dexie {
   userProfile!: Table<ICurrentUserPreferences>
   constructor() {
     super('FaceKittenDB')
-    this.version(3).stores({
+    this.version(5).stores({
       // Profile tables
       profiles: 'id, username',
       pageProfiles: 'id, username',
 
       posts: 'id, authorId, createdAt',
+      sharePosts: 'id, authorId, createdAt, targetPostId',
 
       comments: 'id, postId, authorId, createdAt',
       replies: 'id, postCommentId, authorId, createdAt',

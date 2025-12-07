@@ -15,6 +15,7 @@ interface PostCardModel {
   reactionIds: string[];
   author: PostCardAuthorModel;
   comments: PostCardCommentModel[];
+  type: 'text' 
 }
 
 export function PostList() {
@@ -51,7 +52,7 @@ export function PostList() {
                   id: Comment.authorId,
                   username: 'Caricamento...',
                   avatarUrl: '/default-avatar.png',
-                  commentAuthorPropic: Comment.commentAuthorPropic,
+                  commentAuthorPropic: Comment.commentAuthorPropic
                 };
 
               return {
@@ -65,6 +66,7 @@ export function PostList() {
                 createdAt: Comment.createdAt,
                 commentAuthorPropic:
                   Comment.commentAuthorPropic ?? 'FALLBACK STRING TODO',
+                  
               };
             })
           );
@@ -76,7 +78,8 @@ export function PostList() {
             reactionIds: post.reactionIds,
             author,
             comments,
-            
+            type:"text"
+
           };
         })
       );
