@@ -5,7 +5,7 @@ import { PostList } from "./Crosslist/PostList";
 
 export function CrossList() {
     return (
-        <section className="" >
+        <section className="w-full" >
             <CrossListPostForm size={40} />
             <PostList />
         </section>

@@ -3,8 +3,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { FaceKittenDB } from '@/lib/db';
 import { PostCard, PostCardAuthorModel, PostCardCommentModel } from './PostCard';
-import { useFirst15Profiles } from '@/lib/dbHooks';
 import { useEffect, useState } from 'react';
+import { useFirstNProfiles } from '@/lib/dbHooks';
 
 const db = new FaceKittenDB();
 
@@ -18,14 +18,13 @@ interface PostCardModel {
 }
 
 export function PostList() {
-  const profilesResult = useFirst15Profiles();
   const user = useLiveQuery(() => db.profiles.get("0"), []);
   const posts = useLiveQuery(() => db.posts.toArray(), []);
-
+  
   const [cardModels, setCardModels] = useState<PostCardModel[]>([]);
-
-  const isLoading =
-    profilesResult === undefined || user === undefined || posts === undefined;
+  const [loadedProfileNumber, SetLoadedProfileNumber] = useState(15)
+  const profilesResult = useFirstNProfiles(loadedProfileNumber);
+  const isLoading = profilesResult === undefined || user === undefined || posts === undefined;
 
   const profiles = profilesResult ?? [];
 

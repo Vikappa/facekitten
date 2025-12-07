@@ -33,8 +33,8 @@ export function useProfiles() {
   return profiles
 }
 
-export function useFirst15Profiles() {
-  return useLiveQuery(() => db.profiles.limit(15).toArray(), []);
+export function useFirstNProfiles(n:number) {
+  return useLiveQuery(() => db.profiles.limit(n).toArray(), []);
 }
 
 

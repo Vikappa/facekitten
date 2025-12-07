@@ -6,10 +6,10 @@ import { RightSidebar } from "../../components/organisms/RightSideBar";
 export default function HomePage() {
 
   return (
-    <>
+    <div className="flex">
       <LeftSideBar />
       <CrossList />
       <RightSidebar />
-    </>
+    </div>
   );
 }

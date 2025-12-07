@@ -6,6 +6,7 @@ import { formatRelativeTime } from "@/lib/utils";
 import { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import { EmojiMart } from "./EmojiMart";
 import { CiFaceSmile } from "react-icons/ci";
+import Image from "next/image";
 
 interface PostCommentReplyProps {
     currentNewReply: string;
@@ -107,10 +108,30 @@ export function PostCommentReply({
     return (
         <div className="flex flex-col" ref={wrapperRef}>
             {replyModels && replyModels.length > 0 && replyModels.map(r => (
-                <span className="text-xs bg-gray-100 rounded-md p-1 px-2 my-1" key={r.content.id}>
-                    {formatRelativeTime(r.content.createdAt.toString())}{" "}
-                    {r.replyAuthor.username} {r.content.content}
-                </span>
+                <div
+                    className="text-xs flex items-center bg-gray-100 rounded-md p-1 px-2 my-1 gap-1"
+                    key={r.content.id}
+                >
+
+                    <span className="text-gray-500 text-[10px] font-semibold">
+                        {formatRelativeTime(r.content.createdAt.toString())}
+                    </span>
+                    <div className="overflow-hidden rounded-full w-4 h-4 flex-shrink-0">
+                        <Image
+                            className="object-cover w-full h-full"
+                            src={r.replyAuthor.avatarUrl}
+                            alt={r.replyAuthor.username}
+                            width={12}
+                            height={12}
+                            unoptimized
+                        />
+                    </div>
+
+                    <span className="font-semibold text-gray-700">{r.replyAuthor.username}</span>
+
+                    <span className="text-gray-900">{r.content.content}</span>
+                </div>
+
             ))}
 
             <form

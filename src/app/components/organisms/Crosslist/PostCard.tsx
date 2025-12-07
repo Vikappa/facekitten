@@ -6,7 +6,6 @@ import { CiFaceSmile } from 'react-icons/ci';
 import { EmojiMart } from '../../atoms/EmojiMart';
 import {
   FaceKittenDB,
-  IPost,
   IPostComment,
   IProfile,
   IReaction,
@@ -15,6 +14,8 @@ import { ReactionMart } from '../../atoms/ReactionMart';
 import { ReactionAtom } from '../../atoms/ReactionAtom';
 import { ReactionType } from '@/lib/interfaces/CommonInterfaces';
 import { PostComment } from '../../atoms/PostComment';
+import { useShareModal } from '../ShareModal';
+import { formatRelativeTime } from '@/lib/utils';
 
 const LONG_PRESS_MS = 600;
 
@@ -65,6 +66,7 @@ export function PostCard({
   const [currentReactionStatus, setReactionCurrentStatus] =
     useState<ReactionType | undefined>();
   const [top3Reactions, setTop3Reactions] = useState<ReactionType[]>([]);
+  const { openShareModal } = useShareModal();
 
 
   useEffect(() => {
@@ -158,8 +160,6 @@ export function PostCard({
     });
 
     setCommentText('');
-    // I commenti visualizzati vengono passati dal padre via props;
-    // se vuoi vederli live, dovrai ricaricarli a livello di lista.
   };
 
   /* ------------------------ REACTION HANDLERS ------------------------- */
@@ -260,7 +260,7 @@ export function PostCard({
         <div className="flex flex-col leading-tight">
           <span className="font-semibold text-sm">{author.username}</span>
           <span className="text-xs text-gray-500">
-            {new Date(createdAt).toLocaleString()}
+            {formatRelativeTime( new Date(createdAt).toLocaleString())}
           </span>
         </div>
       </div>
@@ -367,7 +367,9 @@ export function PostCard({
             Commenta
           </span>
 
-          <span className="flex-1 text-center hover:text-gray-800 cursor-pointer select-none touch-none">
+          <span className="flex-1 text-center hover:text-gray-800 cursor-pointer select-none touch-none"
+            onClick={() => openShareModal(id)} 
+          >
             Condividi
           </span>
         </div>

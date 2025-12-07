@@ -34,7 +34,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
         const newPostID = crypto.randomUUID();
 
         const newPost: IPost = {
-            id:newPostID,
+            id: newPostID,
             authorId: "0",
             content: "",
             createdAt: Date.now.toString(),
@@ -62,47 +62,59 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
         setPostText("")
     }
 
-
-    return (
-        <form className="flex p-2 py-3 my-2 bg-white shadow-md" onSubmit={(e) => handleSubmit(e)}>
-            {userProfile?.avatarUrl && userProfile?.username ?
-                < >
-                    <Image
-                        style={{
-                            width: `${size}px`,
-                            height: `${size}px`,
-                        }}
-                        src={userProfile?.avatarUrl} alt={userProfile?.username} height={size} width={size} unoptimized className="object-cover rounded-full overflow-hidden " />
-                    <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai fusando?" type="text" />
-                    <NavBarActionButton
-                        icon={RiLiveFill}
-                        size={20}
-                        ringClassName=""
-                    />
-                    <NavBarActionButton
-                        size={20}
-                        icon={IoMdPhotos}
-                        ringClassName=""
-                    />
-                    <NavBarActionButton
-                        size={20}
-                        icon={FiSmile}
-                        ringClassName=""
-                    />
-                </>
-                :
+    if (!(userProfile?.avatarUrl && userProfile?.username)) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
                 <div
                     className={styles.loader}
                     style={
                         {
                             "--size": `${size}px`,
-                            "--color": "#000000ab",
+                            "--color": `#000000ab`,
                         } as CSSProperties
                     }
                 />
-            }
+            </div>
+        )
+    }
 
+    return (
+        <form className={`flex p-2 py-3 my-2 bg-white shadow-md`} onSubmit={(e) => handleSubmit(e)}>
+            < >
+                <div
+                    style={{
+                        width: size,
+                        height: size,
+                    }}
+                    className="overflow-hidden rounded-full flex-shrink-0"
+                >
+                    <Image
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.username}
+                        width={size}
+                        height={size}
+                        unoptimized
+                        className="object-cover w-full h-full"
+                    />
+                </div>
 
+                <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl w-full focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai fusando?" type="text" />
+                <NavBarActionButton
+                    icon={RiLiveFill}
+                    size={20}
+                    ringClassName=""
+                />
+                <NavBarActionButton
+                    size={20}
+                    icon={IoMdPhotos}
+                    ringClassName=""
+                />
+                <NavBarActionButton
+                    size={20}
+                    icon={FiSmile}
+                    ringClassName=""
+                />
+            </>
         </form>
     )
 

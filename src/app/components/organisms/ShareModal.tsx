@@ -1,7 +1,22 @@
-'use client'
+'use client';
 
-import { FaceKittenDB, IImagePost, IMarketplacePost, IPost, IProfile, IVideoPost } from "@/lib/db";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react"
+import {
+    FaceKittenDB,
+    IImagePost,
+    IMarketplacePost,
+    IPost,
+    IProfile,
+    IVideoPost,
+} from "@/lib/db";
+import { formatRelativeTime } from "@/lib/utils";
+import Image from "next/image";
+import {
+    createContext,
+    ReactNode,
+    useCallback,
+    useContext,
+    useState,
+} from "react";
 
 type ShareModalContextType = {
     isVisible: boolean;
@@ -20,55 +35,93 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
     const [isVisible, setVisible] = useState(false);
     const [postId, setPostId] = useState<string | null>(null);
 
-    const [sharePostContent, SetSharePostContent] = useState<string>("")
-    const [sharedPost, setSharedPost] = useState<IPost | null>()
-    const [sharedPostAuthor, setSharedPostAuthor] = useState<IProfile | null>()
-
-    
-
+    const [sharedPost, setSharedPost] = useState<IPost | null>(null);
+    const [sharedPostAuthor, setSharedPostAuthor] = useState<IProfile | null>(null);
 
     const openShareModal = useCallback((postId: string) => {
         setPostId(postId);
         setVisible(true);
 
         async function fetchSharedPostData() {
-
             const sharedPost = await getFullPostById(postId, db);
-
-
             const authorData = await getAuthorById(sharedPost.authorId, db);
 
             setSharedPostAuthor(authorData);
-            setSharedPost(sharedPost); 
+            setSharedPost(sharedPost);
         }
 
-        fetchSharedPostData().catch(err => {
+        fetchSharedPostData().catch((err) => {
             console.error("Error while fetching shared post data:", err);
         });
-    }, []);
-
+    }, [db]);
 
     const close = useCallback(() => {
         setVisible(false);
         setPostId(null);
-        setSharedPost(null)
-        setSharedPostAuthor(null)
+        setSharedPost(null);
+        setSharedPostAuthor(null);
     }, []);
 
+    const hasData =
+        !!sharedPostAuthor?.username && !!sharedPost?.createdAt;
+
     return (
-        <ShareModalContext.Provider value={{ isVisible, postId, openShareModal, close }}>
-
-            {isVisible && (
+        <ShareModalContext.Provider
+            value={{ isVisible, postId, openShareModal, close }}
+        >
+            {isVisible && hasData && (
                 <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
-                    <div className="bg-white p-4 rounded shadow w-96">
-                        <h2 className="font-bold text-lg mb-2">Stai condividendo il post di {sharedPostAuthor && sharedPostAuthor.username}</h2>
+                    <div className="bg-white text-gray-500 px-2 rounded shadow w-96 pb-1">
+                        <span className="px-3 text-xs mb-2">
+                            Stai condividendo il post di {sharedPostAuthor!.username}
+                        </span>
 
-                        <button
-                            onClick={close}
-                            className="mt-4 px-3 py-1 bg-gray-900 text-white rounded"
-                        >
-                            Chiudi
-                        </button>
+                        <div className="flex flex-col">
+                            <form>
+                                <input placeholder="Scrivi cosa ne pensi.." className="w-full border-0 focus:ring-0 focus:outline-none hover:ring-0 rounded px-2 py-1 text-sm" />
+                            </form>
+
+                            <div className="flex flex-col mt-2 border-1 border-gray-300 rounded-sm p-2">
+                                <div className="flex gap-2">
+                                    <div className="rounded-circle overflow-hidden w-12 h-12">
+                                        <Image
+                                            src={sharedPostAuthor!.avatarUrl}
+                                            alt={sharedPostAuthor!.username}
+                                            width={40}
+                                            height={40}
+                                            className="rounded-full"
+                                            unoptimized
+                                        />
+                                    </div>
+                                    <div className="flex flex-col text-xs">
+                                        <span className="font-semibold">
+                                            {sharedPostAuthor!.username}
+                                        </span>
+                                        <span className="text-gray-700 text-sm">
+                                            {sharedPost!.content}
+                                        </span>
+                                        <span className="text-gray-400 text-[10px]">
+                                            {formatRelativeTime(sharedPost!.createdAt)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button
+                                onClick={close}
+                                className="px-3 py-1 bg-gray-300 text-gray-900 rounded text-sm"
+                            >
+                                Annulla
+                            </button>
+                            <button
+                                onClick={close}
+                                className="px-3 py-1 bg-gray-900 text-white rounded text-sm"
+                            >
+                                Condividi
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -85,55 +138,15 @@ export function useShareModal() {
     }
     return ctx;
 }
-
-
-async function getFullPostById(
-    postId: string,
-    db: FaceKittenDB
-): Promise<IPost | IImagePost | IVideoPost | IMarketplacePost> {
-    const base = await db.posts.get(postId);
-
-    if (!base) {
-        throw new Error(`Post with id ${postId} not found`);
-    }
-
-    switch (base.type) {
-        case "text":
-            // il base è già sufficiente
-            return base;
-
-        case "image": {
-            const imagePost = await db.imagePosts.get(postId);
-            if (!imagePost) {
-                // fallback: almeno ritorno il base
-                return base as IImagePost;
-            }
-            return imagePost;
-        }
-
-        case "video": {
-            const videoPost = await db.videoPosts.get(postId);
-            if (!videoPost) {
-                return base as IVideoPost;
-            }
-            return videoPost;
-        }
-
-        case "marketplace": {
-            const marketPost = await db.marketplacePosts.get(postId);
-            if (!marketPost) {
-                return base as IMarketplacePost;
-            }
-            return marketPost;
-        }
-
-        default:
-            throw new Error(`Unknown post type: ${(base as any).type}`);
-    }
+async function getFullPostById(postId: string, db: FaceKittenDB): Promise<IPost> {
+    const post = await db.posts.get(postId)
+    if (post) return post
+    throw new Error("Could not find postId" + postId);
 }
 
-async function getAuthorById(authorId: string, db: FaceKittenDB): Promise<IProfile> {
-    const author = await db.profiles.get(authorId);
-    if (!author) throw new Error(`Profile with id ${authorId} not found`);
-    return author;
+async function getAuthorById(authorId: any, db: FaceKittenDB): Promise<IProfile> {
+    const author = await db.profiles.get(authorId)
+    if (author) return author
+    throw new Error("Could not find authorId" + authorId);
 }
+
