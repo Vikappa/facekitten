@@ -11,7 +11,7 @@ import { ReactionMart } from "../../atoms/ReactionMart"
 import { CiFaceSmile } from "react-icons/ci"
 import { EmojiMart } from "../../atoms/EmojiMart"
 import { PostComment } from "../../atoms/PostComment"
-import { usePostFromId } from "@/lib/dbHooks"
+import { usePostFromId, useProfileById } from "@/lib/dbHooks"
 const LONG_PRESS_MS = 600;
 
 interface SharePostCardProps {
@@ -34,6 +34,7 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
     const [commentText, setCommentText] = useState('');
     const commentInputRef = useRef<HTMLInputElement | null>(null);
     const sharedPost = usePostFromId(sharedPostId)
+    const sharedPostAuthor = useProfileById(sharedPost?.authorId)
     const [currentReactionStatus, setReactionCurrentStatus] =
         useState<ReactionType | undefined>();
     const pressRef = useRef<{
@@ -169,9 +170,22 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
                 }}
             >
                 {content}
-                {sharedPost &&
-                    <div className="flex flex-col border-1 border-red-700 ">
-                        <Image src={sharedPost.authorAvatarUrl} alt={sharedPost.authorId} width={20} height={20} unoptimized />
+                {sharedPost && sharedPostAuthor &&
+                    <div className="flex flex-col gap-1 border-1 border-gray-300 rounded-sm p-3 m-2">
+                        <div className="flex gap-2">
+                            <Image
+                                className="w-8 h-8 rounded-full bg-gray-300"
+                                src={sharedPostAuthor.avatarUrl}
+                                height={12}
+                                width={12}
+                                alt={sharedPostAuthor.username}
+                                unoptimized
+                            />
+                            <div className="flex flex-col text-xs">
+                                <span>{sharedPostAuthor.username}</span>
+                                <span className="text-gray-500 text-[10px]">{formatRelativeTime(sharedPost.createdAt)}</span>
+                            </div>
+                        </div>
                         <div className="">
                             <span>{sharedPost.content}</span>
                         </div>
