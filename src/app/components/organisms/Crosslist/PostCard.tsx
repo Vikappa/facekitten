@@ -431,7 +431,7 @@ export function PostCard({
 
 /* ------------------------ HELPERS ------------------------- */
 
-async function GetUserProfile(db: FaceKittenDB): Promise<IProfile> {
+export async function GetUserProfile(db: FaceKittenDB): Promise<IProfile> {
   const u = await db.profiles.get('0');
   if (u) return u;
 
@@ -440,7 +440,7 @@ async function GetUserProfile(db: FaceKittenDB): Promise<IProfile> {
   );
 }
 
-export async function upsertReaction(
+async function upsertReaction(
   db: FaceKittenDB,
   postId: string,
   reactionType?: ReactionType

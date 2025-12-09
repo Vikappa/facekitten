@@ -1,10 +1,10 @@
 'use client'
 
 import { FaceKittenDB, IPostComment, IReaction } from "@/lib/db"
-import { PostCardAuthorModel, PostCardCommentModel, upsertReaction } from "./PostCard"
+import { GetUserProfile, PostCardAuthorModel, PostCardCommentModel } from "./PostCard"
 import Image from "next/image"
 import { formatRelativeTime } from "@/lib/utils"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ReactionType } from "@/lib/interfaces/CommonInterfaces"
 import { ReactionAtom } from "../../atoms/ReactionAtom"
 import { ReactionMart } from "../../atoms/ReactionMart"
@@ -44,6 +44,61 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
         timeoutId: null,
         longPressTriggered: false,
     });
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function getPostReactions() {
+            if (!postReactionsIds || postReactionsIds.length === 0) {
+                if (!cancelled) setReactions([]);
+                return;
+            }
+
+            const raw = await db.reactions.bulkGet(postReactionsIds);
+            const filtered = raw.filter(
+                (r): r is IReaction => typeof r !== "undefined"
+            );
+
+            if (!cancelled) setReactions(filtered);
+        }
+
+        getPostReactions();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [db, postReactionsIds]);
+
+    useEffect(() => {
+        if (!reactions || reactions.length === 0) {
+            setReactionCurrentStatus(undefined);
+            setTop3Reactions([]);
+            return;
+        }
+
+        const counts = new Map<ReactionType, number>();
+
+        for (const r of reactions) {
+            counts.set(r.type, (counts.get(r.type) ?? 0) + 1);
+        }
+
+        const userReaction = reactions.find((r) => r.authorId === "0");
+
+        if (userReaction) {
+            setReactionCurrentStatus(userReaction.type);
+        } else {
+            setReactionCurrentStatus(undefined);
+        }
+
+        const top3 = [...counts.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([type]) => type);
+
+        setTop3Reactions(top3);
+    }, [reactions]);
+
+
 
     async function NewLikeReaction(db: FaceKittenDB): Promise<IReaction[]> {
         const updated = await upsertReaction(db, id, undefined);
@@ -106,7 +161,7 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
             return;
         }
 
-        const thisPostInDB = await db.posts.get(id);
+        const thisPostInDB = await db.sharePosts.get(id);
         if (!thisPostInDB) {
             console.warn(`[AddComment] post not found in db (id=${id})`);
             return;
@@ -128,9 +183,9 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
         thisPostInDB.commentsIds = thisPostInDB.commentsIds ?? [];
         thisPostInDB.commentsIds.push(newCommentId);
 
-        await db.transaction('rw', db.comments, db.posts, async () => {
+        await db.transaction('rw', db.comments, db.sharePosts, async () => {
             await db.comments.add(newComment);
-            await db.posts.put(thisPostInDB);
+            await db.sharePosts.put(thisPostInDB);
         });
 
         setCommentText('');
@@ -336,3 +391,68 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
 
 }
 
+
+async function upsertReaction(
+    db: FaceKittenDB,
+    postId: string,
+    reactionType?: ReactionType
+): Promise<IReaction[]> {
+    const user = await GetUserProfile(db);
+    const post = await db.sharePosts.get(postId);
+
+    if (!post) {
+        throw new Error(`Post ${postId} non trovato`);
+    }
+
+    // assicuro che reactionIds esista
+    post.reactionIds = post.reactionIds ?? [];
+
+    // recupero tutte le reaction del post
+    const allReactions = await db.reactions.bulkGet(post.reactionIds);
+    const existingReaction = allReactions.find(
+        (r) => r && r.authorId === user.id
+    );
+
+    const removeReaction = async (reaction: IReaction) => {
+        await db.reactions.delete(reaction.id);
+        post.reactionIds = post.reactionIds!.filter((id) => id !== reaction.id);
+        await db.sharePosts.put(post);
+    };
+
+    if (reactionType === undefined) {
+        if (existingReaction) {
+            await removeReaction(existingReaction);
+        } else {
+            const newReaction: IReaction = {
+                id: crypto.randomUUID(),
+                type: ReactionType.like,
+                authorId: user.id,
+            };
+            await db.reactions.add(newReaction);
+            post.reactionIds.push(newReaction.id);
+            await db.sharePosts.put(post);
+        }
+    } else {
+        // reaction scelta dal mart (branch che avevamo già)
+        if (!existingReaction) {
+            const newReaction: IReaction = {
+                id: crypto.randomUUID(),
+                type: reactionType,
+                authorId: user.id,
+            };
+            await db.reactions.add(newReaction);
+            post.reactionIds.push(newReaction.id);
+            await db.sharePosts.put(post);
+        } else if (existingReaction.type === reactionType) {
+            await removeReaction(existingReaction);
+        } else {
+            existingReaction.type = reactionType;
+            await db.reactions.put(existingReaction);
+        }
+    }
+
+
+    // ritorna lo stato aggiornato
+    const finalReactions = await db.reactions.bulkGet(post.reactionIds);
+    return finalReactions.filter((r): r is IReaction => !!r);
+}
