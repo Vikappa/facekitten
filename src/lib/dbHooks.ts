@@ -156,10 +156,12 @@ export function usePostsByAuthor(authorId: string) {
 
 export function usePostCommentRepliesByPostCommentId(postCommentId: string) {
   const replies = useLiveQuery<IPostCommentReply[]>(
-    () => db.replies
-      .where('postCommentId')
-      .equals(postCommentId)
-      .toArray(),
+    () =>
+      db.replies
+        .where('postCommentId')
+        .equals(postCommentId)
+        .sortBy('createdAt')
+        .then(rs => rs.reverse()),
     [postCommentId]
   );
 

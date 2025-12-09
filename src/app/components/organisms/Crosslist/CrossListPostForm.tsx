@@ -90,10 +90,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
             await db.profiles.put(userData);
         }
-
-
-
-
+        setImageMode(false)
         setPostText("")
     }
 
