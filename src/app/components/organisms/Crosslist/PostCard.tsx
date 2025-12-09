@@ -368,7 +368,7 @@ export function PostCard({
           </span>
 
           <span className="flex-1 text-center hover:text-gray-800 cursor-pointer select-none touch-none"
-            onClick={() => openShareModal(id)} 
+            onClick={() => openShareModal(id, "text")} 
           >
             Condividi
           </span>

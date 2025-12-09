@@ -2,6 +2,7 @@
 
 import {
     FaceKittenDB,
+    IImagePost,
     IPost,
     IProfile,
     ISharePost,
@@ -16,12 +17,13 @@ import {
     useContext,
     useState,
 } from "react";
+import { OriginalPostType } from "./Crosslist/SharePostCard";
 
 type ShareModalContextType = {
     isVisible: boolean;
     postId: string | null;
-    openShareModal: (postId: string) => void;
-    close: () => void;
+    originalPostType: OriginalPostType | null;
+    openShareModal: (postId: string, type: OriginalPostType) => void; close: () => void;
 };
 
 const ShareModalContext = createContext<ShareModalContextType | undefined>(
@@ -34,32 +36,52 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
     const [isVisible, setVisible] = useState(false);
     const [postId, setPostId] = useState<string | null>(null);
 
-    const [sharedPost, setSharedPost] = useState<IPost | null>(null);
+    const [sharedPost, setSharedPost] = useState<IPost | IImagePost | null>(null);
     const [sharedPostAuthor, setSharedPostAuthor] = useState<IProfile | null>(null);
+    const [originalPostType, setOriginalPostType] =
+        useState<OriginalPostType | null>(null);
 
-    const openShareModal = useCallback((postId: string) => {
-        setPostId(postId);
-        setVisible(true);
 
-        async function fetchSharedPostData() {
-            const sharedPost = await getFullPostById(postId, db);
-            const authorData = await getAuthorById(sharedPost.authorId, db);
+    const openShareModal = useCallback(
+        (postId: string, type: OriginalPostType) => {
+            setPostId(postId);
+            setOriginalPostType(type);
+            setVisible(true);
 
-            setSharedPostAuthor(authorData);
-            setSharedPost(sharedPost);
-        }
+            async function fetchSharedPostData() {
+                let localPost: IPost | IImagePost;
 
-        fetchSharedPostData().catch((err) => {
-            console.error("Error while fetching shared post data:", err);
-        });
-    }, [db]);
+                if (type === 'image') {
+                    const imgPost = await db.imagePosts.get(postId);
+                    if (!imgPost) throw new Error('Image post not found ' + postId);
+                    localPost = imgPost; // QUI è proprio IImagePost
+                } else {
+                    const textPost = await getFullPostById(postId, db);
+                    localPost = textPost; // IPost
+                }
+
+                const authorData = await getAuthorById(localPost.authorId, db);
+
+                setSharedPostAuthor(authorData);
+                setSharedPost(localPost);
+            }
+
+            fetchSharedPostData().catch((err) => {
+                console.error('Error while fetching shared post data:', err);
+            });
+        },
+        [db]
+    );
+
 
     const close = useCallback(() => {
         setVisible(false);
         setPostId(null);
+        setOriginalPostType(null);
         setSharedPost(null);
         setSharedPostAuthor(null);
     }, []);
+
 
     const hasData =
         !!sharedPostAuthor?.username && !!sharedPost?.createdAt;
@@ -82,7 +104,7 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
                 authorAvatarUrl: sharedPostAuthor.avatarUrl
             }
 
-            if(!sharedPostAuthor?.postIds) sharedPostAuthor.postIds = []
+            if (!sharedPostAuthor?.postIds) sharedPostAuthor.postIds = []
 
             sharedPostAuthor.postIds.push(newShareId)
             await db.profiles.put(sharedPostAuthor)
@@ -98,7 +120,7 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
 
     return (
         <ShareModalContext.Provider
-            value={{ isVisible, postId, openShareModal, close }}
+            value={{ isVisible, postId, originalPostType, openShareModal, close }}
         >
             {isVisible && hasData && (
                 <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
@@ -136,6 +158,21 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
                                         </span>
                                     </div>
                                 </div>
+                                {originalPostType === 'image' &&
+                                    sharedPost &&
+                                    'imageUrl' in sharedPost &&
+                                    sharedPost.imageUrl && (
+                                        <div className="relative w-full h-64 mt-2 overflow rounded-xl">
+                                            <Image
+                                                src={sharedPost.imageUrl}
+                                                alt={sharedPost.content}
+                                                fill
+                                                className="object-cover"
+                                                unoptimized
+                                                sizes="(min-width: 768px) 600px, 100vw"
+                                            />
+                                        </div>
+                                    )}
                             </div>
                         </div>
 
@@ -156,6 +193,8 @@ export function ShareModalProvider({ children }: { children: ReactNode }) {
                     </div>
                 </div>
             )}
+
+
 
             {children}
         </ShareModalContext.Provider>

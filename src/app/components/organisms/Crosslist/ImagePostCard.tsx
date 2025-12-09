@@ -1,51 +1,75 @@
-'use client'
+'use client';
 
-import { FaceKittenDB, IPostComment, IReaction } from "@/lib/db"
-import { GetUserProfile, PostCardAuthorModel, PostCardCommentModel } from "./PostCard"
-import Image from "next/image"
-import { formatRelativeTime } from "@/lib/utils"
-import { useEffect, useRef, useState } from "react"
-import { ReactionType } from "@/lib/interfaces/CommonInterfaces"
-import { ReactionAtom } from "../../atoms/ReactionAtom"
-import { ReactionMart } from "../../atoms/ReactionMart"
-import { CiFaceSmile } from "react-icons/ci"
-import { EmojiMart } from "../../atoms/EmojiMart"
-import { PostComment } from "../../atoms/PostComment"
-import { usePostFromId, useProfileById } from "@/lib/dbHooks"
+import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import { CiFaceSmile } from 'react-icons/ci';
+import { EmojiMart } from '../../atoms/EmojiMart';
+import {
+    FaceKittenDB,
+    IPostComment,
+    IProfile,
+    IReaction,
+} from '@/lib/db';
+import { ReactionMart } from '../../atoms/ReactionMart';
+import { ReactionAtom } from '../../atoms/ReactionAtom';
+import { ReactionType } from '@/lib/interfaces/CommonInterfaces';
+import { PostComment } from '../../atoms/PostComment';
+import { useShareModal } from '../ShareModal';
+import { formatRelativeTime } from '@/lib/utils';
+
 const LONG_PRESS_MS = 600;
 
-export type OriginalPostType = 'text' | 'image' | 'share';
-
-interface SharePostCardProps {
-    id: string
-    content: string
-    createdAt: string
-    postReactionsIds: string[]
-    author: PostCardAuthorModel
-    comments: PostCardCommentModel[]
-    sharedPostId: string
-    db: FaceKittenDB
+export interface PostCardAuthorModel {
+    id: string;
+    username: string;
+    avatarUrl: string;
 }
-export function SharePostCard({ id, content, createdAt, postReactionsIds, author, comments, sharedPostId, db }: SharePostCardProps) {
-    const cardRef = useRef<HTMLDivElement | null>(null);
-    const [reactions, setReactions] = useState<IReaction[]>([]);
-    const [top3Reactions, setTop3Reactions] = useState<ReactionType[]>([]);
+
+export interface PostCardCommentModel {
+    id: string;
+    content: string;
+    authorId: string;
+    authorName: string;
+    createdAt: string;
+    commentAuthorPropic: string;
+    postId: string
+    repliesIds: string[]
+    reactionIds: string[]
+}
+
+export interface ImagePostCardProps {
+    id: string;
+    content: string;
+    createdAt: string;
+    postReactionsIds?: string[];
+    author: PostCardAuthorModel;
+    comments: PostCardCommentModel[];
+    db: FaceKittenDB;
+    imageUrl: string
+}
+
+export function ImagePostCard({
+    id,
+    content,
+    createdAt,
+    postReactionsIds,
+    author,
+    comments,
+    db,
+    imageUrl
+}: ImagePostCardProps) {
     const [isCommenting, setIsCommenting] = useState(false);
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [isReactionMartOpen, setOpenReactionMart] = useState(false);
     const [commentText, setCommentText] = useState('');
     const commentInputRef = useRef<HTMLInputElement | null>(null);
-    const sharedPost = usePostFromId(sharedPostId)
-    const sharedPostAuthor = useProfileById(sharedPost?.authorId)
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [isReactionMartOpen, setOpenReactionMart] = useState(false);
+    const cardRef = useRef<HTMLDivElement | null>(null);
+    const [reactions, setReactions] = useState<IReaction[]>([]);
     const [currentReactionStatus, setReactionCurrentStatus] =
         useState<ReactionType | undefined>();
-    const pressRef = useRef<{
-        timeoutId: ReturnType<typeof setTimeout> | null;
-        longPressTriggered: boolean;
-    }>({
-        timeoutId: null,
-        longPressTriggered: false,
-    });
+    const [top3Reactions, setTop3Reactions] = useState<ReactionType[]>([]);
+    const { openShareModal } = useShareModal();
+
 
     useEffect(() => {
         let cancelled = false;
@@ -58,9 +82,8 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
 
             const raw = await db.reactions.bulkGet(postReactionsIds);
             const filtered = raw.filter(
-                (r): r is IReaction => typeof r !== "undefined"
+                (r): r is IReaction => typeof r !== 'undefined'
             );
-
             if (!cancelled) setReactions(filtered);
         }
 
@@ -71,6 +94,7 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
         };
     }, [db, postReactionsIds]);
 
+    // Calcola stato utente + top3 reaction
     useEffect(() => {
         if (!reactions || reactions.length === 0) {
             setReactionCurrentStatus(undefined);
@@ -84,7 +108,8 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
             counts.set(r.type, (counts.get(r.type) ?? 0) + 1);
         }
 
-        const userReaction = reactions.find((r) => r.authorId === "0");
+        const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+        const userReaction = reactions.find((r) => r.authorId === '0');
 
         if (userReaction) {
             setReactionCurrentStatus(userReaction.type);
@@ -92,15 +117,54 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
             setReactionCurrentStatus(undefined);
         }
 
-        const top3 = [...counts.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([type]) => type);
-
+        const top3 = sorted.slice(0, 3).map(([type]) => type);
         setTop3Reactions(top3);
     }, [reactions]);
 
+    /* ------------------------ COMMENTI ------------------------- */
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmed = commentText.trim();
+        if (!trimmed) return;
+
+        const dbUser = await db.profiles.get('0');
+        if (!dbUser) {
+            console.warn('[AddComment] dbUser not found (id=0)');
+            return;
+        }
+
+        const thisPostInDB = await db.imagePosts.get(id);
+        if (!thisPostInDB) {
+            console.warn(`[AddComment] post not found in db (id=${id})`);
+            return;
+        }
+
+        const newCommentId = crypto.randomUUID();
+
+        const newComment: IPostComment = {
+            id: newCommentId,
+            postId: id,
+            content: trimmed,
+            authorId: dbUser.id,
+            createdAt: new Date().toISOString(),
+            commentAuthorPropic: dbUser.avatarUrl,
+            repliesIds: [],
+            reactionIds: []
+        };
+
+        thisPostInDB.commentsIds = thisPostInDB.commentsIds ?? [];
+        thisPostInDB.commentsIds.push(newCommentId);
+
+        await db.transaction('rw', db.comments, db.imagePosts, async () => {
+            await db.comments.add(newComment);
+            await db.imagePosts.put(thisPostInDB);
+        });
+
+        setCommentText('');
+    };
+
+    /* ------------------------ REACTION HANDLERS ------------------------- */
 
     async function NewLikeReaction(db: FaceKittenDB): Promise<IReaction[]> {
         const updated = await upsertReaction(db, id, undefined);
@@ -113,6 +177,16 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
         setReactions(updated);
         setOpenReactionMart(false);
     };
+
+    /* ------------------------ GESTIONE LONG PRESS ------------------------- */
+
+    const pressRef = useRef<{
+        timeoutId: ReturnType<typeof setTimeout> | null;
+        longPressTriggered: boolean;
+    }>({
+        timeoutId: null,
+        longPressTriggered: false,
+    });
 
     const handlePressStart = (e: React.PointerEvent<HTMLSpanElement>) => {
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -152,52 +226,27 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
         pressRef.current.longPressTriggered = false;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const trimmed = commentText.trim();
-        if (!trimmed) return;
 
-        const dbUser = await db.profiles.get('0');
-        if (!dbUser) {
-            console.warn('[AddComment] dbUser not found (id=0)');
-            return;
+    useEffect(() => {
+        if (!isReactionMartOpen) return;
+
+        function handlePointerDown(event: PointerEvent) {
+            if (!cardRef.current) return;
+            const target = event.target as Node | null;
+            if (target && cardRef.current.contains(target)) {
+                // click dentro la card → non chiudere qui
+                return;
+            }
+
+            setOpenReactionMart(false);
         }
 
-        const thisPostInDB = await db.sharePosts.get(id);
-        if (!thisPostInDB) {
-            console.warn(`[AddComment] post not found in db (id=${id})`);
-            return;
-        }
+        document.addEventListener('pointerdown', handlePointerDown);
 
-        const newCommentId = crypto.randomUUID();
-
-        const newComment: IPostComment = {
-            id: newCommentId,
-            postId: id,
-            content: trimmed,
-            authorId: dbUser.id,
-            createdAt: new Date().toISOString(),
-            commentAuthorPropic: dbUser.avatarUrl,
-            repliesIds: [],
-            reactionIds: []
+        return () => {
+            document.removeEventListener('pointerdown', handlePointerDown);
         };
-
-        thisPostInDB.commentsIds = thisPostInDB.commentsIds ?? [];
-        thisPostInDB.commentsIds.push(newCommentId);
-
-        await db.transaction('rw', db.comments, db.sharePosts, async () => {
-            await db.comments.add(newComment);
-            await db.sharePosts.put(thisPostInDB);
-        });
-
-        setCommentText('');
-    };
-
-    const isImagePost =
-        sharedPost !== undefined &&
-        sharedPost !== null &&
-        "imageUrl" in sharedPost &&
-        !!sharedPost.imageUrl;
+    }, [isReactionMartOpen]);
 
     return (
         <div ref={cardRef} className="w-full max-w-full bg-white rounded-xl shadow p-4 my-2 py-3 pb-2 flex flex-col gap-3 border border-gray-200">
@@ -207,7 +256,7 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
                     src={author.avatarUrl}
                     height={40}
                     width={40}
-                    alt={author.username}
+                    alt={content}
                     unoptimized
                 />
                 <div className="flex flex-col leading-tight">
@@ -217,6 +266,7 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
                     </span>
                 </div>
             </div>
+
 
             <span
                 className="
@@ -233,45 +283,17 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
                 }}
             >
                 {content}
-                {sharedPost && sharedPostAuthor &&
-                    <div className="flex flex-col gap-1 border-1 border-gray-300 rounded-sm p-3 m-2">
-                        <div className="flex gap-2">
-                            <Image
-                                className="w-8 h-8 rounded-full bg-gray-300"
-                                src={sharedPostAuthor.avatarUrl}
-                                height={12}
-                                width={12}
-                                alt={sharedPostAuthor.username}
-                                unoptimized
-                            />
-                            <div className="flex flex-col text-xs">
-                                <span>{sharedPostAuthor.username}</span>
-                                <span className="text-gray-500 text-[10px]">{formatRelativeTime(sharedPost.createdAt)}</span>
-                            </div>
-                        </div>
-                        <div className="">
-                            <span>{sharedPost.content}</span>
-                        </div>
-                        {isImagePost &&
-                            sharedPost &&
-                            'imageUrl' in sharedPost &&
-                            sharedPost.imageUrl && (
-                                <div className="relative w-full aspect-[4/3] mt-2 overflow-hidden rounded-xs">
-                                    <Image
-                                        src={sharedPost.imageUrl}
-                                        alt={sharedPost.content}
-                                        fill
-                                        className="object-cover"
-                                        unoptimized
-                                        sizes="(min-width: 768px) 600px, 100vw"
-                                    />
-                                </div>
-                            )}
-                    </div>
-                }
-
-
             </span>
+            <div className="relative w-full h-64 mt-1 overflow-hidden rounded-xs">
+                <Image
+                    src={imageUrl}
+                    alt={author.username}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    sizes="(min-width: 768px) 600px, 100vw"
+                />
+            </div>
 
 
             <div className="flex flex-col">
@@ -358,6 +380,12 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
                     >
                         Commenta
                     </span>
+
+                    <span className="flex-1 text-center hover:text-gray-800 cursor-pointer select-none touch-none"
+                        onClick={() => openShareModal(id, 'image')}
+                    >
+                        Condividi
+                    </span>
                 </div>
             </div>
 
@@ -413,9 +441,18 @@ export function SharePostCard({ id, content, createdAt, postReactionsIds, author
             )}
         </div>
     );
-
 }
 
+/* ------------------------ HELPERS ------------------------- */
+
+export async function GetUserProfile(db: FaceKittenDB): Promise<IProfile> {
+    const u = await db.profiles.get('0');
+    if (u) return u;
+
+    throw new Error(
+        "NON SONO RIUSCITO A RECUPERARE I DATI DELL'UTENTE DAL DB LOCALE"
+    );
+}
 
 async function upsertReaction(
     db: FaceKittenDB,
@@ -423,7 +460,7 @@ async function upsertReaction(
     reactionType?: ReactionType
 ): Promise<IReaction[]> {
     const user = await GetUserProfile(db);
-    const post = await db.sharePosts.get(postId);
+    const post = await db.imagePosts.get(postId);
 
     if (!post) {
         throw new Error(`Post ${postId} non trovato`);
@@ -441,7 +478,7 @@ async function upsertReaction(
     const removeReaction = async (reaction: IReaction) => {
         await db.reactions.delete(reaction.id);
         post.reactionIds = post.reactionIds!.filter((id) => id !== reaction.id);
-        await db.sharePosts.put(post);
+        await db.imagePosts.put(post);
     };
 
     if (reactionType === undefined) {
@@ -455,7 +492,7 @@ async function upsertReaction(
             };
             await db.reactions.add(newReaction);
             post.reactionIds.push(newReaction.id);
-            await db.sharePosts.put(post);
+            await db.imagePosts.put(post);
         }
     } else {
         // reaction scelta dal mart (branch che avevamo già)
@@ -467,7 +504,7 @@ async function upsertReaction(
             };
             await db.reactions.add(newReaction);
             post.reactionIds.push(newReaction.id);
-            await db.sharePosts.put(post);
+            await db.imagePosts.put(post);
         } else if (existingReaction.type === reactionType) {
             await removeReaction(existingReaction);
         } else {

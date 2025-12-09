@@ -151,13 +151,14 @@ export class FaceKittenDB extends Dexie {
   userProfile!: Table<ICurrentUserPreferences>
   constructor() {
     super('FaceKittenDB')
-    this.version(5).stores({
+    this.version(6).stores({
       // Profile tables
       profiles: 'id, username',
       pageProfiles: 'id, username',
 
       posts: 'id, authorId, createdAt',
       sharePosts: 'id, authorId, createdAt, targetPostId',
+      imagePosts: 'id, authorId, createdAt',
 
       comments: 'id, postId, authorId, createdAt',
       replies: 'id, postCommentId, authorId, createdAt',

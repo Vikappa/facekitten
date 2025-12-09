@@ -7,8 +7,10 @@ import { RiLiveFill } from "react-icons/ri";
 import { IoMdPhotos } from "react-icons/io";
 import { FiSmile } from "react-icons/fi";
 import { NavBarActionButton } from "../Navbar/NavbarActionButton";
-import { FaceKittenDB, IPost, IProfile } from "@/lib/db";
+import { FaceKittenDB, IImagePost, IPost, IProfile } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { CrossListPostFormToggleImageMode } from "../../atoms/PostForm/CrossListPostFormToggleImageMode";
+import { PostFormImageSelection } from "../../atoms/PostForm/PostFormImageSelection";
 
 interface CrossListPostFormProps {
     size: number
@@ -21,6 +23,8 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
     const userProfile = useLiveQuery(() => db.profiles.get("0"), []);
 
     const [postText, setPostText] = useState("")
+    const [imageMode, setImageMode] = useState(false)
+    const [imageUrl, setImageUrl] = useState("")
 
 
 
@@ -33,30 +37,61 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
 
         const newPostID = crypto.randomUUID();
 
-        const newPost: IPost = {
-            id: newPostID,
-            authorId: "0",
-            content: "",
-            createdAt: Date.now.toString(),
-            type: "text",
+        if (imageMode) {
+            const newPost: IImagePost = {
+                id: newPostID,
+                authorId: "0",
+                content: "",
+                createdAt: Date.now.toString(),
+                type: "text",
+                imageUrl: imageUrl,
+                authorAvatarUrl: "",
+                reactionIds: [],
+                commentsIds: []
+            };
+            newPost.content = postText;
+            newPost.createdAt = new Date().toString();
 
-            authorAvatarUrl: "",
-            reactionIds: [],
-            commentsIds: []
-        };
-        newPost.content = postText;
-        newPost.createdAt = new Date().toString();
 
-        await db.posts.add(newPost)
+            await db.imagePosts.add(newPost)
 
-        if (!userData?.postIds) {
-            userData.postIds = []
+            if (!userData?.postIds) {
+                userData.postIds = []
+            }
+
+            setImageMode(false)
+            setImageUrl("")
+            userData.postIds.push(newPostID)
+
+            await db.profiles.put(userData);
+        } else {
+            const newPost: IPost = {
+                id: newPostID,
+                authorId: "0",
+                content: "",
+                createdAt: Date.now.toString(),
+                type: "text",
+
+                authorAvatarUrl: "",
+                reactionIds: [],
+                commentsIds: []
+            };
+            newPost.content = postText;
+            newPost.createdAt = new Date().toString();
+
+            await db.posts.add(newPost)
+
+            if (!userData?.postIds) {
+                userData.postIds = []
+            }
+
+
+            userData.postIds.push(newPostID)
+
+            await db.profiles.put(userData);
         }
 
 
-        userData.postIds.push(newPostID)
-
-        await db.profiles.put(userData);
 
 
         setPostText("")
@@ -79,8 +114,8 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
     }
 
     return (
-        <form className={`flex p-2 py-3 my-2 bg-white shadow-md`} onSubmit={(e) => handleSubmit(e)}>
-            < >
+        <div className="flex flex-col">
+            <form className={`flex p-2 py-3 my-2 bg-white shadow-md ${imageMode && `mb-0`}`} onSubmit={(e) => handleSubmit(e)}>
                 <div
                     style={{
                         width: size,
@@ -104,18 +139,15 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                     size={20}
                     ringClassName=""
                 />
-                <NavBarActionButton
-                    size={20}
-                    icon={IoMdPhotos}
-                    ringClassName=""
-                />
+                <CrossListPostFormToggleImageMode functionProp={setImageMode} />
                 <NavBarActionButton
                     size={20}
                     icon={FiSmile}
                     ringClassName=""
                 />
-            </>
-        </form>
+            </form>
+            {imageMode && <PostFormImageSelection currentUrl={imageUrl} setUrl={setImageUrl} />}
+        </div>
     )
 
 

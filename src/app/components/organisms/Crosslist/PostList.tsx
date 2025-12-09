@@ -1,15 +1,16 @@
 'use client';
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { FaceKittenDB, ISharePost } from '@/lib/db';
+import { FaceKittenDB, IImagePost, ISharePost } from '@/lib/db';
 import { PostCard, PostCardAuthorModel, PostCardCommentModel } from './PostCard';
 import { useEffect, useState } from 'react';
 import { useFirstNProfiles } from '@/lib/dbHooks';
 import { SharePostCard } from './SharePostCard';
+import { ImagePostCard } from './ImagePostCard';
 
 const db = new FaceKittenDB();
 
-type PostCardType = 'text' | 'share';
+type PostCardType = 'text' | 'share' | 'image';
 
 interface BasePostCardModel {
   id: string;
@@ -30,12 +31,18 @@ interface TextPostCardModel extends BasePostCardModel {
   type: 'text';
 }
 
-type PostCardModel = TextPostCardModel | SharePostCardModel;
+interface ImagePostCardModel extends BasePostCardModel {
+  type: 'image';
+  imageUrl: string;
+}
+
+type PostCardModel = TextPostCardModel | SharePostCardModel | ImagePostCardModel;
 
 export function PostList() {
   const user = useLiveQuery(() => db.profiles.get('0'), []);
   const posts = useLiveQuery(() => db.posts.toArray(), []);
-  const sharePosts = useLiveQuery(() => db.sharePosts.toArray(), []); // <- aggiunta
+  const sharePosts = useLiveQuery(() => db.sharePosts.toArray(), []);
+  const imagePosts = useLiveQuery(()=> db.imagePosts.toArray(), [])
 
   const [cardModels, setCardModels] = useState<PostCardModel[]>([]);
   const [loadedProfileNumber] = useState(15);
@@ -56,6 +63,7 @@ export function PostList() {
       // Combino text-post e share-post in un unico array, con info sul tipo
       const combined = [
         ...(posts ?? []).map((p) => ({ kind: 'text' as const, post: p })),
+        ...(imagePosts ?? []).map((im) => ({ kind: 'image' as const, post: im as IImagePost })),
         ...(sharePosts ?? []).map((sp) => ({ kind: 'share' as const, post: sp as ISharePost })),
       ];
 
@@ -103,6 +111,23 @@ export function PostList() {
             })
           );
 
+          if (kind === 'image') {
+            const imgPost = post as IImagePost;
+
+            const imgPostModel: ImagePostCardModel = {
+              id: imgPost.id!,
+              content: imgPost.content,
+              createdAt: imgPost.createdAt,
+              reactionIds: imgPost.reactionIds,
+              author,
+              comments,
+              type: 'image',
+              imageUrl: imgPost.imageUrl,
+            };
+
+            return imgPostModel;
+          }
+
           if (kind === 'share') {
             const share = post as ISharePost;
 
@@ -136,7 +161,7 @@ export function PostList() {
 
       setCardModels(models);
     })();
-  }, [isLoading, posts, sharePosts, profiles]);
+  }, [isLoading, posts, sharePosts, profiles, imagePosts]);
 
   if (isLoading) {
     return null;
@@ -144,32 +169,55 @@ export function PostList() {
 
   return (
     <div className="flex flex-col gap-2 bg-transparent mt-3">
-      {cardModels.map((card) =>
-        card.type === 'share' ? (
-          <SharePostCard
-            key={card.id}
-            id={card.id}
-            content={card.content}
-            createdAt={card.createdAt}
-            postReactionsIds={card.reactionIds}
-            author={card.author}
-            comments={card.comments}
-            sharedPostId={card.sharedPostId}
-            db={db}
-          />
-        ) : (
-          <PostCard
-            key={card.id}
-            id={card.id}
-            content={card.content}
-            createdAt={card.createdAt}
-            postReactionsIds={card.reactionIds}
-            author={card.author}
-            comments={card.comments}
-            db={db}
-          />
-        )
-      )}
+      {cardModels.map((card) => {
+        switch (card.type) {
+          case "share":
+            return (
+              <SharePostCard
+                key={card.id}
+                id={card.id}
+                content={card.content}
+                createdAt={card.createdAt}
+                postReactionsIds={card.reactionIds}
+                author={card.author}
+                comments={card.comments}
+                sharedPostId={card.sharedPostId}
+                db={db}
+              />
+            );
+
+          case "image":
+            return (
+              <ImagePostCard
+                key={card.id}
+                id={card.id}
+                content={card.content}
+                createdAt={card.createdAt}
+                postReactionsIds={card.reactionIds}
+                author={card.author}
+                comments={card.comments}
+                imageUrl={card.imageUrl}
+                db={db}
+              />
+            );
+
+          case "text":
+          default:
+            return (
+              <PostCard
+                key={card.id}
+                id={card.id}
+                content={card.content}
+                createdAt={card.createdAt}
+                postReactionsIds={card.reactionIds}
+                author={card.author}
+                comments={card.comments}
+                db={db}
+              />
+            );
+        }
+      })}
     </div>
   );
+
 }

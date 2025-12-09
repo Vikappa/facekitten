@@ -33,17 +33,22 @@ export function useProfiles() {
   return profiles
 }
 
-export function useFirstNProfiles(n:number) {
+export function useFirstNProfiles(n: number) {
   return useLiveQuery(() => db.profiles.limit(n).toArray(), []);
 }
 
-export function useSharedPostFromId(id:string){
-  return useLiveQuery(()=> db.sharePosts.get(id))
+export function useSharedPostFromId(id: string) {
+  return useLiveQuery(() => db.sharePosts.get(id))
 }
 
-export function usePostFromId(id:string){
-  return useLiveQuery(()=> db.posts.get(id))
+export function usePostFromId(id: string): IPost | IImagePost | undefined {
+  const textPost = useLiveQuery(() => db.posts.get(id), [id]);
+  const imagePost = useLiveQuery(() => db.imagePosts.get(id), [id]);
+
+  return textPost ?? imagePost ?? undefined;
 }
+
+
 /**
  * Hook: useProfile
  * Get a single profile by ID
