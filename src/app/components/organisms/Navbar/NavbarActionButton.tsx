@@ -7,6 +7,7 @@ interface NavBarActionButtonProps {
   className?: string;
   functionProp?: () => void;
   ringClassName?: string;
+  clicked?: () => void
 }
 
 export function NavBarActionButton({
@@ -15,13 +16,11 @@ export function NavBarActionButton({
   className = "",
   functionProp,
   ringClassName = "",
+  clicked
 }: NavBarActionButtonProps) {
   const [active, setActive] = useState(false);
 
-  function activateButton() {
-    setActive(!active);
-    functionProp?.();
-  }
+
 
   return (
     <div
@@ -33,7 +32,7 @@ export function NavBarActionButton({
     >
       <Icon
         size={size}
-        onClick={activateButton}
+        onClick={clicked}
         className={`cursor-pointer ${active ? "text-blue-600" : "text-black"} ${className}`}
       />
     </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from "next/image"
-import { CSSProperties, useState } from "react";
+import { CSSProperties, useRef, useState } from "react";
 import styles from "../Navbar/NavBarUserButton.module.css";
 import { RiLiveFill } from "react-icons/ri";
 import { IoMdPhotos } from "react-icons/io";
@@ -11,6 +11,7 @@ import { FaceKittenDB, IImagePost, IPost, IProfile } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { CrossListPostFormToggleImageMode } from "../../atoms/PostForm/CrossListPostFormToggleImageMode";
 import { PostFormImageSelection } from "../../atoms/PostForm/PostFormImageSelection";
+import { EmojiMart } from "../../atoms/EmojiMart";
 
 interface CrossListPostFormProps {
     size: number
@@ -25,7 +26,8 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
     const [postText, setPostText] = useState("")
     const [imageMode, setImageMode] = useState(false)
     const [imageUrl, setImageUrl] = useState("")
-
+    const [showMainFormEmojiPicker, setShowMainFormEmojipicer] = useState(false)
+    const mainInputRef = useRef<HTMLInputElement | null>(null);
 
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement> | React.FormEvent<HTMLInputElement>) {
@@ -34,6 +36,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
         const userData: IProfile | undefined = await db.profiles.get("0")
 
         if (userData === undefined) throw new Error("UserData non trovato")
+
 
         const newPostID = crypto.randomUUID();
 
@@ -130,7 +133,39 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                     />
                 </div>
 
-                <input id={"newPostText"} value={postText} onChange={(e) => { setPostText(e.target.value) }} onSubmit={(e) => handleSubmit(e)} className="px-3 mx-2 bg-gray-100 rounded-xl w-full focus:outline-none focus:ring-[0.9px] focus:ring-blue-600" placeholder="A cosa stai fusando?" type="text" />
+                <div className="relative flex-1 mx-2 flex items-center">
+                    <input
+                        id="newPostText"
+                        ref={mainInputRef}
+                        value={postText}
+                        onChange={(e) => setPostText(e.target.value)}
+                        className="px-3 py-2 bg-gray-100 rounded-xl w-full
+                   focus:outline-none focus:ring-[0.9px] focus:ring-blue-600"
+                        placeholder="A cosa stai fusando?"
+                        type="text"
+                    />
+
+                    {showMainFormEmojiPicker && (
+                        <EmojiMart
+                            inputRef={mainInputRef}
+                            value={postText}
+                            onChange={(newValue: string) => {
+                                setPostText(newValue);
+                                requestAnimationFrame(() => {
+                                    mainInputRef.current?.focus();
+                                });
+                            }}
+                            onClose={() => {
+                                setShowMainFormEmojipicer(false);
+                                requestAnimationFrame(() => {
+                                    mainInputRef.current?.focus();
+                                });
+                            }}
+                        />
+                    )}
+                </div>
+
+
                 <NavBarActionButton
                     icon={RiLiveFill}
                     size={20}
@@ -141,7 +176,14 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                     size={20}
                     icon={FiSmile}
                     ringClassName=""
+                    clicked={() => {
+                        setShowMainFormEmojipicer(!showMainFormEmojiPicker);
+                        requestAnimationFrame(() => {
+                            mainInputRef.current?.focus();
+                        });
+                    }}
                 />
+
             </form>
             {imageMode && <PostFormImageSelection currentUrl={imageUrl} setUrl={setImageUrl} />}
         </div>
