@@ -11,7 +11,7 @@ export interface DoMyBioResponseDTO {
 }
 
 
-export enum  ReactionType{
+export enum ReactionType {
     like,
     love,
     care,
@@ -22,4 +22,13 @@ export enum  ReactionType{
     gay,
     flower,
     boom,
-} 
+}
+
+export interface CasualArticle{
+title:string
+description:string
+}
+
+export interface NewsApiPayload {
+    articles: CasualArticle[]
+}

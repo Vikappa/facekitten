@@ -202,6 +202,61 @@ export function useAddPost() {
   }, [])
 }
 
+export function useRandomProfileIdExcept(excludedId: string = "0") {
+  const randomId = useLiveQuery<string | undefined>(
+    async () => {
+      const count = await db.profiles
+        .where("id")
+        .notEqual(excludedId)
+        .count();
+
+      if (count === 0) return undefined;
+
+      const randomIndex = Math.floor(Math.random() * count);
+
+      const profile = await db.profiles
+        .where("id")
+        .notEqual(excludedId)
+        .offset(randomIndex)
+        .limit(1)
+        .first();
+
+      return profile?.id;
+    },
+    [excludedId]
+  );
+
+  return randomId;
+}
+
+export function useRandomProfileId(excludedId: string = "0") {
+  const randomId = useLiveQuery<string | undefined>(
+    async () => {
+      const count = await db.profiles
+        .where("id")
+        .notEqual(excludedId)
+        .count();
+
+      if (count === 0) return undefined;
+
+      const randomIndex = Math.floor(Math.random() * count);
+
+      const profile = await db.profiles
+        .where("id")
+        .notEqual(excludedId)
+        .offset(randomIndex)
+        .limit(1)
+        .first();
+
+      return profile?.id;
+    },
+    [excludedId]
+  );
+
+  return randomId;
+}
+
+
 /**
 //  * Hook: useUpdatePost
 //  * Update an existing post

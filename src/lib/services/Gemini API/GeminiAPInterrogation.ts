@@ -14,8 +14,7 @@ const ai = new GoogleGenAI({});
 export async function DoPromptRequest<T>(
   prompt: string,
   schema?: T
-): Promise<GenerateContentResponse> {
-
+): Promise<T> {
   const config: { responseMimeType: string; responseSchema?: T } = {
     responseMimeType: "application/json",
   };
@@ -27,12 +26,18 @@ export async function DoPromptRequest<T>(
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
-    config: config,
+    config,
   });
 
-  console.log(`[${new Date().toISOString()}] DoPromptRequest response text:`, response.text);
+  const text =
+    response.candidates?.[0]?.content?.parts?.[0]?.text;
 
-  return response;
+  if (!text) {
+    throw new Error("Nessun testo nella risposta del modello");
+  }
+
+  const data = JSON.parse(text) as T;
+  return data;
 }
 
 

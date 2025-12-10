@@ -171,6 +171,7 @@ export function CrossListPostForm({ size }: CrossListPostFormProps) {
                     size={20}
                     ringClassName=""
                 />
+                
                 <CrossListPostFormToggleImageMode functionProp={setImageMode} />
                 <NavBarActionButton
                     size={20}
