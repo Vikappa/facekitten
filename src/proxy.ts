@@ -5,12 +5,24 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get("fk_session")?.value;
   const { pathname } = request.nextUrl;
 
+  const FACEKITTEN_SECRET= process.env.FACEKITTEN_SECRET;
+
   const isPublic =
     pathname === "/" ||
     pathname === "/api/session/init";
 
+const isPazuzuTryChat = pathname.startsWith("/api/hardcodedcats/");
   // Le public le lasciamo sempre passare
   if (isPublic) {
+    return NextResponse.next();
+  }
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    console.log(request)
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
+  if(isPazuzuTryChat) {
+    // request.headers.get
+
     return NextResponse.next();
   }
 
