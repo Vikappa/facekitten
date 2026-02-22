@@ -7,8 +7,11 @@ const isPublic = (pathname: string) => pathname === "/" || pathname === "/api/se
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-console.log("PROXY RUN:", request.nextUrl.pathname, "host:", request.headers.get("host"));
-  // Debug: tienilo finché non sei sicuro che sta girando in produzione
+  console.log("PROXY RUN:", request.nextUrl.pathname, "host:", request.headers.get("host"));
+  const secret = (process.env.FACEKITTEN_SECRET || "").trim();
+  const auth = (request.headers.get("authorization") || "").trim();
+  console.log("FK secret len:", secret.length, "prefix:", secret.slice(0, 6));
+  console.log("FK auth prefix:", auth.slice(0, 12)); 
   console.log("PROXY HIT:", pathname);
 
   // 1) Public routes: sempre ok
