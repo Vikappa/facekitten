@@ -1,5 +1,5 @@
 import { FaceKittenDB, IProfile } from "@/lib/db";
-import { DoVisionRequest, DoPromptRequest } from "@/lib/services/Gemini API/GeminiAPInterrogation";
+import { doPromptJson } from "@/lib/services/Gemini API/GeminiAPInterrogation";
 import { imageUrlToBase64 } from "@/lib/utils";
 
 export async function GenerateProfile(): Promise<IProfile> {
@@ -52,28 +52,28 @@ export async function GenerateProfile(): Promise<IProfile> {
         required: ["bio"]
     };
 
-    const response: DoMyBioResponseDTO = await InterrogateGoogleVisionForProfileBIO(
-        ProfileVisionDTO,
-        BioResponseSchema,
-        `Su un social network per soli gatti, crea una breve biografia per questo profilo basata sull'immagine fornita. Ti chiami ${profile.username}. La biografia dovrebbe riflettere la personalità e l'umore del gatto nell'immagine, essere accattivante e adatta a un pubblico di amanti dei gatti. Si ironico e memico.`
-    )
+    // const response: DoMyBioResponseDTO = await InterrogateGoogleVisionForProfileBIO(
+    //     ProfileVisionDTO,
+    //     BioResponseSchema,
+    //     `Su un social network per soli gatti, crea una breve biografia per questo profilo basata sull'immagine fornita. Ti chiami ${profile.username}. La biografia dovrebbe riflettere la personalità e l'umore del gatto nell'immagine, essere accattivante e adatta a un pubblico di amanti dei gatti. Si ironico e memico.`
+    // )
 
-    profile.bio = response.bio;
+    // profile.bio = response.bio;
     return profile;
 }
 
-export async function InterrogateGoogleVisionForProfileBIO(doMyBioRequestDTO: DoMyBioRequestDTO, BioResponseSchema: object, prompt: string): Promise<DoMyBioResponseDTO> {
+// export async function InterrogateGoogleVisionForProfileBIO(doMyBioRequestDTO: DoMyBioRequestDTO, BioResponseSchema: object, prompt: string): Promise<DoMyBioResponseDTO> {
 
-    const response = await DoVisionRequest<typeof BioResponseSchema>(
-        doMyBioRequestDTO.avatarImageBase64,
-        prompt,
-        BioResponseSchema
-    );
+//     const response = await doPromptJson<typeof BioResponseSchema>(
+//         doMyBioRequestDTO.avatarImageBase64,
+//         prompt,
+//         BioResponseSchema
+//     );
 
-    const parsedResponse: DoMyBioResponseDTO = JSON.parse(response.text || "{}");
+//     const parsedResponse: DoMyBioResponseDTO = JSON.parse(response.text || "{}");
 
-    return parsedResponse;
-}
+//     return parsedResponse;
+// }
 
 export interface DoMyBioRequestDTO {
     avatarImageBase64: string;

@@ -1,4 +1,4 @@
-import { DoPromptRequest } from "@/lib/services/Gemini API/GeminiAPInterrogation";
+import { doPromptJson } from "@/lib/services/Gemini API/GeminiAPInterrogation";
 import { newResume } from "../randomnews/randomNews";
 import { FaceKittenDB, IPost, IProfile } from "@/lib/db";
 
@@ -16,7 +16,7 @@ export async function CreateSinglePost(author: IProfile) {
 
     const prompt = CreatePromptStringAboutThisNew(topic, author.username, author.bio);
 
-    const generatedText = await DoPromptRequest<IPostRequestResponse>(prompt);
+    const generatedText = await doPromptJson<IPostRequestResponse>(prompt);
 
     const post : IPost = {
         id: null,
