@@ -7,7 +7,7 @@ const isPublic = (pathname: string) => pathname === "/" || pathname === "/api/se
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+console.log("PROXY RUN:", request.nextUrl.pathname, "host:", request.headers.get("host"));
   // Debug: tienilo finché non sei sicuro che sta girando in produzione
   console.log("PROXY HIT:", pathname);
 
