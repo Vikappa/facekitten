@@ -43,6 +43,7 @@ export type ProfileUpdate = TablesUpdate<'Profile'>
 export type ProfilePublicDb = Pick<
   ProfileRow,
   | 'id'
+  | 'email'
   | 'username'
   | 'avatarUrl'
   | 'bannerUrl'
@@ -52,10 +53,19 @@ export type ProfilePublicDb = Pick<
   | 'updatedAt'
 >
 
-export type ProfileAuthDb = Pick<ProfileRow, 'id' | 'username' | 'password' | 'confirmedAccount'>
+export type ProfileAuthDb = Pick<
+  ProfileRow,
+  'id' | 'email' | 'username' | 'password' | 'confirmedAccount'
+>
+
+export type ProfileVerificationDb = Pick<
+  ProfileRow,
+  'id' | 'email' | 'username' | 'password' | 'confirmedAccount' | 'createdAt'
+>
 
 export interface ProfileDto {
   id: string
+  email: string
   username: string
   avatarUrl: string
   bannerUrl: string
@@ -67,20 +77,25 @@ export interface ProfileDto {
 
 export interface ProfileAuthDto {
   id: string
+  email: string
   username: string
   passwordHash?: string
   confirmedAccount: boolean
 }
 
 export const PROFILE_PUBLIC_SAFE_SELECT =
-  'id, username, avatarUrl, bannerUrl, bio, confirmedAccount, createdAt, updatedAt' as const
+  'id, email, username, avatarUrl, bannerUrl, bio, confirmedAccount, createdAt, updatedAt' as const
 
 export const PROFILE_AUTH_SAFE_SELECT =
-  'id, username, password, confirmedAccount' as const
+  'id, email, username, password, confirmedAccount' as const
+
+export const PROFILE_VERIFICATION_SAFE_SELECT =
+  'id, email, username, password, confirmedAccount, createdAt' as const
 
 export function toProfileDto(row: ProfilePublicDb): ProfileDto {
   return {
     id: row.id,
+    email: row.email,
     username: toRequiredString(row.username),
     avatarUrl: toRequiredString(row.avatarUrl),
     bannerUrl: toRequiredString(row.bannerUrl),
@@ -94,6 +109,7 @@ export function toProfileDto(row: ProfilePublicDb): ProfileDto {
 export function toProfileAuthDto(row: ProfileAuthDb): ProfileAuthDto {
   return {
     id: row.id,
+    email: row.email,
     username: toRequiredString(row.username),
     passwordHash: toOptionalString(row.password),
     confirmedAccount: toBoolean(row.confirmedAccount),

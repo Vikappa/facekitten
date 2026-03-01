@@ -317,6 +317,7 @@ export type Database = {
           bio: string | null
           confirmedAccount: boolean | null
           createdAt: string | null
+          email: string
           id: string
           password: string | null
           updatedAt: string | null
@@ -328,6 +329,7 @@ export type Database = {
           bio?: string | null
           confirmedAccount?: boolean | null
           createdAt?: string | null
+          email: string
           id?: string
           password?: string | null
           updatedAt?: string | null
@@ -339,6 +341,7 @@ export type Database = {
           bio?: string | null
           confirmedAccount?: boolean | null
           createdAt?: string | null
+          email?: string
           id?: string
           password?: string | null
           updatedAt?: string | null
