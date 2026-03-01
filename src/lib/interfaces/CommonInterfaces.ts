@@ -1,4 +1,3 @@
-import { FaceKittenDB, IPageProfile, IPost, IPostComment, IReaction } from "../db";
 
 export interface IResponseModelFormat {
 

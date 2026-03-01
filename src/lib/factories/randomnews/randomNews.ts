@@ -1,5 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
-import { NewsApiPayload } from "../../interfaces/CommonInterfaces";
+import { NewsApiPayload } from "@/lib/interfaces/CommonInterfaces";
 
 const newApiKey = process.env.NEWSDATA_KEY
 export const dynamic = `force-dynamic`;
