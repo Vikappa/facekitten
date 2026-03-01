@@ -18,6 +18,7 @@
     "dexie-react-hooks": "^4.2.0",
     "jose": "^6.1.2",
     "next": "^16.0.7",
+    "nodemailer": "^8.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.3.0",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^20.19.33",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "baseline-browser-mapping": "^2.10.0",

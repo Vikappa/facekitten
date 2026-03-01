@@ -12,11 +12,9 @@ export async function POST(req: Request) {
   }
   
   const { currentProfiles } = await req.json();
-  console.log("currentProfiles", currentProfiles)
   const VipProfiles = await fetchMissingVipProfiles(currentProfiles);
     debugger
 
-  console.log("VIPS", VipProfiles)
 
   return NextResponse.json(VipProfiles);
 }

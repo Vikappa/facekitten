@@ -106,10 +106,6 @@ export async function doVisionJson<T>(
   return safeJsonParse<T>(raw);
 }
 
-/**
- * Se ti serve il response grezzo per debug (token usage, candidates, ecc.)
- * ma vuoi comunque avere anche il JSON parsato.
- */
 export async function doPromptJsonWithRaw<T>(
   prompt: string,
   responseSchema?: GeminiResponseSchema

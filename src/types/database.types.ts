@@ -310,6 +310,35 @@ export type Database = {
           },
         ]
       }
+      registrationcodes: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: number
+          profile: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: number
+          profile?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: number
+          profile?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrationcodes_profile_fkey"
+            columns: ["profile"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Profile: {
         Row: {
           avatarUrl: string | null

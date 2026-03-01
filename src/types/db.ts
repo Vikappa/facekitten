@@ -355,6 +355,10 @@ export function toFriendshipDto(row: FriendshipDb): FriendshipDto {
   }
 }
 
+export type RegistrationCodeRow = Tables<'registrationcodes'>
+export type RegistrationCodeInsert = TablesInsert<'registrationcodes'>
+export type RegistrationCodeUpdate = TablesUpdate<'registrationcodes'>
+
 // Short aliases for common usage
 export type Profile = ProfileDto
 export type Post = PostDto
@@ -365,3 +369,15 @@ export type PostReaction = PostReactionDto
 export type CommentReaction = CommentReactionDto
 export type Follow = FollowDto
 export type Friendship = FriendshipDto
+export type RegistrationCode = RegistrationCodeRow
+
+
+//Registration 
+export interface ProfileRegistrationDTO {
+        email: string
+        username: string
+        avatarUrl: string
+        bannerUrl: string
+        bio: string
+        confirmedAccount: boolean 
+    }
