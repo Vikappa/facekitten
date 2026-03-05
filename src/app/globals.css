@@ -1,16 +1,18 @@
-/* ============================= */
-/* Tailwind CSS                  */
-/* ============================= */
-
 @import "tailwindcss";
 
-/* ============================= */
-/* Custom Font Face              */
-/* ============================= */
+@theme {
+  --color-primary: #ff6b6b;
+  --color-secondary: #4ecdc4;
+  --color-tertiary : #f2f4f7;
+  --color-success: #51cf66;
+  --color-danger: #ff6b6b;
+  --color-warning: #ffd93d;
+  --color-info: #6bcfff;
+}
 
 @font-face {
-  font-family: 'klavika';
-  src: url('/assets/fonts/klavika-medium.otf') format('woff2');
+  font-family: "klavika";
+  src: url("/assets/fonts/klavika-medium.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
 }
@@ -19,11 +21,4 @@
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
 }
-
-/* body{
-  background-color: var(--color-gray-100);
-} */

@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'FaceKitten',
-    short_name: 'Fk',
+    short_name: 'FaceKitten',
     description: 'Facekitten web app',
     start_url: '/',
     display: 'standalone',
