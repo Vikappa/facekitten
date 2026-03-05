@@ -19,7 +19,7 @@ export default function NavbarButtonFunction(props: NavbarButtonFunctionProps) {
     return (
         <button 
         onClick={handleClick} 
-        className={`${props.className} ${props.isActive ? "text-primary bg-secondary" : ""} transition-[color,background-color] duration-300 ease-in`}
+        className={`${props.className} border-b-2 ${props.isActive ? "text-primary border-primary" : "border-transparent"} transition-[color,border-color] duration-300 ease-in`}
         >
             {props.icon}
         </button>
