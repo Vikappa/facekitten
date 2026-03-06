@@ -1,3 +1,7 @@
+"use client";
+
+import { MutableRefObject, useRef } from "react";
+import ProfileModal from "../modals/ProfileModal";
 import Navbar from "./NavbarParts/Navbar";
 
 export enum PageFocus {
@@ -14,12 +18,13 @@ export default function CommonLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-
+    const navbarRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 
     return (
-        <>
-        <Navbar/>
+        <div>
+        <Navbar navbarRef={navbarRef} />
+        <ProfileModal navbarRef={navbarRef} />
                 {children}
-        </>
+        </div>
     );
 }

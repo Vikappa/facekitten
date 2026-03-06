@@ -1,26 +1,20 @@
 'use client'
 
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { setActiveMidNavbarTab, type MidNavbarTab } from "@/lib/redux/uiSlice";
 import { FaGamepad, FaHome, FaStore, FaUsers } from "react-icons/fa";
 import MidNavbarButtonFunction from "./MidNavbarButtonFunction";
 
 export default function Midnavbar(){
+    const dispatch = useAppDispatch();
+    const activeMidNavbarTab = useAppSelector((state) => state.ui.activeMidNavbarTab);
     const midNavbarButtonClassName = "text-dark-400 px-7 py-2 rounded-lg transition-colors duration-100";
-    const [isHomeButtonActive, setIsHomeButtonActive] = useState(false);
-    const [isMarketplaceButtonActive, setIsMarketplaceButtonActive] = useState(false);
-    const [isGroupsButtonActive, setIsGroupsButtonActive] = useState(false);
-    const [isVideogamesButtonActive, setIsVideogamesButtonActive] = useState(false);
-
-    
 
     const setExclusiveActive = (
-        button: "home" | "marketplace" | "groups" | "videogames",
+        button: MidNavbarTab,
         isActive: boolean
     ) => {
-        setIsHomeButtonActive(button === "home" ? isActive : false);
-        setIsMarketplaceButtonActive(button === "marketplace" ? isActive : false);
-        setIsGroupsButtonActive(button === "groups" ? isActive : false);
-        setIsVideogamesButtonActive(button === "videogames" ? isActive : false);
+        dispatch(setActiveMidNavbarTab(isActive ? button : null));
     };
 
     return (
@@ -28,25 +22,25 @@ export default function Midnavbar(){
             <MidNavbarButtonFunction
                 icon={<FaHome className="text-2xl" />}
                 onClick={(nextState) => setExclusiveActive("home", nextState)}
-                isActive={isHomeButtonActive}
+                isActive={activeMidNavbarTab === "home"}
                 className={midNavbarButtonClassName}
             />
             <MidNavbarButtonFunction
                 icon={<FaStore className="text-2xl" />}
                 onClick={(nextState) => setExclusiveActive("marketplace", nextState)}
-                isActive={isMarketplaceButtonActive}
+                isActive={activeMidNavbarTab === "marketplace"}
                 className={midNavbarButtonClassName}
             />
             <MidNavbarButtonFunction
                 icon={<FaUsers className="text-2xl" />}
                 onClick={(nextState) => setExclusiveActive("groups", nextState)}
-                isActive={isGroupsButtonActive}
+                isActive={activeMidNavbarTab === "groups"}
                 className={midNavbarButtonClassName}
             />
             <MidNavbarButtonFunction
                 icon={<FaGamepad className="text-2xl" />}
                 onClick={(nextState) => setExclusiveActive("videogames", nextState)}
-                isActive={isVideogamesButtonActive}
+                isActive={activeMidNavbarTab === "videogames"}
                 className={midNavbarButtonClassName}
             />
         </div>

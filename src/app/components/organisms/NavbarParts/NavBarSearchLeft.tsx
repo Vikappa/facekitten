@@ -1,15 +1,18 @@
 'use client'
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { resetNavbarUiState, setActiveNavFunction, setSearchTerm, setSmallSearchBarVisible, toggleSmallSearchBarVisible } from "@/lib/redux/uiSlice";
+import { useEffect } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 
-interface NavBarSearchLeftProps {
-    isSmallSearchBarVisible: boolean;
-    setIsSmallSearchBarVisible: (visible: boolean) => void;
-}
+export default function NavBarSearchLeft() {
+    const dispatch = useAppDispatch();
+    const searchTerm = useAppSelector((state) => state.ui.searchTerm);
+    const isSmallSearchBarVisible = useAppSelector((state) => state.ui.isSmallSearchBarVisible);
 
-export default function NavBarSearchLeft({ isSmallSearchBarVisible, setIsSmallSearchBarVisible }: NavBarSearchLeftProps) {
-
-    const [searchTerm, setSearchTerm] = useState("");
+    function openSmallSearchBar() {
+        dispatch(toggleSmallSearchBarVisible())
+        dispatch(setActiveNavFunction(null))
+    }
 
     return (
         <div className="relative ps-2">
@@ -40,7 +43,7 @@ export default function NavBarSearchLeft({ isSmallSearchBarVisible, setIsSmallSe
                             id=""
                             placeholder="Cerca micetti..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                         />
                     )
                         :
@@ -58,7 +61,7 @@ export default function NavBarSearchLeft({ isSmallSearchBarVisible, setIsSmallSe
                 type="text"
                 placeholder="Cerca micetti..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                 className="
                     hidden md:block
                     w-full ps-10 p-2 rounded-full
@@ -80,8 +83,7 @@ export default function NavBarSearchLeft({ isSmallSearchBarVisible, setIsSmallSe
                 <HiOutlineMagnifyingGlass
                     className=" left-5 top-3 text-gray-400 text-xl drop-shadow-[0_0_0.5px_currentColor] "
                     onClick={() => {
-                        const nextVisible = !isSmallSearchBarVisible;
-                        setIsSmallSearchBarVisible(nextVisible);
+                        openSmallSearchBar()
                     }}
                 />
             </div>

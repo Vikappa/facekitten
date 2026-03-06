@@ -1,22 +1,23 @@
 'use client'
+import { useAppSelector } from "@/lib/redux/hooks";
 import Image from "next/image";
 import Midnavbar from "./MidNavbar";
 import NavbarFunctions from "./NavBarFunctions";
 import NavBarSearchLeft from "./NavBarSearchLeft";
-import { useState } from "react";
+import { MutableRefObject } from "react";
 
+interface NavbarProps {
+    navbarRef: MutableRefObject<HTMLDivElement | null>;
+}
 
-export default function Navbar() {
-    const [isSmallSearchBarVisible, setIsSmallSearchBarVisible] = useState(false);
-
+export default function Navbar({ navbarRef }: NavbarProps) {
+    const isSmallSearchBarVisible = useAppSelector((state) => state.ui.isSmallSearchBarVisible);
+    
     return (
-        <div className="w-full bg-white shadow-sm py-2 px-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center" >
+        <div className="sticky w-full bg-white shadow-sm py-2 px-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center" ref={navbarRef}>
             <div className="flex min-w-0 justify-self-start">
                 <Image src="/img/facekittenlogo.png" alt="FaceKitten Logo" width={40} height={40} />
-                <NavBarSearchLeft
-                    isSmallSearchBarVisible={isSmallSearchBarVisible}
-                    setIsSmallSearchBarVisible={setIsSmallSearchBarVisible}
-                />
+                <NavBarSearchLeft />
             </div>
             <div className="justify-self-center">
                 <Midnavbar />

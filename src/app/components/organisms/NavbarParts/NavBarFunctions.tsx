@@ -1,30 +1,28 @@
 'use client'
 
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { setActiveNavFunction, type NavFunction } from "@/lib/redux/uiSlice";
 import NavbarButtonFunction, { ProfilePicture } from "../../atoms/NavbarFunctionButton";
 import { PiSquaresFourFill } from "react-icons/pi";
 import { FaFacebookMessenger } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
-import { useState } from "react";
 
 export default function NavbarFunctions(){
 
     const navbarbuttonsClassName = "bg-tertiary text-dark-400 p-2 md:px-2 rounded-full transition-colors duration-100";
     const profileButtonClassName = "rounded-full overflow-hidden";
-    const [activeNavFunction, setActiveNavFunction] = useState<null | "squares" | "messenger" | "bell" | "profile">(null);
+    const dispatch = useAppDispatch();
+    const activeNavFunction = useAppSelector((state) => state.ui.activeNavFunction);
     const isSquaresButtonActive = activeNavFunction === "squares";
     const isMessengerButtonActive = activeNavFunction === "messenger";
     const isBellButtonActive = activeNavFunction === "bell";
     const isProfileButtonActive = activeNavFunction === "profile";
 
     const setExclusiveButtonState = (
-        button: "squares" | "messenger" | "bell" | "profile",
+        button: NavFunction,
         isActive: boolean
     ) => {
-        if (isActive) {
-            setActiveNavFunction(button);
-        } else {
-            setActiveNavFunction((current) => current === button ? null : current);
-        }
+        dispatch(setActiveNavFunction(isActive ? button : null));
     };
     
     return (
