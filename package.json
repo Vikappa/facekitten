@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:types": "npx supabase gen types typescript --project-id hhpbhtfyoipoihafzfnp --schema public > src/types/database.types.ts"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

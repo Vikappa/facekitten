@@ -355,9 +355,66 @@ export function toFriendshipDto(row: FriendshipDb): FriendshipDto {
   }
 }
 
+// Notifications
+export type NotificationRow = Tables<'notifications'>
+export type NotificationInsert = TablesInsert<'notifications'>
+export type NotificationUpdate = TablesUpdate<'notifications'>
+
+export type NotificationDb = Pick<
+  NotificationRow,
+  'id' | 'created_at' | 'activity_from' | 'to' | 'type' | 'seen'
+>
+
+export interface NotificationDto {
+  id: number
+  createdAt?: Date
+  activityFrom?: string
+  to?: string
+  type?: PostType
+  seen: boolean
+}
+
+export const NOTIFICATION_SAFE_SELECT =
+  'id, created_at, activity_from, to, type, seen' as const
+
+export function toNotificationDto(row: NotificationDb): NotificationDto {
+  return {
+    id: row.id,
+    createdAt: toDate(row.created_at),
+    activityFrom: toOptionalString(row.activity_from),
+    to: toOptionalString(row.to),
+    type: row.type ?? undefined,
+    seen: toBoolean(row.seen),
+  }
+}
+
 export type RegistrationCodeRow = Tables<'registrationcodes'>
 export type RegistrationCodeInsert = TablesInsert<'registrationcodes'>
 export type RegistrationCodeUpdate = TablesUpdate<'registrationcodes'>
+
+export type RegistrationCodeDb = Pick<
+  RegistrationCodeRow,
+  'id' | 'created_at' | 'code' | 'profile'
+>
+
+export interface RegistrationCodeDto {
+  id: number
+  createdAt?: Date
+  code?: string
+  profile?: string
+}
+
+export const REGISTRATION_CODE_SAFE_SELECT =
+  'id, created_at, code, profile' as const
+
+export function toRegistrationCodeDto(row: RegistrationCodeDb): RegistrationCodeDto {
+  return {
+    id: row.id,
+    createdAt: toDate(row.created_at),
+    code: toOptionalString(row.code),
+    profile: toOptionalString(row.profile),
+  }
+}
 
 // Short aliases for common usage
 export type Profile = ProfileDto
@@ -369,15 +426,15 @@ export type PostReaction = PostReactionDto
 export type CommentReaction = CommentReactionDto
 export type Follow = FollowDto
 export type Friendship = FriendshipDto
-export type RegistrationCode = RegistrationCodeRow
+export type Notification = NotificationDto
+export type RegistrationCode = RegistrationCodeDto
 
-
-//Registration 
+// Registration
 export interface ProfileRegistrationDTO {
-        email: string
-        username: string
-        avatarUrl: string
-        bannerUrl: string
-        bio: string
-        confirmedAccount: boolean 
-    }
+  email: string
+  username: string
+  avatarUrl: string
+  bannerUrl: string
+  bio: string
+  confirmedAccount: boolean
+}

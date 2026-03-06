@@ -236,6 +236,48 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          activity_from: string | null
+          created_at: string
+          id: number
+          seen: boolean | null
+          to: string | null
+          type: Database["public"]["Enums"]["postType"] | null
+        }
+        Insert: {
+          activity_from?: string | null
+          created_at?: string
+          id?: number
+          seen?: boolean | null
+          to?: string | null
+          type?: Database["public"]["Enums"]["postType"] | null
+        }
+        Update: {
+          activity_from?: string | null
+          created_at?: string
+          id?: number
+          seen?: boolean | null
+          to?: string | null
+          type?: Database["public"]["Enums"]["postType"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_activity_from_fkey"
+            columns: ["activity_from"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_to_fkey"
+            columns: ["to"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post: {
         Row: {
           authorId: string

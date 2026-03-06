@@ -1,7 +1,6 @@
 const CACHE_NAME = 'facekitten-cache-v1';
 const OFFLINE_URLS = [
   '/',           // homepage
-  '/offline',    // se vuoi una pagina offline dedicata
 ];
 
 // Install: cache di base
