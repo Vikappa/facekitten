@@ -2,7 +2,7 @@
 
 @theme {
   --color-primary: #0866ff;
-  --color-secondary: #4ecdc4;
+  --color-secondary: #e2e5e9;
   --color-tertiary : #f2f4f7;
   --color-success: #51cf66;
   --color-danger: #ff6b6b;
@@ -21,4 +21,11 @@
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.customboxShadow{
+-webkit-box-shadow:0px 4px 18px 0px #ACACAC;
+-moz-box-shadow:0px 4px 18px 0px #ACACAC;
+-o-box-shadow:0px 4px 18px 0px #ACACAC;
+box-shadow:0px 4px 18px 0px #ACACAC;
 }
