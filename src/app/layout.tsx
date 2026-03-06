@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import CommonLayout from "./components/organisms/CommonLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,9 +47,7 @@ export default function RootLayout({
         <link rel="icon" href="/img/facekittenlogo.png" />
       </head>
       <body className={`${inter.className} bg-tertiary`}>
-        <CommonLayout>
-          {children}
-        </CommonLayout>
+        {children}
       </body>
     </html>
   );

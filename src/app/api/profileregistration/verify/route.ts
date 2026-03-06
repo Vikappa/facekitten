@@ -1,4 +1,5 @@
 import { VercelLogger } from '@/lib/logging/VercelLogger'
+import { issueSessionCookie } from '@/lib/Security/SessionSecurity'
 import { createSupabaseAdminClient } from '@/lib/supabase/serverAdminClient'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -48,13 +49,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Codice di verifica non valido' }, { status: 400 })
   }
 
-  const profileToUpdate= supabase.from('Profile')
+  const profileToUpdate = supabase.from('Profile')
     .update({ confirmedAccount: true })
     .eq('id', registration.profile)
+    .select('id, email')
+    .single()
 
-  const { error: updateError } = await profileToUpdate
+  const { data: updatedProfile, error: updateError } = await profileToUpdate
   
-  if(updateError) {
+  if(updateError || !updatedProfile) {
     VercelLogger(
       'Errore durante l\'aggiornamento del profilo alla conferma ' +
         JSON.stringify({ error: updateError?.message, code })
@@ -62,5 +65,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Errore durante la verifica del codice' }, { status: 500 })
   }
 
-  return NextResponse.json({ message: 'Codice di verifica valido' }, { status: 200 })
+  const response = NextResponse.json(
+    { message: 'Codice di verifica valido', profileId: updatedProfile.id },
+    { status: 200 }
+  )
+
+  await issueSessionCookie(response, {
+    profileId: updatedProfile.id,
+    email: updatedProfile.email,
+  })
+
+  return response
 }

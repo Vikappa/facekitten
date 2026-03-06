@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Debug server (webpack)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev -- --inspect=9230 --webpack",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Next.js: Attach server (9230)",
+      "type": "node",
+      "request": "attach",
+      "port": 9230,
+      "restart": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Next.js: Debug full stack (webpack + Chrome)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev -- --inspect=9230 --webpack",
+      "cwd": "${workspaceFolder}",
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}"
+      }
+    }
+  ]
+}

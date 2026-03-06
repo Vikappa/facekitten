@@ -1,4 +1,5 @@
 import { VercelLogger } from '@/lib/logging/VercelLogger'
+import { hashProfilePassword, normalizeEmail } from '@/lib/Security/ProfilePasswordSecurity'
 import { SendEmail } from '@/lib/services/emailsender/EmailSender'
 import { createSupabaseAdminClient } from '@/lib/supabase/serverAdminClient'
 import type { ProfileInsert, RegistrationCodeInsert } from '@/types/db'
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   const name = body.name?.trim()
-  const email = body.email?.trim().toLowerCase()
+  const email = normalizeEmail(body.email)
   const password = body.password
 
   if (!name || !email || !password) {
@@ -29,6 +30,17 @@ export async function POST(req: NextRequest) {
       { error: 'Missing required fields: name, email, password' },
       { status: 400 }
     )
+  }
+
+  let hashedPassword: string
+  try {
+    hashedPassword = await hashProfilePassword(password)
+  } catch (error) {
+    VercelLogger(
+      'Errore durante hashing password in registrazione ' +
+        JSON.stringify({ email, name, error: error instanceof Error ? error.message : 'Unknown error' })
+    )
+    return NextResponse.json({ error: 'Could not hash password' }, { status: 500 })
   }
 
   let supabase: ReturnType<typeof createSupabaseAdminClient>
@@ -54,7 +66,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     )
   }
-
+  console.warn("Utente auth creato con successo " + JSON.stringify({ email, name, userId: authData.user.id, "hash": hashedPassword }))
   const profileToInsert: ProfileInsert = {
     id: authData.user.id,
     email,
@@ -63,6 +75,7 @@ export async function POST(req: NextRequest) {
     bannerUrl: '',
     bio: '',
     confirmedAccount: false,
+    password: hashedPassword
   }
 
   const { data: createdProfile, error: profileError } = await supabase

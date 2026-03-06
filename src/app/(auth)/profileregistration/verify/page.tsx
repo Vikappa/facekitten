@@ -28,6 +28,8 @@ export default function VerifyPage() {
                     type="text"
                     placeholder="Inserisci il codice di verifica"
                     className="border border-gray-300 rounded-md px-4 py-2 mb-4 w-full max-w-sm"
+                    value={codice}
+                    onChange={(e) => setCodice(e.target.value)}
                 />
                 <input className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors" type="submit" value="Verifica" />
             </form>
