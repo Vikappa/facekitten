@@ -96,7 +96,8 @@ export default function LoginPage() {
         await warmImageCache(
           Array.isArray(successPayload.preloadImages) ? successPayload.preloadImages : []
         );
-        router.push("/");
+        router.replace("/");
+        router.refresh();
         return;
       }
 

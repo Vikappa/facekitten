@@ -11,7 +11,15 @@ const PUBLIC_AUTH_ROUTES = new Set([
   "/accountconfirmation",
 ]);
 
-const ALLOWED_WITHOUT_SESSION = new Set([...PUBLIC_AUTH_ROUTES, VERIFY_ROUTE]);
+const AUTH_ACTION_ROUTES = new Set([
+  "/login/request",
+]);
+
+const ALLOWED_WITHOUT_SESSION = new Set([
+  ...PUBLIC_AUTH_ROUTES,
+  ...AUTH_ACTION_ROUTES,
+  VERIFY_ROUTE,
+]);
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
