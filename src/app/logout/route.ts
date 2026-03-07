@@ -2,7 +2,7 @@ import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/Security/Sess
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const response = NextResponse.redirect(new URL("/", request.url));
+  const response = NextResponse.redirect(new URL("/login", request.url));
 
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
