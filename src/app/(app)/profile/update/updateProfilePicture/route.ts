@@ -7,7 +7,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 
-type ProfileIdentityRow = {
+export type ProfileIdentityRow = {
   id: string;
 };
 

@@ -2,6 +2,7 @@
 import { FaCamera } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import Image from "next/image";
+import Link from "next/link";
 import { patchCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
 import { useRef, useState, type ChangeEvent } from "react";
 
@@ -10,18 +11,13 @@ function getValidImageUrl(url: string | null | undefined, fallbackUrl: string) {
     return normalizedUrl ? normalizedUrl : fallbackUrl;
 }
 
-function getValidBio(currentProfile: UserProfile | null) {
-    if (currentProfile === null || !!currentProfile?.bio || currentProfile.bio.trim() === "") {
-        return "Non hai una bio..";
-    } else {
-        return currentProfile.bio;
-    }
-}
+
 
 
 
 export default function ProfilePageHero() {
     const dispatch = useAppDispatch();
+
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const selectedAvatarFileRef = useRef<File | null>(null);
@@ -29,7 +25,7 @@ export default function ProfilePageHero() {
     const profileAvatar = getValidImageUrl(currentProfile?.avatarUrl, "/assets/blankprofile.png");
     const profileBanner = getValidImageUrl(currentProfile?.bannerUrl, "/assets/grumpy-cat-background-facebook-cover.jpg");
     const profileName = currentProfile?.username?.trim() ?? "";
-    const profileBio = getValidBio(currentProfile);
+    const profileBio = useAppSelector((state) => state.profile.currentProfile?.bio ?? "Non hai una bio..")
     const [isLoading, setIsLoading] = useState(false)
 
     function handleUploadProfilePicture() {
@@ -86,7 +82,7 @@ export default function ProfilePageHero() {
                         className="w-full h-auto"
                     />
                 </div>
-                <div className="absolute bottom-0 right-0 z-20 rounded-full bg-secondary ring-2 ring-white p-2.5 -translate-y-1/2 hover:cursor-pointer me-2">
+                <div className="absolute bottom-0 right-0 z-20 rounded-full bg-secondary ring-2 ring-white p-2.5 -translate-y-1/2 hover:cursor-pointer me-2" onClick={handleUploadProfilePicture}>
                     <FaCamera className="" />
                 </div>
             </div>
@@ -122,7 +118,12 @@ export default function ProfilePageHero() {
                 </span>
                 <div className="flex gap-2 mt-auto">
                     <button className="bg-primary text-white w-1/2 font-bold mb-2 rounded-md py-1.5">Crea Post</button>
-                    <button className="bg-tertiary text-gra w-1/2 font-semibold mb-2 rounded-md py-1.5">Modifica Profilo</button>
+                    <Link
+                        href="/profile/modifica"
+                        className="bg-tertiary text-gra w-1/2 font-semibold mb-2 rounded-md py-1.5 text-center"
+                    >
+                        Modifica Profilo
+                    </Link>
                 </div>
             </div>
 

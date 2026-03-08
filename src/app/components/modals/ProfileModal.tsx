@@ -43,6 +43,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
             await fetch("/logout", { method: "POST" });
         } finally {
             resetProfileModalSections();
+
             router.replace("/login");
             router.refresh();
             setIsLoggingOut(false);
