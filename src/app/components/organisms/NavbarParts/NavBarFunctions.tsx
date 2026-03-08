@@ -17,7 +17,9 @@ export default function NavbarFunctions(){
     const isMessengerButtonActive = activeNavFunction === "messenger";
     const isBellButtonActive = activeNavFunction === "bell";
     const isProfileButtonActive = activeNavFunction === "profile";
-
+    const currentProfile = useAppSelector((state) => state.profile.currentProfile);
+    const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
+    
     const setExclusiveButtonState = (
         button: NavFunction,
         isActive: boolean
@@ -46,7 +48,7 @@ export default function NavbarFunctions(){
                 isActive={isBellButtonActive}
             />
             <ProfilePicture
-                imageSrc="/assets/blankprofile.png"
+                imageSrc={profileAvatar ?? "/assets/blankprofile.png"}
                 alt="Profile"
                 isActive={isProfileButtonActive}
                 setIsActive={(nextState) => setExclusiveButtonState("profile", nextState)}

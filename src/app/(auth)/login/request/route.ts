@@ -26,10 +26,10 @@ const loadProfileMedia = async (profile: Profile) => {
 
     try{
             const payload = {
-                profilePicture: profile.avatarUrl ? await fetch(profile.avatarUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
-                coverPhoto: profile.bannerUrl ? await fetch(profile.bannerUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
+                profilePicture: profile.avatarUrl ? profile.avatarUrl : undefined,
+                coverPhoto: profile.bannerUrl ? profile.bannerUrl: undefined,
                 name:profile.username,
-                bio: profile.bio
+                bio: profile.bio,
             };
             return payload;
     }catch{
@@ -37,7 +37,8 @@ const loadProfileMedia = async (profile: Profile) => {
                 profilePicture:undefined,
                 coverPhoto:undefined,
                 name:undefined,
-                bio:undefined 
+                bio:undefined,
+
             }
     }
 }

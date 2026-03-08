@@ -1,19 +1,50 @@
 'use client'
 
+import { setCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { useDispatch } from "react-redux";
 
 type LoginSuccessResponse = {
   code: "LOGIN_OK";
   profileId: string;
-  preloadImages?: string[];
+  preloadData?: PreloadPayload;
 };
+
+type PreloadPayload = {
+  profilePicture?: string;
+  coverPhoto?: string;
+  name?: string;
+  bio?: string;
+}
 
 type LoginErrorResponse = {
   code?: string;
   error?: string;
+};
+
+const isLoginSuccessResponse = (payload: unknown): payload is LoginSuccessResponse => {
+  if (typeof payload !== "object" || payload === null) {
+    return false;
+  }
+
+  const candidate = payload as Partial<LoginSuccessResponse>;
+  return candidate.code === "LOGIN_OK" && typeof candidate.profileId === "string";
+};
+
+const isLoginErrorResponse = (payload: unknown): payload is LoginErrorResponse => {
+  if (typeof payload !== "object" || payload === null) {
+    return false;
+  }
+
+  const candidate = payload as Partial<LoginErrorResponse>;
+  return (
+    candidate.code === undefined || typeof candidate.code === "string"
+  ) && (
+    candidate.error === undefined || typeof candidate.error === "string"
+  );
 };
 
 const toAbsoluteAssetUrl = (url: string) => {
@@ -23,47 +54,27 @@ const toAbsoluteAssetUrl = (url: string) => {
   return new URL(url, window.location.origin).toString();
 };
 
-const warmImageCache = async (urls: string[]) => {
-  const uniqueUrls = [...new Set(urls.filter((url) => typeof url === "string" && url.trim().length > 0))];
-  if (uniqueUrls.length === 0) return;
-
-  let cache: Cache | undefined;
-  if ("caches" in window) {
-    try {
-      cache = await window.caches.open("fk-login-preload-v1");
-    } catch {
-      cache = undefined;
-    }
+const downloadAssetContent = async (url?: string): Promise<Uint8Array | []> => {
+  if (!url) {
+    return [];
   }
 
-  await Promise.allSettled(
-    uniqueUrls.map(async (rawUrl) => {
-      const url = toAbsoluteAssetUrl(rawUrl);
+  try {
+    const absoluteUrl = toAbsoluteAssetUrl(url);
+    const response = await fetch(absoluteUrl);
 
-      const image = new window.Image();
-      image.decoding = "async";
-      image.src = url;
+    if (!response.ok) {
+      return [];
+    }
 
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          credentials: "include",
-          cache: "force-cache",
-        });
-
-        if (cache && response.ok) {
-          await cache.put(url, response.clone());
-        }
-      } catch {
-      }
-
-      try {
-        await image.decode();
-      } catch {
-      }
-    })
-  );
+    const buffer = await response.arrayBuffer();
+    return new Uint8Array(buffer);
+  } catch {
+    return [];
+  }
 };
+
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,6 +85,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const dispatch = useDispatch();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,19 +101,46 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const payload = await response.json().catch(() => ({}));
+      let payload: unknown = null;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
 
       if (response.ok) {
-        const successPayload = payload as LoginSuccessResponse;
-        await warmImageCache(
-          Array.isArray(successPayload.preloadImages) ? successPayload.preloadImages : []
-        );
+        if (!isLoginSuccessResponse(payload)) {
+          setError("Risposta login non valida.");
+          return;
+        }
+
+        const successPayload = payload;
+        const avatarUrl = successPayload.preloadData?.profilePicture
+          ? toAbsoluteAssetUrl(successPayload.preloadData.profilePicture)
+          : "";
+        const bannerUrl = successPayload.preloadData?.coverPhoto
+          ? toAbsoluteAssetUrl(successPayload.preloadData.coverPhoto)
+          : "";
+
+
+        const downloadedProfileData : UserProfile = {
+          id: successPayload.profileId,
+          email: email,
+          username: successPayload.preloadData?.name ?? "",
+          avatarUrl,
+          bannerUrl,
+          bio: successPayload.preloadData?.bio ?? "",
+          confirmedAccount: true
+        }
+
+        dispatch(setCurrentProfile(downloadedProfileData))
+
         router.replace("/");
         router.refresh();
         return;
       }
 
-      const errorPayload = payload as LoginErrorResponse;
+      const errorPayload = isLoginErrorResponse(payload) ? payload : {};
 
       if (response.status === 403 && errorPayload.code === "ACCOUNT_NOT_VERIFIED") {
         router.push("/profileregistration/verify");
@@ -180,7 +219,7 @@ export default function LoginPage() {
           {isSubmitting ? "Accesso..." : "Accedi"}
         </button>
       </form>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p onClick={() => {location.reload}} className="text-sm text-red-600">{error}</p>}
       <div className="text-sm text-gray-700 w-full text-center">
         <Link className="text-blue-700 no-underline py-4 flex items-center justify-center border-primary border rounded-full" href="/registration">
           Crea un nuovo account

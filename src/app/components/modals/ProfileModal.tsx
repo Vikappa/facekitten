@@ -17,10 +17,13 @@ interface ProfileModalProps {
 
 export default function ProfileModal({ navbarRef }: ProfileModalProps) {
     const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "profile");
+    const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const [navbarHeight, setNavbarHeight] = useState(0);
     const [settingAndPrivacyOn, setSettingAndPrivacyOn] = useState(false);
     const [helpAndSupportOn, setHelpAndSupportOn] = useState(false);
     const [displayAndAccessybilityOn, setDisplayAndAccessybilityOn] = useState(false);
+    const profileName = currentProfile?.username?.trim() ? currentProfile.username : "Name";
+    const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
 
     const resetProfileModalSections = () => {
         setSettingAndPrivacyOn(false);
@@ -68,10 +71,10 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                             <div className="customboxShadow p-3 rounded-xl mb-3">
                                 <div className="w-full flex bg-trasparent rounded-xl " >
                                     <div className="relative w-9 h-9">
-                                        <Image src="/assets/blankprofile.png" alt="Profile Picture" fill className="rounded-full mx-auto" />
+                                        <Image src={profileAvatar} alt="Profile Picture" fill className="rounded-full mx-auto" />
                                     </div>
                                     <div className="flex align-bottom justify-content-center m-3 ms-2 mt-2">
-                                        <p className="m-0 font-bold">Name</p>
+                                        <p className="m-0 font-bold">{profileName}</p>
                                     </div>
                                 </div>
                                 <hr className="mt-3 mx-3" />
