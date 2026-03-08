@@ -11,18 +11,21 @@ import { FaMoon } from "react-icons/fa";
 import { RiUserCommunityFill } from "react-icons/ri";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ProfileModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
 }
 
 export default function ProfileModal({ navbarRef }: ProfileModalProps) {
+    const router = useRouter();
     const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "profile");
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const [navbarHeight, setNavbarHeight] = useState(0);
     const [settingAndPrivacyOn, setSettingAndPrivacyOn] = useState(false);
     const [helpAndSupportOn, setHelpAndSupportOn] = useState(false);
     const [displayAndAccessybilityOn, setDisplayAndAccessybilityOn] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const profileName = currentProfile?.username?.trim() ? currentProfile.username : "Name";
     const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
 
@@ -30,6 +33,20 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
         setSettingAndPrivacyOn(false);
         setHelpAndSupportOn(false);
         setDisplayAndAccessybilityOn(false);
+    };
+
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
+        setIsLoggingOut(true);
+
+        try {
+            await fetch("/logout", { method: "POST" });
+        } finally {
+            resetProfileModalSections();
+            router.replace("/login");
+            router.refresh();
+            setIsLoggingOut(false);
+        }
     };
 
     useEffect(() => {
@@ -90,7 +107,12 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                             <ProfileModalRectangle text="Help & Support" icon={<FaCircleQuestion className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setHelpAndSupportOn(true)} />
                             <ProfileModalRectangle text="Display & Accessibility" icon={<FaMoon className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setDisplayAndAccessybilityOn(true)} />
                             <ProfileModalRectangle text="Give Feedback" icon={<RiErrorWarningFill className="text-2xl mx-auto my-auto" />} showArrow={false} href="/feedback" />
-                            <ProfileModalRectangle text="Log out" icon={<BiSolidDoorOpen className="text-2xl mx-auto my-auto" />} showArrow={false} href="/logout" />
+                            <ProfileModalRectangle
+                                text={isLoggingOut ? "Logging out..." : "Log out"}
+                                icon={<BiSolidDoorOpen className="text-2xl mx-auto my-auto" />}
+                                showArrow={false}
+                                onClick={handleLogout}
+                            />
                         </div>
                     )
                 }

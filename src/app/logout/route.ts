@@ -1,8 +1,8 @@
 import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/Security/SessionSecurity";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-  const response = NextResponse.redirect(new URL("/login", request.url));
+export async function POST() {
+  const response = NextResponse.json({ code: "LOGOUT_OK" });
 
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
@@ -12,4 +12,9 @@ export async function GET(request: Request) {
   });
 
   return response;
+}
+
+export async function GET(request: Request) {
+  // GET must remain side-effect free to avoid accidental logout due to prefetch.
+  return NextResponse.redirect(new URL("/login", request.url));
 }
