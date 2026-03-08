@@ -62,21 +62,21 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
     return (
         <div
             style={{ top: `${navbarHeight}px` }}
-            className="absolute w-full p-2 flex flex-col items-center align-content-center"
+            className="fixed left-0 right-0 z-50 w-full p-2 flex flex-col items-center align-content-center"
         >
             <div className="w-full flex flex-col p-3 pt-0 rounded-xl">
                 {
                     !settingAndPrivacyOn && !helpAndSupportOn && !displayAndAccessybilityOn && (
                         <div className=" rounded-2xl p-3 bg-white customboxShadow">
                             <div className="customboxShadow p-3 rounded-xl mb-3">
-                                <div className="w-full flex bg-trasparent rounded-xl " >
+                                <a className="w-full flex bg-trasparent rounded-xl " href="/profile">
                                     <div className="relative w-9 h-9">
                                         <Image src={profileAvatar} alt="Profile Picture" fill className="rounded-full mx-auto" />
                                     </div>
                                     <div className="flex align-bottom justify-content-center m-3 ms-2 mt-2">
                                         <p className="m-0 font-bold">{profileName}</p>
                                     </div>
-                                </div>
+                                </a>
                                 <hr className="mt-3 mx-3" />
                                 <div className="w-full flex justify-center" >
                                     <button className="bg-secondary rounded-xl font-bold m-3 py-2 mx-auto w-full text-md flex items-center justify-center gap-2">

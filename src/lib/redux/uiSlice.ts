@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export type NavFunction = "squares" | "messenger" | "bell" | "profile";
-export type MidNavbarTab = "home" | "marketplace" | "groups" | "videogames";
+export type MidNavbarTab = "home" | "marketplace" | "groups" | "videogames" | "profile";
 
 interface UiState {
     activeNavFunction: NavFunction | null;

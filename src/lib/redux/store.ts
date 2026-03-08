@@ -66,18 +66,11 @@ function savePersistedProfileState(profileState: ProfileState) {
 }
 
 export const makeStore = () => {
-    const persistedProfileState = loadPersistedProfileState();
-
     const store = configureStore({
         reducer: {
             ui: uiReducer,
             profile: profileReducer,
         },
-        preloadedState: persistedProfileState
-            ? {
-                profile: persistedProfileState,
-            }
-            : undefined,
     });
 
     let previousProfile = store.getState().profile.currentProfile;
@@ -94,6 +87,8 @@ export const makeStore = () => {
 
     return store;
 };
+
+export { loadPersistedProfileState };
 
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore["getState"]>;

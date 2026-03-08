@@ -50,13 +50,15 @@ export function ProfilePicture(props: ProfilePctureProps) {
                 filter: props.isActive ? "sepia(1) saturate(7) hue-rotate(175deg) brightness(0.95)" : "none",
             }}
         >
-            <Image
-                src={props.imageSrc}
-                alt={props.alt}
-                width={37}
-                height={37}
-                className="rounded-full"
-            />
+            <span className="relative block h-[37px] w-[37px] shrink-0 overflow-hidden rounded-full">
+                <Image
+                    src={props.imageSrc}
+                    alt={props.alt}
+                    fill
+                    sizes="37px"
+                    className="object-cover"
+                />
+            </span>
         </button>
     )
 }
