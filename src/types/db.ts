@@ -95,7 +95,7 @@ export const PROFILE_VERIFICATION_SAFE_SELECT =
 export function toProfileDto(row: ProfilePublicDb): ProfileDto {
   return {
     id: row.id,
-    email: row.email,
+    email: toRequiredString(row.email),
     username: toRequiredString(row.username),
     avatarUrl: toRequiredString(row.avatarUrl),
     bannerUrl: toRequiredString(row.bannerUrl),
@@ -109,7 +109,7 @@ export function toProfileDto(row: ProfilePublicDb): ProfileDto {
 export function toProfileAuthDto(row: ProfileAuthDb): ProfileAuthDto {
   return {
     id: row.id,
-    email: row.email,
+    email: toRequiredString(row.email),
     username: toRequiredString(row.username),
     passwordHash: toOptionalString(row.password),
     confirmedAccount: toBoolean(row.confirmedAccount),

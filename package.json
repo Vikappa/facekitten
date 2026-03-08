@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:types": "npx supabase gen types typescript --project-id hhpbhtfyoipoihafzfnp --schema public > src/types/database.types.ts"
+    "db:types": "bash -lc 'tmp_file=$(mktemp) && supabase gen types typescript --project-id ${SUPABASE_PROJECT_ID:-hhpbhtfyoipoihafzfnp} --schema public > \"$tmp_file\" && mv \"$tmp_file\" src/types/database.types.ts'",
+    "db:typecheck": "tsc --noEmit",
+    "db:sync": "npm run db:types && npm run db:typecheck"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

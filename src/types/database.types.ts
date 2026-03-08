@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       ChatMessage: {
         Row: {
+          created_at: string
           extraContent: string | null
           from: string | null
           id: number
@@ -25,6 +26,7 @@ export type Database = {
           to: string | null
         }
         Insert: {
+          created_at?: string
           extraContent?: string | null
           from?: string | null
           id?: number
@@ -34,6 +36,7 @@ export type Database = {
           to?: string | null
         }
         Update: {
+          created_at?: string
           extraContent?: string | null
           from?: string | null
           id?: number
@@ -63,6 +66,7 @@ export type Database = {
         Row: {
           authorId: string | null
           commentText: string | null
+          created_at: string
           extraContent: string | null
           id: number
           postid: string | null
@@ -70,6 +74,7 @@ export type Database = {
         Insert: {
           authorId?: string | null
           commentText?: string | null
+          created_at?: string
           extraContent?: string | null
           id?: number
           postid?: string | null
@@ -77,6 +82,7 @@ export type Database = {
         Update: {
           authorId?: string | null
           commentText?: string | null
+          created_at?: string
           extraContent?: string | null
           id?: number
           postid?: string | null
@@ -102,18 +108,21 @@ export type Database = {
         Row: {
           athorId: string | null
           commentId: number | null
+          created_at: string
           id: number
           reactionType: Database["public"]["Enums"]["ReactionType"] | null
         }
         Insert: {
           athorId?: string | null
           commentId?: number | null
+          created_at?: string
           id?: number
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Update: {
           athorId?: string | null
           commentId?: number | null
+          created_at?: string
           id?: number
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
@@ -138,6 +147,7 @@ export type Database = {
         Row: {
           authorId: string | null
           commentId: number | null
+          created_at: string
           extraContent: string | null
           id: number
           mediaUrl: string | null
@@ -146,6 +156,7 @@ export type Database = {
         Insert: {
           authorId?: string | null
           commentId?: number | null
+          created_at?: string
           extraContent?: string | null
           id?: number
           mediaUrl?: string | null
@@ -154,6 +165,7 @@ export type Database = {
         Update: {
           authorId?: string | null
           commentId?: number | null
+          created_at?: string
           extraContent?: string | null
           id?: number
           mediaUrl?: string | null
@@ -178,14 +190,17 @@ export type Database = {
       }
       follows: {
         Row: {
+          created_at: string
           followed_id: string
           follower_id: string
         }
         Insert: {
+          created_at: string
           followed_id: string
           follower_id: string
         }
         Update: {
+          created_at?: string
           followed_id?: string
           follower_id?: string
         }
@@ -208,14 +223,17 @@ export type Database = {
       }
       friendships: {
         Row: {
+          created_at: string
           user_a: string
           user_b: string
         }
         Insert: {
+          created_at?: string
           user_a: string
           user_b: string
         }
         Update: {
+          created_at?: string
           user_a?: string
           user_b?: string
         }
@@ -235,6 +253,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      location: {
+        Row: {
+          address: string | null
+          country: string | null
+          created_at: string | null
+          descr: string | null
+          Id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          region: string | null
+        }
+        Insert: {
+          address?: string | null
+          country?: string | null
+          created_at?: string | null
+          descr?: string | null
+          Id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          region?: string | null
+        }
+        Update: {
+          address?: string | null
+          country?: string | null
+          created_at?: string | null
+          descr?: string | null
+          Id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          region?: string | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -319,18 +373,21 @@ export type Database = {
       postReaction: {
         Row: {
           authorId: string | null
+          created_at: string
           id: number
           postId: string | null
           reactionType: Database["public"]["Enums"]["ReactionType"] | null
         }
         Insert: {
           authorId?: string | null
+          created_at?: string
           id?: number
           postId?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Update: {
           authorId?: string | null
+          created_at?: string
           id?: number
           postId?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
@@ -349,6 +406,59 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "post"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      Profile: {
+        Row: {
+          avatarUrl: string | null
+          bannerUrl: string | null
+          bio: string | null
+          confirmedAccount: boolean | null
+          created_at: string
+          createdAt: string | null
+          email: string | null
+          id: string
+          location: string | null
+          password: string | null
+          updatedAt: string | null
+          username: string | null
+        }
+        Insert: {
+          avatarUrl?: string | null
+          bannerUrl?: string | null
+          bio?: string | null
+          confirmedAccount?: boolean | null
+          created_at?: string
+          createdAt?: string | null
+          email?: string | null
+          id?: string
+          location?: string | null
+          password?: string | null
+          updatedAt?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatarUrl?: string | null
+          bannerUrl?: string | null
+          bio?: string | null
+          confirmedAccount?: boolean | null
+          created_at?: string
+          createdAt?: string | null
+          email?: string | null
+          id?: string
+          location?: string | null
+          password?: string | null
+          updatedAt?: string | null
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Profile_location_fkey"
+            columns: ["location"]
+            isOneToOne: false
+            referencedRelation: "location"
+            referencedColumns: ["Id"]
           },
         ]
       }
@@ -381,45 +491,6 @@ export type Database = {
           },
         ]
       }
-      Profile: {
-        Row: {
-          avatarUrl: string | null
-          bannerUrl: string | null
-          bio: string | null
-          confirmedAccount: boolean | null
-          createdAt: string | null
-          email: string
-          id: string
-          password: string | null
-          updatedAt: string | null
-          username: string | null
-        }
-        Insert: {
-          avatarUrl?: string | null
-          bannerUrl?: string | null
-          bio?: string | null
-          confirmedAccount?: boolean | null
-          createdAt?: string | null
-          email: string
-          id?: string
-          password?: string | null
-          updatedAt?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatarUrl?: string | null
-          bannerUrl?: string | null
-          bio?: string | null
-          confirmedAccount?: boolean | null
-          createdAt?: string | null
-          email?: string
-          id?: string
-          password?: string | null
-          updatedAt?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -428,6 +499,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      Lettino:
+        | "Cuccia"
+        | "Scatola"
+        | "Cassetto dei calzini (scassinato)"
+        | "Strada"
+        | "Letto di umano (ospite)"
+        | "Letto di umano (espropriato)"
+        | "Divano"
+        | "Sedia"
+        | "Poltrona"
       postType:
         | "post"
         | "image"
@@ -573,6 +654,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      Lettino: [
+        "Cuccia",
+        "Scatola",
+        "Cassetto dei calzini (scassinato)",
+        "Strada",
+        "Letto di umano (ospite)",
+        "Letto di umano (espropriato)",
+        "Divano",
+        "Sedia",
+        "Poltrona",
+      ],
       postType: [
         "post",
         "image",

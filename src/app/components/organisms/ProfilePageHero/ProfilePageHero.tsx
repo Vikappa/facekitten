@@ -3,7 +3,7 @@ import { FaCamera } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import Image from "next/image";
 import { patchCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
-import { useRef, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 
 function getValidImageUrl(url: string | null | undefined, fallbackUrl: string) {
     const normalizedUrl = url?.trim();
@@ -30,12 +30,14 @@ export default function ProfilePageHero() {
     const profileBanner = getValidImageUrl(currentProfile?.bannerUrl, "/assets/grumpy-cat-background-facebook-cover.jpg");
     const profileName = currentProfile?.username?.trim() ?? "";
     const profileBio = getValidBio(currentProfile);
+    const [isLoading, setIsLoading] = useState(false)
 
     function handleUploadProfilePicture() {
         fileInputRef.current?.click();
     }
 
     async function handleChangeProfilePictureInput(e: ChangeEvent<HTMLInputElement>) {
+        setIsLoading(true)
         const selectedFile = e.target.files?.[0];
 
         if (!selectedFile) {
@@ -67,6 +69,8 @@ export default function ProfilePageHero() {
             console.error("Errore rete durante upload immagine profilo", error);
         } finally {
             e.target.value = "";
+            setIsLoading(false)
+
         }
     }
 
@@ -89,14 +93,21 @@ export default function ProfilePageHero() {
 
             <div className="flex h-1/5 items-center">
 
-                <div className="flex aspect-square ms-3 relative">
-                    <Image
-                        src={profileAvatar}
-                        alt={profileName}
-                        width={100}
-                        height={100}
-                        className="rounded-full object-cover ring-5 ring-white"
-                    />
+                <div className="flex aspect-square ms-3 relative ">
+                    {
+                        !isLoading ?
+                            <Image
+                                src={profileAvatar}
+                                alt={profileName}
+                                width={100}
+                                height={100}
+                                className="rounded-full object-cover ring-5 ring-white"
+                            /> :
+                            <div className="w-[100px] h-[100px] p-6">
+                                <span className="loaderProfilePictures"></span>
+                            </div>
+                    }
+
                     <div className="absolute bottom-0 right-0 rounded-full bg-secondary p-2.5 hover:cursor-pointer" onClick={handleUploadProfilePicture}>
                         <FaCamera className="" />
                         <input ref={fileInputRef} onChange={handleChangeProfilePictureInput} type="file" accept="image/*" className="hidden" />
