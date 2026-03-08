@@ -10,6 +10,7 @@ import { FaCircleQuestion } from "react-icons/fa6";
 import { FaMoon } from "react-icons/fa";
 import { RiUserCommunityFill } from "react-icons/ri";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
+import Link from "next/link";
 
 interface ProfileModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
@@ -69,14 +70,14 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                     !settingAndPrivacyOn && !helpAndSupportOn && !displayAndAccessybilityOn && (
                         <div className=" rounded-2xl p-3 bg-white customboxShadow">
                             <div className="customboxShadow p-3 rounded-xl mb-3">
-                                <a className="w-full flex bg-trasparent rounded-xl " href="/profile">
+                                <Link className="w-full flex bg-trasparent rounded-xl " href="/profile">
                                     <div className="relative w-9 h-9">
                                         <Image src={profileAvatar} alt="Profile Picture" fill className="rounded-full mx-auto" />
                                     </div>
                                     <div className="flex align-bottom justify-content-center m-3 ms-2 mt-2">
                                         <p className="m-0 font-bold">{profileName}</p>
                                     </div>
-                                </a>
+                                </Link>
                                 <hr className="mt-3 mx-3" />
                                 <div className="w-full flex justify-center" >
                                     <button className="bg-secondary rounded-xl font-bold m-3 py-2 mx-auto w-full text-md flex items-center justify-center gap-2">

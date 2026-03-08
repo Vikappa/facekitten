@@ -2,7 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setActiveMidNavbarTab, type MidNavbarTab } from "@/lib/redux/uiSlice";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FaGamepad, FaHome, FaStore, FaUsers } from "react-icons/fa";
 import MidNavbarButtonFunction from "./MidNavbarButtonFunction";
@@ -31,6 +31,7 @@ function getTabFromPathname(pathname: string): MidNavbarTab | null {
 
 export default function Midnavbar(){
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const pathname = usePathname();
     const activeMidNavbarTab = useAppSelector((state) => state.ui.activeMidNavbarTab);
     const midNavbarButtonClassName = "text-dark-400 px-7 py-2 rounded-lg transition-colors duration-100";
@@ -54,7 +55,10 @@ export default function Midnavbar(){
         <div className="hidden md:flex items-center gap-2">
             <MidNavbarButtonFunction
                 icon={<FaHome className="text-2xl" />}
-                onClick={(nextState) => {setExclusiveActive("home", nextState); location.href = "/"}}
+                onClick={(nextState) => {
+                    setExclusiveActive("home", nextState);
+                    router.push("/");
+                }}
                 isActive={activeMidNavbarTab === "home"}
                 className={midNavbarButtonClassName}
             />

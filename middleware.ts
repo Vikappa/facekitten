@@ -22,8 +22,10 @@ const ALLOWED_WITHOUT_SESSION = new Set([
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const hasSessionCookie = Boolean(sessionToken);
+  const hasSessionCookie =
+    request.cookies
+      .getAll(SESSION_COOKIE_NAME)
+      .some(({ value }) => value.trim().length > 0);
 
   const isAllowedWithoutSession = ALLOWED_WITHOUT_SESSION.has(pathname);
 

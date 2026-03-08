@@ -64,21 +64,31 @@ async function resizeProfilePictureToWebp(imageBuffer: Buffer): Promise<ImageRes
 
 export async function POST(req: NextRequest) {
   // 1) Controllo sessione: la route è protetta, quindi richiede il cookie di sessione.
-  const sessionToken = req.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const sessionTokens = req.cookies
+    .getAll(SESSION_COOKIE_NAME)
+    .map(({ value }) => value.trim())
+    .filter((value) => value.length > 0);
 
-  if (!sessionToken) {
+  if (sessionTokens.length === 0) {
     return NextResponse.json(
       { code: "SESSION_REQUIRED", error: "Sessione mancante" },
       { status: 401 }
     );
   }
 
-  let payload: Awaited<ReturnType<typeof verifySession>>;
+  let payload: Awaited<ReturnType<typeof verifySession>> | null = null;
 
-  try {
-    // 2) Verifica crittografica della sessione.
-    payload = await verifySession(sessionToken);
-  } catch {
+  // 2) Verifica crittografica della sessione.
+  for (const sessionToken of sessionTokens) {
+    try {
+      payload = await verifySession(sessionToken);
+      break;
+    } catch {
+      // Prova il prossimo token in caso di cookie duplicati.
+    }
+  }
+
+  if (!payload) {
     const response = NextResponse.json(
       { code: "INVALID_SESSION", error: "Sessione non valida" },
       { status: 401 }
