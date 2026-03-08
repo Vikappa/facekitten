@@ -1,7 +1,5 @@
 import { normalizeEmail, verifyProfilePassword } from "@/lib/Security/ProfilePasswordSecurity";
-import {
-  issueSessionCookie,
-} from "@/lib/Security/SessionSecurity";
+import { issueSessionCookie } from "@/lib/Security/SessionSecurity";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import { NextRequest, NextResponse } from "next/server";
 import { Profile } from "@/types/db";
@@ -25,25 +23,25 @@ interface PreloadMediaData{
 }
 
 const loadProfileMedia = async (profile: Profile) => {
-    const profilePictureUrl = profile.avatarUrl;
-    const coverPhotoUrl = profile.bannerUrl;
-    const name = profile.username;
 
     try{
             const payload = {
-                profilePicture: profilePictureUrl ? await fetch(profilePictureUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
-                coverPhoto: coverPhotoUrl ? await fetch(coverPhotoUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
-                name,
+                profilePicture: profile.avatarUrl ? await fetch(profile.avatarUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
+                coverPhoto: profile.bannerUrl ? await fetch(profile.bannerUrl).then(res => res.arrayBuffer()).then(buffer => new Uint8Array(buffer)) : undefined,
+                name:profile.username,
+                bio: profile.bio
             };
             return payload;
     }catch{
         return {
-            profilePicture: undefined,
-            coverPhoto: undefined,
-            name,
+                profilePicture:undefined,
+                coverPhoto:undefined,
+                name:undefined,
+                bio:undefined 
             }
     }
 }
+
 export async function POST(req: NextRequest) {
   let body: LoginBody;
   try {
