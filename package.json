@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:types": "bash -lc 'tmp_file=$(mktemp) && supabase gen types typescript --project-id ${SUPABASE_PROJECT_ID:-hhpbhtfyoipoihafzfnp} --schema public > \"$tmp_file\" && mv \"$tmp_file\" src/types/database.types.ts'",
+    "db:types": "bash scripts/db-types.sh",
+    "db:exports": "node scripts/generate-db-exports.mjs",
     "db:typecheck": "tsc --noEmit",
-    "db:sync": "npm run db:types && npm run db:typecheck"
+    "db:sync": "npm run db:types && npm run db:exports && npm run db:typecheck"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

@@ -254,42 +254,6 @@ export type Database = {
           },
         ]
       }
-      location: {
-        Row: {
-          address: string | null
-          country: string | null
-          created_at: string | null
-          descr: string | null
-          Id: string
-          latitude: number | null
-          longitude: number | null
-          name: string
-          region: string | null
-        }
-        Insert: {
-          address?: string | null
-          country?: string | null
-          created_at?: string | null
-          descr?: string | null
-          Id?: string
-          latitude?: number | null
-          longitude?: number | null
-          name: string
-          region?: string | null
-        }
-        Update: {
-          address?: string | null
-          country?: string | null
-          created_at?: string | null
-          descr?: string | null
-          Id?: string
-          latitude?: number | null
-          longitude?: number | null
-          name?: string
-          region?: string | null
-        }
-        Relationships: []
-      }
       notifications: {
         Row: {
           activity_from: string | null
@@ -421,6 +385,7 @@ export type Database = {
           id: string
           location: string | null
           password: string | null
+          tipoCuccia: Database["public"]["Enums"]["Lettino"] | null
           updatedAt: string | null
           username: string | null
         }
@@ -435,6 +400,7 @@ export type Database = {
           id?: string
           location?: string | null
           password?: string | null
+          tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
           updatedAt?: string | null
           username?: string | null
         }
@@ -449,6 +415,7 @@ export type Database = {
           id?: string
           location?: string | null
           password?: string | null
+          tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
           updatedAt?: string | null
           username?: string | null
         }
@@ -457,10 +424,46 @@ export type Database = {
             foreignKeyName: "Profile_location_fkey"
             columns: ["location"]
             isOneToOne: false
-            referencedRelation: "location"
+            referencedRelation: "profileLocation"
             referencedColumns: ["Id"]
           },
         ]
+      }
+      profileLocation: {
+        Row: {
+          address: string | null
+          country: string | null
+          created_at: string | null
+          descr: string | null
+          Id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          region: string | null
+        }
+        Insert: {
+          address?: string | null
+          country?: string | null
+          created_at?: string | null
+          descr?: string | null
+          Id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          region?: string | null
+        }
+        Update: {
+          address?: string | null
+          country?: string | null
+          created_at?: string | null
+          descr?: string | null
+          Id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          region?: string | null
+        }
+        Relationships: []
       }
       registrationcodes: {
         Row: {
