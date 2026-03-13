@@ -136,7 +136,7 @@ export const emailText = (nome: string, token: string) => {
 };
 
 export const emailHTML = (nome: string, token: string) => {
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/profileregistration/verify/`;
+  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/profile/verify/`;
   return `
         <html>
             <head>

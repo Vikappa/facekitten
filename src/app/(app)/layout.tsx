@@ -32,7 +32,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     }
 
     if (sessionStatus.isConfirmed === false) {
-        redirect("/profileregistration/verify");
+        redirect("/profile/verify");
     }
 
     return (

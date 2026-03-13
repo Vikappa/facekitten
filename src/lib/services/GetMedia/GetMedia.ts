@@ -1,5 +1,5 @@
 export async function GetProfilePicture(): Promise<string> {
-    const response: ProfilePictureResponseModel = await fetch('/api/get/randomProfilePicture')
+    const response: ProfilePictureResponseModel = await fetch('/api/v1/get/randomProfilePicture')
 
         .then(res => res.json())
         .then(data => data as ProfilePictureResponseModel);

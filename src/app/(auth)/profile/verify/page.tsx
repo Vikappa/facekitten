@@ -10,7 +10,7 @@ export default function VerifyPage() {
     const verifyCode = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const res = await fetch("/api/profileregistration/verify", {
+        const res = await fetch("/api/v1/profileregistration/verify", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

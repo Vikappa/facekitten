@@ -381,9 +381,11 @@ export type Database = {
           confirmedAccount: boolean | null
           created_at: string
           createdAt: string | null
+          dataDiNascita: string | null
           email: string | null
+          giocattoloPreferito: string | null
           id: string
-          location: string | null
+          locationId: string | null
           password: string | null
           tipoCuccia: Database["public"]["Enums"]["Lettino"] | null
           updatedAt: string | null
@@ -396,9 +398,11 @@ export type Database = {
           confirmedAccount?: boolean | null
           created_at?: string
           createdAt?: string | null
+          dataDiNascita?: string | null
           email?: string | null
+          giocattoloPreferito?: string | null
           id?: string
-          location?: string | null
+          locationId?: string | null
           password?: string | null
           tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
           updatedAt?: string | null
@@ -411,57 +415,15 @@ export type Database = {
           confirmedAccount?: boolean | null
           created_at?: string
           createdAt?: string | null
+          dataDiNascita?: string | null
           email?: string | null
+          giocattoloPreferito?: string | null
           id?: string
-          location?: string | null
+          locationId?: string | null
           password?: string | null
           tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
           updatedAt?: string | null
           username?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Profile_location_fkey"
-            columns: ["location"]
-            isOneToOne: false
-            referencedRelation: "profileLocation"
-            referencedColumns: ["Id"]
-          },
-        ]
-      }
-      profileLocation: {
-        Row: {
-          address: string | null
-          country: string | null
-          created_at: string | null
-          descr: string | null
-          Id: string
-          latitude: number | null
-          longitude: number | null
-          name: string
-          region: string | null
-        }
-        Insert: {
-          address?: string | null
-          country?: string | null
-          created_at?: string | null
-          descr?: string | null
-          Id?: string
-          latitude?: number | null
-          longitude?: number | null
-          name: string
-          region?: string | null
-        }
-        Update: {
-          address?: string | null
-          country?: string | null
-          created_at?: string | null
-          descr?: string | null
-          Id?: string
-          latitude?: number | null
-          longitude?: number | null
-          name?: string
-          region?: string | null
         }
         Relationships: []
       }

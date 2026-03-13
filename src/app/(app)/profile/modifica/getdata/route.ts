@@ -5,6 +5,7 @@ import {
   verifySession,
   extractSessionIdentity,
 } from "@/lib/Security/SessionSecurity";
+import type { Lettino } from "@/types/db.generated";
 
 type ProfileEditPayload = {
   username: string;
@@ -12,6 +13,10 @@ type ProfileEditPayload = {
   bannerUrl: string | null;
   bio: string | null;
   confirmedAccount: boolean | null;
+  dataDiNascita: string | null;
+  favToy: string | null;
+  location_id: string | null;
+  tipoCuccia: Lettino | null;
 };
 
 type ProfileEditRow = {
@@ -20,6 +25,10 @@ type ProfileEditRow = {
   bannerUrl: string | null;
   bio: string | null;
   confirmedAccount: boolean | null;
+  dataDiNascita: string | null;
+  giocattoloPreferito: string | null;
+  locationId: string | null;
+  tipoCuccia: Lettino | null;
 };
 
 export async function GET(req: NextRequest) {
@@ -72,7 +81,9 @@ export async function GET(req: NextRequest) {
 
   let profileQuery = supabase
     .from("Profile")
-    .select("username, avatarUrl, bannerUrl, bio, confirmedAccount")
+    .select(
+      "username, avatarUrl, bannerUrl, bio, confirmedAccount, dataDiNascita, giocattoloPreferito, locationId, tipoCuccia"
+    )
     .limit(1);
 
   if (tokenProfileId) {
@@ -105,6 +116,10 @@ export async function GET(req: NextRequest) {
     bannerUrl: profile.bannerUrl,
     bio: profile.bio,
     confirmedAccount: profile.confirmedAccount,
+    dataDiNascita: profile.dataDiNascita,
+    favToy: profile.giocattoloPreferito,
+    location_id: profile.locationId,
+    tipoCuccia: profile.tipoCuccia,
   };
 
   return NextResponse.json({

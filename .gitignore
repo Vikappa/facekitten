@@ -39,3 +39,5 @@ next-env.d.ts
 
 ENV_SETUP.md
 .env*.local
+
+.next_backup_before_api_v1

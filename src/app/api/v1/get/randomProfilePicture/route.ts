@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { picIndexes } from "../../../../../public/storedcatprofilepictures/imgs/fileindexer";
+import { picIndexes } from "../../../../../../public/storedcatprofilepictures/imgs/fileindexer";
 
 export async function GET() {
   const cookieStore = await cookies();

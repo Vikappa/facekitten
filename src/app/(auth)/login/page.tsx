@@ -143,7 +143,7 @@ export default function LoginPage() {
       const errorPayload = isLoginErrorResponse(payload) ? payload : {};
 
       if (response.status === 403 && errorPayload.code === "ACCOUNT_NOT_VERIFIED") {
-        router.push("/profileregistration/verify");
+        router.push("/profile/verify");
         return;
       }
 

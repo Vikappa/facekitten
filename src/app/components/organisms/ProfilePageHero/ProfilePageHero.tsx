@@ -11,10 +11,6 @@ function getValidImageUrl(url: string | null | undefined, fallbackUrl: string) {
     return normalizedUrl ? normalizedUrl : fallbackUrl;
 }
 
-
-
-
-
 export default function ProfilePageHero() {
     const dispatch = useAppDispatch();
 

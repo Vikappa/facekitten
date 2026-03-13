@@ -2,7 +2,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { NextRequest, NextResponse } from "next/server";
 
 const LOGIN_ROUTE = "/login";
-const VERIFY_ROUTE = "/profileregistration/verify";
+const VERIFY_ROUTE = "/profile/verify";
 
 const PUBLIC_AUTH_ROUTES = new Set([
   "/login",
