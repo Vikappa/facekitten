@@ -1,7 +1,8 @@
 'use client';
-import { useAppSelector } from "@/lib/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { setActiveNavFunction } from "@/lib/redux/uiSlice";
 import Image from "next/image";
-import { MutableRefObject, useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import ProfileModalRectangle from "./ProfileModalParts/ProfileModalRectangle";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidDoorOpen } from "react-icons/bi";
@@ -11,14 +12,17 @@ import { FaMoon } from "react-icons/fa";
 import { RiUserCommunityFill } from "react-icons/ri";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface ProfileModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
 }
 
 export default function ProfileModal({ navbarRef }: ProfileModalProps) {
+    const dispatch = useAppDispatch();
     const router = useRouter();
+    const pathname = usePathname();
+    const previousPathnameRef = useRef(pathname);
     const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "profile");
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const [navbarHeight, setNavbarHeight] = useState(0);
@@ -73,6 +77,19 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
             window.removeEventListener("resize", updateNavbarHeight);
         };
     }, [isOpen, navbarRef]);
+
+    useEffect(() => {
+        const previousPathname = previousPathnameRef.current;
+        previousPathnameRef.current = pathname;
+
+        if (!isOpen) {
+            return;
+        }
+
+        if (previousPathname !== pathname) {
+            dispatch(setActiveNavFunction(null));
+        }
+    }, [pathname, isOpen, dispatch]);
 
     if (!isOpen) {
         return null;
