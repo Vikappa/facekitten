@@ -123,15 +123,15 @@ export default function ProfilePageHero() {
                         <input id="profile-location" className="rounded-md px-2 py-1" disabled value={location} />
                     </div>
                     <div className="flex flex-col">
-                        <label htmlFor="profile-cuccia" className="font-medium text-black">Cuccia</label>
+                        <label htmlFor="profile-cuccia" className="font-medium text-black">Tipo di cuccetta</label>
                         <input id="profile-cuccia" className="rounded-md px-2 py-1" disabled value={cuccetta} />
                     </div>
                     <div className="flex flex-col">
-                        <label htmlFor="profile-favtoy" className="font-medium text-black">Giocattolo</label>
+                        <label htmlFor="profile-favtoy" className="font-medium text-black">Giocattolo prefe</label>
                         <input id="profile-favtoy" className="rounded-md px-2 py-1" disabled value={favToy} />
                     </div>
                     <div className="flex flex-col">
-                        <label htmlFor="profile-birthdate" className="font-medium text-black">Nascita</label>
+                        <label htmlFor="profile-birthdate" className="font-medium text-black">Data di Nascita</label>
                         <input id="profile-birthdate" className="rounded-md px-2 py-1" disabled value={birthDate} />
                     </div>
                 </div>
