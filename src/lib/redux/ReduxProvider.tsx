@@ -3,8 +3,14 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
+import { hydrateHomepagePostsState } from "./homepagePostsSlice";
 import { setCurrentProfile } from "./profileSlice";
-import { loadPersistedProfileState, makeStore, type AppStore } from "./store";
+import {
+    loadPersistedHomepagePostsState,
+    loadPersistedProfileState,
+    makeStore,
+    type AppStore,
+} from "./store";
 
 interface ReduxProviderProps {
     children: ReactNode;
@@ -30,6 +36,11 @@ export default function ReduxProvider({ children }: ReduxProviderProps) {
 
         if (persistedProfile) {
             storeRef.current.dispatch(setCurrentProfile(persistedProfile));
+        }
+
+        const persistedHomepagePostsState = loadPersistedHomepagePostsState();
+        if (persistedHomepagePostsState) {
+            storeRef.current.dispatch(hydrateHomepagePostsState(persistedHomepagePostsState));
         }
     }, []);
 

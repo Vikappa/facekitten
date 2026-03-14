@@ -1,15 +1,8 @@
-import {
-  SESSION_COOKIE_NAME,
-  extractSessionIdentity,
-  verifySession,
-} from "@/lib/Security/SessionSecurity";
+import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
+import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-
-export type ProfileIdentityRow = {
-  id: string;
-};
 
 type UpdatedProfilePictureRow = {
   id: string;
@@ -63,73 +56,44 @@ async function resizeProfilePictureToWebp(imageBuffer: Buffer): Promise<ImageRes
 }
 
 export async function POST(req: NextRequest) {
-  // 1) Controllo sessione: la route è protetta, quindi richiede il cookie di sessione.
-  const sessionTokens = req.cookies
-    .getAll(SESSION_COOKIE_NAME)
-    .map(({ value }) => value.trim())
-    .filter((value) => value.length > 0);
-
-  if (sessionTokens.length === 0) {
-    return NextResponse.json(
-      { code: "SESSION_REQUIRED", error: "Sessione mancante" },
-      { status: 401 }
-    );
-  }
-
-  let payload: Awaited<ReturnType<typeof verifySession>> | null = null;
-
-  // 2) Verifica crittografica della sessione.
-  for (const sessionToken of sessionTokens) {
-    try {
-      payload = await verifySession(sessionToken);
-      break;
-    } catch {
-      // Prova il prossimo token in caso di cookie duplicati.
-    }
-  }
-
-  if (!payload) {
-    const response = NextResponse.json(
-      { code: "INVALID_SESSION", error: "Sessione non valida" },
-      { status: 401 }
-    );
-    response.cookies.delete(SESSION_COOKIE_NAME);
-    return response;
-  }
-
-  // 3) Estrazione identità minima (profileId o email) dal token validato.
-  const { profileId: tokenProfileId, email } = extractSessionIdentity(payload);
-  if (!tokenProfileId && !email) {
-    return NextResponse.json(
-      { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
-      { status: 401 }
-    );
-  }
-
-  // 4) Risoluzione del profilo associato alla sessione.
   const supabase = createSupabaseAdminClient();
-  let profileQuery = supabase.from("Profile").select("id").limit(1);
+  const sessionResolution = await resolveAuthenticatedProfileIdFromRequest(req, supabase);
 
-  if (tokenProfileId) {
-    profileQuery = profileQuery.eq("id", tokenProfileId);
-  } else if (email) {
-    profileQuery = profileQuery.eq("email", email);
-  }
+  if (!sessionResolution.ok) {
+    if (sessionResolution.code === "SESSION_REQUIRED") {
+      return NextResponse.json(
+        { code: "SESSION_REQUIRED", error: "Sessione mancante" },
+        { status: 401 }
+      );
+    }
 
-  const { data: profileIdentity, error: profileIdentityError } = await profileQuery.maybeSingle<ProfileIdentityRow>();
+    if (sessionResolution.code === "INVALID_SESSION") {
+      const response = NextResponse.json(
+        { code: "INVALID_SESSION", error: "Sessione non valida" },
+        { status: 401 }
+      );
+      response.cookies.delete(SESSION_COOKIE_NAME);
+      return response;
+    }
 
-  if (profileIdentityError) {
-    console.error(
-      "Errore durante la risoluzione del profilo da sessione:",
-      profileIdentityError
-    );
-    return NextResponse.json(
-      { code: "PROFILE_RESOLUTION_ERROR", error: "Errore interno" },
-      { status: 500 }
-    );
-  }
+    if (sessionResolution.code === "INVALID_SESSION_IDENTITY") {
+      return NextResponse.json(
+        { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
+        { status: 401 }
+      );
+    }
 
-  if (!profileIdentity) {
+    if (sessionResolution.code === "PROFILE_RESOLUTION_ERROR") {
+      console.error(
+        "Errore durante la risoluzione del profilo da sessione:",
+        sessionResolution.error
+      );
+      return NextResponse.json(
+        { code: "PROFILE_RESOLUTION_ERROR", error: "Errore interno" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { code: "PROFILE_NOT_FOUND", error: "Profilo non trovato" },
       { status: 404 }
@@ -137,7 +101,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // 5) Parsing multipart/form-data e recupero del campo file `newImage`.
+    // 1) Parsing multipart/form-data e recupero del campo file `newImage`.
     const formData = await req.formData();
     const imageEntry = formData.get("newImage");
 
@@ -147,19 +111,19 @@ export async function POST(req: NextRequest) {
 
     const image = imageEntry;
 
-    // 6) Primo filtro: MIME type dichiarato dal client.
+    // 2) Primo filtro: MIME type dichiarato dal client.
     if (!image.type || !image.type.startsWith("image/")) {
       return NextResponse.json({ error: "Formato file non valido" }, { status: 400 });
     }
 
     const imageBuffer = Buffer.from(await image.arrayBuffer());
 
-    // 7) Limite hard sul file in ingresso per evitare payload troppo grandi.
+    // 3) Limite hard sul file in ingresso per evitare payload troppo grandi.
     if (imageBuffer.byteLength > MAX_UPLOAD_BYTES) {
       return NextResponse.json({ error: "Immagine troppo grande (max 5MB)" }, { status: 413 });
     }
 
-    // 8) Secondo filtro: validazione del contenuto reale (anti-spoof MIME).
+    // 4) Secondo filtro: validazione del contenuto reale (anti-spoof MIME).
     const validImageContent = await hasValidImageContent(imageBuffer);
     if (!validImageContent) {
       return NextResponse.json(
@@ -168,7 +132,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 9) Resize + compressione: max 800x600 e max 1MB in output.
+    // 5) Resize + compressione: max 800x600 e max 1MB in output.
     const resizeResult = await resizeProfilePictureToWebp(imageBuffer);
     if (resizeResult.status === "invalid_image") {
       return NextResponse.json(
@@ -185,9 +149,9 @@ export async function POST(req: NextRequest) {
     }
 
     const resizedImageBuffer = resizeResult.buffer;
-    const filePath = `public/${profileIdentity.id}-${Date.now()}.webp`;
+    const filePath = `public/${sessionResolution.profileId}-${Date.now()}.webp`;
 
-    // 10) Upload su Supabase Storage (bucket profilo) del file già normalizzato.
+    // 6) Upload su Supabase Storage (bucket profilo) del file già normalizzato.
     const { data: uploadResult, error: uploadError } = await supabase.storage
       .from(PROFILE_PICTURE_BUCKET)
       .upload(filePath, resizedImageBuffer, {
@@ -203,7 +167,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 11) Recupero URL pubblico dal path appena caricato.
+    // 7) Recupero URL pubblico dal path appena caricato.
     const { data: publicUrlData } = supabase.storage
       .from(PROFILE_PICTURE_BUCKET)
       .getPublicUrl(uploadResult.path);
@@ -216,11 +180,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 12) Persistenza URL nel profilo applicativo.
+    // 8) Persistenza URL nel profilo applicativo.
     const { data: updatedProfile, error: updateError } = await supabase
       .from("Profile")
       .update({ avatarUrl })
-      .eq("id", profileIdentity.id)
+      .eq("id", sessionResolution.profileId)
       .select("id, avatarUrl")
       .single<UpdatedProfilePictureRow>();
 
@@ -232,7 +196,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 13) Risposta finale con URL salvato.
+    // 9) Risposta finale con URL salvato.
     return NextResponse.json({
       code: "PROFILE_PICTURE_UPDATED",
       profileId: updatedProfile.id,

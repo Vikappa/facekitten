@@ -2,16 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_OPTIONS,
-  verifySession,
-  extractSessionIdentity,
 } from "@/lib/Security/SessionSecurity";
+import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type { ProfileUpdate } from "@/types/db";
 import type { Lettino } from "@/types/db.generated";
-
-type ProfileIdentityRow = {
-  id: string;
-};
 
 type SetProfileBody = {
   username?: string;
@@ -178,25 +173,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const sessionTokens = req.cookies
-    .getAll(SESSION_COOKIE_NAME)
-    .map(({ value }) => value.trim())
-    .filter((value) => value.length > 0);
+  const supabase = createSupabaseAdminClient();
+  const sessionResolution = await resolveAuthenticatedProfileIdFromRequest(req, supabase);
 
-  if (sessionTokens.length === 0) {
-    return NextResponse.json(
-      { code: "SESSION_REQUIRED", error: "Sessione mancante" },
-      { status: 401 }
-    );
-  }
+  if (!sessionResolution.ok) {
+    if (sessionResolution.code === "SESSION_REQUIRED") {
+      return NextResponse.json(
+        { code: "SESSION_REQUIRED", error: "Sessione mancante" },
+        { status: 401 }
+      );
+    }
 
-  let payload: Awaited<ReturnType<typeof verifySession>> | null = null;
-
-  for (const sessionToken of sessionTokens) {
-    try {
-      payload = await verifySession(sessionToken);
-      break;
-    } catch {
+    if (sessionResolution.code === "INVALID_SESSION") {
       const response = NextResponse.redirect(new URL("/login", req.url), 303);
       response.cookies.set({
         name: SESSION_COOKIE_NAME,
@@ -206,50 +194,25 @@ export async function POST(req: NextRequest) {
       });
       return response;
     }
-  }
 
-  if (!payload) {
-    const response = NextResponse.json(
-      { code: "INVALID_SESSION", error: "Sessione non valida" },
-      { status: 401 }
-    );
-    response.cookies.delete(SESSION_COOKIE_NAME);
-    return response;
-  }
+    if (sessionResolution.code === "INVALID_SESSION_IDENTITY") {
+      return NextResponse.json(
+        { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
+        { status: 401 }
+      );
+    }
 
-  const { profileId: tokenProfileId, email } = extractSessionIdentity(payload);
+    if (sessionResolution.code === "PROFILE_RESOLUTION_ERROR") {
+      console.error(
+        "Errore durante la risoluzione del profilo da sessione:",
+        sessionResolution.error
+      );
+      return NextResponse.json(
+        { code: "PROFILE_RESOLUTION_ERROR", error: "Errore interno" },
+        { status: 500 }
+      );
+    }
 
-  if (!tokenProfileId && !email) {
-    return NextResponse.json(
-      { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
-      { status: 401 }
-    );
-  }
-
-  const supabase = createSupabaseAdminClient();
-  let profileQuery = supabase.from("Profile").select("id").limit(1);
-
-  if (tokenProfileId) {
-    profileQuery = profileQuery.eq("id", tokenProfileId);
-  } else if (email) {
-    profileQuery = profileQuery.eq("email", email);
-  }
-
-  const { data: profileIdentity, error: profileIdentityError } =
-    await profileQuery.maybeSingle<ProfileIdentityRow>();
-
-  if (profileIdentityError) {
-    console.error(
-      "Errore durante la risoluzione del profilo da sessione:",
-      profileIdentityError
-    );
-    return NextResponse.json(
-      { code: "PROFILE_RESOLUTION_ERROR", error: "Errore interno" },
-      { status: 500 }
-    );
-  }
-
-  if (!profileIdentity) {
     return NextResponse.json(
       { code: "PROFILE_NOT_FOUND", error: "Profilo non trovato" },
       { status: 404 }
@@ -259,7 +222,7 @@ export async function POST(req: NextRequest) {
   const { data: updatedProfile, error: updateError } = await supabase
     .from("Profile")
     .update(profileUpdateInput)
-    .eq("id", profileIdentity.id)
+    .eq("id", sessionResolution.profileId)
     .select(
       "id, username, avatarUrl, bannerUrl, bio, confirmedAccount, dataDiNascita, giocattoloPreferito, locationId, tipoCuccia"
     )

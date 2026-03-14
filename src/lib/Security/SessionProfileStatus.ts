@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import { extractSessionIdentity, verifySession } from "./SessionSecurity";
+import { resolveSessionIdentityFromToken } from "./SessionRequestProfileResolver";
 
 type SessionProfileStatus = {
   isAuthenticated: boolean;
@@ -10,20 +10,17 @@ type SessionProfileStatus = {
 };
 
 export async function getSessionProfileStatus(sessionToken: string): Promise<SessionProfileStatus> {
-  let payload: Awaited<ReturnType<typeof verifySession>>;
+  const sessionResult = await resolveSessionIdentityFromToken(sessionToken);
 
-  try {
-    payload = await verifySession(sessionToken);
-  } catch {
-    return { isAuthenticated: false };
-  }
+  if (!sessionResult.ok) {
+    if (sessionResult.code === "INVALID_SESSION") {
+      return { isAuthenticated: false };
+    }
 
-  const { profileId, email } = extractSessionIdentity(payload);
-
-  if (!profileId && !email) {
     return { isAuthenticated: true };
   }
 
+  const { profileId, email } = sessionResult.identity;
   const supabase = createSupabaseAdminClient();
   let query = supabase.from("Profile").select("id, confirmedAccount").limit(1);
 

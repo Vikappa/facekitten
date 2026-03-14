@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import {
-  SESSION_COOKIE_NAME,
-  verifySession,
-  extractSessionIdentity,
-} from "@/lib/Security/SessionSecurity";
+import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
+import { resolveSessionIdentityFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import type { Lettino } from "@/types/db.generated";
 
 type ProfileEditPayload = {
@@ -32,52 +29,34 @@ type ProfileEditRow = {
 };
 
 export async function GET(req: NextRequest) {
-  const sessionTokens = req.cookies
-    .getAll(SESSION_COOKIE_NAME)
-    .map(({ value }) => value.trim())
-    .filter((value) => value.length > 0);
+  const sessionResolution = await resolveSessionIdentityFromRequest(req);
 
-  if (sessionTokens.length === 0) {
-    return NextResponse.json(
-      { code: "SESSION_REQUIRED", error: "Sessione mancante" },
-      { status: 401 }
-    );
-  }
-
-  let payload: Awaited<ReturnType<typeof verifySession>> | null = null;
-
-  for (const sessionToken of sessionTokens) {
-    try {
-      payload = await verifySession(sessionToken);
-      break;
-    } catch {
-    const response = NextResponse.json(
-      { code: "INVALID_SESSION", error: "Sessione non verificata" },
-      { status: 401 }
-    );
-    return response; 
-   }
-  }
-
-  if (!payload) {
-    const response = NextResponse.json(
-      { code: "INVALID_SESSION", error: "Sessione non valida" },
-      { status: 401 }
-    );
-    response.cookies.delete(SESSION_COOKIE_NAME);
-    return response;
-  }
-
-  const { profileId: tokenProfileId, email } = extractSessionIdentity(payload);
-
-  if (!tokenProfileId && !email) {
-    return NextResponse.json(
-      { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
-      { status: 401 }
-    );
+  if (!sessionResolution.ok) {
+    switch (sessionResolution.code) {
+      case "SESSION_REQUIRED":
+        return NextResponse.json(
+          { code: "SESSION_REQUIRED", error: "Sessione mancante" },
+          { status: 401 }
+        );
+      case "INVALID_SESSION": {
+        const response = NextResponse.json(
+          { code: "INVALID_SESSION", error: "Sessione non valida" },
+          { status: 401 }
+        );
+        response.cookies.delete(SESSION_COOKIE_NAME);
+        return response;
+      }
+      case "INVALID_SESSION_IDENTITY":
+        return NextResponse.json(
+          { code: "INVALID_SESSION_IDENTITY", error: "Sessione non valida" },
+          { status: 401 }
+        );
+    }
   }
 
   const supabase = createSupabaseAdminClient();
+
+  const { profileId: tokenProfileId, email } = sessionResolution.identity;
 
   let profileQuery = supabase
     .from("Profile")

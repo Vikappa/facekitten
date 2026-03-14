@@ -128,20 +128,22 @@ export default function ProfilePageHero() {
 
             <div className="flex h-1/5 items-center">
 
-                <div className="flex aspect-square ms-3 relative ">
-                    {
-                        !isLoading ?
-                            <Image
-                                src={profileAvatar}
-                                alt={`${profileName} profile image`}
-                                width={100}
-                                height={100}
-                                className="rounded-full object-cover ring-5 ring-white"
-                            /> :
-                            <div className="w-[100px] h-[100px] p-6">
-                                <span className="loaderProfilePictures"></span>
-                            </div>
-                    }
+                <div className="relative ms-3 w-[100px] h-[100px] shrink-0">
+                    <div className="w-full h-full rounded-full overflow-hidden ring-5 ring-white bg-white">
+                        {
+                            !isLoading ?
+                                <Image
+                                    src={profileAvatar}
+                                    alt={`${profileName} profile image`}
+                                    width={100}
+                                    height={100}
+                                    className="w-full h-full object-cover"
+                                /> :
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <span className="loaderProfilePictures"></span>
+                                </div>
+                        }
+                    </div>
 
                     <div className="absolute bottom-0 right-0 rounded-full bg-secondary p-2.5 hover:cursor-pointer" onClick={handleUploadProfilePicture}>
                         <FaCamera className="" />
