@@ -1,8 +1,9 @@
 import { normalizeEmail, verifyProfilePassword } from "@/lib/Security/ProfilePasswordSecurity";
 import { issueSessionCookie } from "@/lib/Security/SessionSecurity";
+import { GetLocationById } from "@/lib/services/searchLocation/GetLocationById";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
+import { Database } from "@/types/database.types";
 import { NextRequest, NextResponse } from "next/server";
-import { Profile } from "@/types/db";
 
 type LoginBody = {
   email?: string;
@@ -16,32 +17,45 @@ type ProfileLoginRow = {
   password: string | null;
 };
 
-interface PreloadMediaData{
-    profilePicture: Uint8Array;
-    coverPhoto: Uint8Array;
-    name?: string;
-}
+type ProfilePreloadRow = {
+  id: string;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+  username: string | null;
+  bio: string | null;
+  dataDiNascita: string | null;
+  giocattoloPreferito: string | null;
+  locationId: string | null;
+  tipoCuccia: Database["public"]["Enums"]["Lettino"] | null;
+};
 
-const loadProfileMedia = async (profile: Profile) => {
+type PreloadMediaData = {
+  profilePicture?: string;
+  coverPhoto?: string;
+  name?: string;
+  bio?: string;
+  dataDiNascita?: string | null;
+  favToy?: string;
+  locationName?: string;
+  cuccetta?: Database["public"]["Enums"]["Lettino"] | null;
+};
 
-    try{
-            const payload = {
-                profilePicture: profile.avatarUrl ? profile.avatarUrl : undefined,
-                coverPhoto: profile.bannerUrl ? profile.bannerUrl: undefined,
-                name:profile.username,
-                bio: profile.bio,
-            };
-            return payload;
-    }catch{
-        return {
-                profilePicture:undefined,
-                coverPhoto:undefined,
-                name:undefined,
-                bio:undefined,
+const loadProfileMedia = async (profile: ProfilePreloadRow): Promise<PreloadMediaData> => {
+  const locationData = profile.locationId
+    ? await GetLocationById(profile.locationId)
+    : null;
 
-            }
-    }
-}
+  return {
+    profilePicture: profile.avatarUrl ?? undefined,
+    coverPhoto: profile.bannerUrl ?? undefined,
+    name: profile.username ?? undefined,
+    bio: profile.bio ?? undefined,
+    dataDiNascita: profile.dataDiNascita ?? null,
+    favToy: profile.giocattoloPreferito ?? "",
+    locationName: locationData?.descr ?? (profile.locationId ?? ""),
+    cuccetta: profile.tipoCuccia ?? null,
+  };
+};
 
 export async function POST(req: NextRequest) {
   let body: LoginBody;
@@ -72,7 +86,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle<ProfileLoginRow>();
 
   if (profileError) {
-    console.error("Errore durante query login:", profileError) 
+    console.error("Errore durante query login:", profileError);
     return NextResponse.json(
       { code: "LOGIN_INTERNAL_ERROR", error: "Errore interno durante il login" },
       { status: 500 }
@@ -115,9 +129,9 @@ export async function POST(req: NextRequest) {
 
   const { data: profile, error: fullProfileError } = await supabase
     .from("Profile")
-    .select("*")
+    .select("id, avatarUrl, bannerUrl, username, bio, dataDiNascita, giocattoloPreferito, locationId, tipoCuccia")
     .eq("id", loginProfile.id)
-    .maybeSingle<Profile>();
+    .maybeSingle<ProfilePreloadRow>();
 
   if (fullProfileError || !profile) {
     return NextResponse.json(

@@ -1,10 +1,11 @@
-'use client'
-import { FaCamera } from "react-icons/fa";
+'use client';
+
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { patchCurrentProfile } from "@/lib/redux/profileSlice";
 import Image from "next/image";
 import Link from "next/link";
-import { patchCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
 import { useRef, useState, type ChangeEvent } from "react";
+import { FaCamera } from "react-icons/fa";
 
 function getValidImageUrl(url: string | null | undefined, fallbackUrl: string) {
     const normalizedUrl = url?.trim();
@@ -20,22 +21,27 @@ export default function ProfilePageHero() {
 
     const profileAvatar = getValidImageUrl(currentProfile?.avatarUrl, "/assets/blankprofile.png");
     const profileBanner = getValidImageUrl(currentProfile?.bannerUrl, "/assets/grumpy-cat-background-facebook-cover.jpg");
-    const profileName = currentProfile?.username?.trim() ?? "";
-    const profileBio = useAppSelector((state) => state.profile.currentProfile?.bio ?? "Non hai una bio..")
-    const [isLoading, setIsLoading] = useState(false)
+    const profileName = currentProfile?.username?.trim() || "Profilo";
+    const profileBio = currentProfile?.bio?.trim() || "Non hai una bio..";
+    const location = currentProfile?.location?.trim() || "Nessuna location impostata";
+    const cuccetta = currentProfile?.tipoCuccia ?? "Nessuna cuccia impostata";
+    const favToy = currentProfile?.giocattoloPreferito?.trim() || "Nessun giocattolo preferito";
+    const birthDate = currentProfile?.dataDiNascita?.trim() || "Data di nascita non impostata";
+
+    const [isLoading, setIsLoading] = useState(false);
 
     function handleUploadProfilePicture() {
         fileInputRef.current?.click();
     }
 
     async function handleChangeProfilePictureInput(e: ChangeEvent<HTMLInputElement>) {
-        setIsLoading(true)
         const selectedFile = e.target.files?.[0];
 
         if (!selectedFile) {
             return;
         }
 
+        setIsLoading(true);
         selectedAvatarFileRef.current = selectedFile;
 
         const formData = new FormData();
@@ -61,8 +67,7 @@ export default function ProfilePageHero() {
             console.error("Errore rete durante upload immagine profilo", error);
         } finally {
             e.target.value = "";
-            setIsLoading(false)
-
+            setIsLoading(false);
         }
     }
 
@@ -90,7 +95,7 @@ export default function ProfilePageHero() {
                         !isLoading ?
                             <Image
                                 src={profileAvatar}
-                                alt={profileName}
+                                alt={`${profileName} profile image`}
                                 width={100}
                                 height={100}
                                 className="rounded-full object-cover ring-5 ring-white"
@@ -108,10 +113,28 @@ export default function ProfilePageHero() {
                 <h3 className="self-center px-3 text-2xl font-semibold">{profileName}</h3>
             </div>
 
-            <div className="flex flex-col h-2/5 align-middle bg-white px-5 pt-8 ">
+            <div className="flex flex-col align-middle bg-white px-5 pt-8 ">
                 <span className="flex w-full text-gray-400 italic">
                     {profileBio}
                 </span>
+                <div className="mt-2 grid grid-cols-1 gap-2 text-sm text-gray-600 sm:grid-cols-2">
+                    <div className="flex flex-col">
+                        <label htmlFor="profile-location" className="font-medium text-black">Location</label>
+                        <input id="profile-location" className="rounded-md px-2 py-1" disabled value={location} />
+                    </div>
+                    <div className="flex flex-col">
+                        <label htmlFor="profile-cuccia" className="font-medium text-black">Cuccia</label>
+                        <input id="profile-cuccia" className="rounded-md px-2 py-1" disabled value={cuccetta} />
+                    </div>
+                    <div className="flex flex-col">
+                        <label htmlFor="profile-favtoy" className="font-medium text-black">Giocattolo</label>
+                        <input id="profile-favtoy" className="rounded-md px-2 py-1" disabled value={favToy} />
+                    </div>
+                    <div className="flex flex-col">
+                        <label htmlFor="profile-birthdate" className="font-medium text-black">Nascita</label>
+                        <input id="profile-birthdate" className="rounded-md px-2 py-1" disabled value={birthDate} />
+                    </div>
+                </div>
                 <div className="flex gap-2 mt-auto">
                     <button className="bg-primary text-white w-1/2 font-bold mb-2 rounded-md py-1.5">Crea Post</button>
                     <Link
@@ -124,5 +147,5 @@ export default function ProfilePageHero() {
             </div>
 
         </div>
-    )
+    );
 }

@@ -1,3 +1,4 @@
+import { Database } from "@/types/database.types";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserProfile {
@@ -8,6 +9,10 @@ export interface UserProfile {
     bannerUrl: string;
     bio: string;
     confirmedAccount: boolean;
+    dataDiNascita: string | null;
+    giocattoloPreferito: string;
+    location: string;
+    tipoCuccia: Database["public"]["Enums"]["Lettino"] | null;
 }
 
 export interface ProfileState {

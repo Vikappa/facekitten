@@ -171,13 +171,13 @@ export default function ModificaProfilePage() {
     };
 
     async function handleChangeProfilePictureInput(e: ChangeEvent<HTMLInputElement>) {
-        setIsLoading(true)
         const selectedFile = e.target.files?.[0];
 
         if (!selectedFile) {
             return;
         }
 
+        setIsLoading(true);
         selectedAvatarFileRef.current = selectedFile;
 
         const formData = new FormData();
@@ -203,8 +203,7 @@ export default function ModificaProfilePage() {
             console.error("Errore rete durante upload immagine profilo", error);
         } finally {
             e.target.value = "";
-            setIsLoading(false)
-
+            setIsLoading(false);
         }
     }
 
@@ -329,6 +328,7 @@ export default function ModificaProfilePage() {
             setBirthDate(payload.profile.dataDiNascita ?? "");
             setFavoriteToy(payload.profile.favToy ?? "");
             setSelectedLettino(payload.profile.tipoCuccia ?? "");
+            let resolvedLocationLabel = "";
             if (payload.profile.location_id) {
                 const savedLocationId = payload.profile.location_id;
                 const resolvedLocation =
@@ -343,6 +343,7 @@ export default function ModificaProfilePage() {
 
                 setTrueLocationStateObj(nextLocation);
                 setLocationInputValue(nextLocation.descr);
+                resolvedLocationLabel = nextLocation.descr;
             } else {
                 setTrueLocationStateObj(undefined);
                 setLocationInputValue("");
@@ -360,6 +361,10 @@ export default function ModificaProfilePage() {
                     ...(typeof payload.profile.confirmedAccount === "boolean"
                         ? { confirmedAccount: payload.profile.confirmedAccount }
                         : {}),
+                    dataDiNascita: payload.profile.dataDiNascita,
+                    giocattoloPreferito: payload.profile.favToy ?? "",
+                    location: resolvedLocationLabel,
+                    tipoCuccia: payload.profile.tipoCuccia ?? null,
                 })
             );
             router.replace("/profile");
@@ -538,6 +543,7 @@ export default function ModificaProfilePage() {
                 <div className="flex flex-col" >
                     <label className="font-medium" htmlFor="lettinoInput">Tipo di lettino</label>
                     <select
+                        className="bg-tertiary m-2 rounded-xl focus:ring-0 focus:outline-0 p-3"
                         id="lettinoInput"
                         value={selectedLettino}
                         onChange={(e) => setSelectedLettino(e.target.value as Lettino | "")}
@@ -556,6 +562,7 @@ export default function ModificaProfilePage() {
                         id="giocattoloPrefe"
                         value={favoriteToy}
                         onChange={(e) => setFavoriteToy(e.target.value)}
+                        className="bg-tertiary m-2 rounded-xl focus:ring-0 focus:outline-0 p-3"
                     />
                 </div>
             </div>

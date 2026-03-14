@@ -1,11 +1,12 @@
 'use client'
 
+import { useAppDispatch } from "@/lib/redux/hooks";
 import { setCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
+import { Database } from "@/types/database.types";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { useDispatch } from "react-redux";
 
 type LoginSuccessResponse = {
   code: "LOGIN_OK";
@@ -18,7 +19,11 @@ type PreloadPayload = {
   coverPhoto?: string;
   name?: string;
   bio?: string;
-}
+  dataDiNascita?: string | null;
+  locationName?: string;
+  cuccetta?: Database["public"]["Enums"]["Lettino"] | null;
+  favToy?: string;
+};
 
 type LoginErrorResponse = {
   code?: string;
@@ -64,7 +69,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -103,17 +108,21 @@ export default function LoginPage() {
           : "";
 
 
-        const downloadedProfileData : UserProfile = {
+        const downloadedProfileData: UserProfile = {
           id: successPayload.profileId,
           email: email,
           username: successPayload.preloadData?.name ?? "",
           avatarUrl,
           bannerUrl,
           bio: successPayload.preloadData?.bio ?? "",
-          confirmedAccount: true
-        }
+          confirmedAccount: true,
+          dataDiNascita: successPayload.preloadData?.dataDiNascita ?? null,
+          giocattoloPreferito: successPayload.preloadData?.favToy ?? "",
+          location: successPayload.preloadData?.locationName ?? "",
+          tipoCuccia: successPayload.preloadData?.cuccetta ?? null,
+        };
 
-        dispatch(setCurrentProfile(downloadedProfileData))
+        dispatch(setCurrentProfile(downloadedProfileData));
 
         shouldResetSubmitting = false;
         router.replace("/");
