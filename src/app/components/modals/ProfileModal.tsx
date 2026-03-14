@@ -117,7 +117,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                                 <div className="w-full flex justify-center" >
                                     <button className="bg-secondary rounded-xl font-bold m-3 py-2 mx-auto w-full text-md flex items-center justify-center gap-2">
                                         <RiUserCommunityFill size={20} />
-                                        <span>Tutti i profili</span>
+                                        <Link href={"/profile/all/browse"}>Tutti i profili</Link>
                                     </button>
                                 </div>
                             </div>

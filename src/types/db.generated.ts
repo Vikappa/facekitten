@@ -4,7 +4,7 @@
 
 import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database.types'
 
-export const DB_TABLES = ["ChatMessage","comment","commentReaction","commentReply","follows","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
+export const DB_TABLES = ["ChatMessage","comment","commentReaction","commentReply","follows","friendshipRequest","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
 export type DbTableName = (typeof DB_TABLES)[number]
 export const DB_ENUMS = ["Lettino","postType","ReactionType"] as const
 export type DbEnumName = (typeof DB_ENUMS)[number]
@@ -77,6 +77,15 @@ export type Follows = FollowsRow
 export type FollowsDto = FollowsRow
 export const toFollows = (row: FollowsRow): Follows => row
 export const toFollowsDto = (row: FollowsRow): FollowsDto => row
+
+// friendshipRequest
+export type FriendshipRequestRow = Tables<'friendshipRequest'>
+export type FriendshipRequestInsert = TablesInsert<'friendshipRequest'>
+export type FriendshipRequestUpdate = TablesUpdate<'friendshipRequest'>
+export type FriendshipRequest = FriendshipRequestRow
+export type FriendshipRequestDto = FriendshipRequestRow
+export const toFriendshipRequest = (row: FriendshipRequestRow): FriendshipRequest => row
+export const toFriendshipRequestDto = (row: FriendshipRequestRow): FriendshipRequestDto => row
 
 // friendships
 export type FriendshipsRow = Tables<'friendships'>

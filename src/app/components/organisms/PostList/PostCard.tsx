@@ -2,6 +2,7 @@
 
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
 import Image from "next/image"
+import Link from "next/link"
 
 interface PostCardProp {
     data:PostData
@@ -20,7 +21,7 @@ export default function PostCard(prop: PostCardProp) {
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <p className="text-center text-primary font-semibold">{prop.data.authorName}</p>
+                <Link className="text-center text-black font-semibold" href={`/profile/${prop.data.authorId}`}>{prop.data.authorName}</Link>
             </div>
             <div className="p-2">
                 <p>{prop.data.text}</p>

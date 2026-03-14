@@ -221,6 +221,45 @@ export type Database = {
           },
         ]
       }
+      friendshipRequest: {
+        Row: {
+          accepted: boolean | null
+          created_at: string
+          id: number
+          sender: string | null
+          target: string | null
+        }
+        Insert: {
+          accepted?: boolean | null
+          created_at?: string
+          id?: number
+          sender?: string | null
+          target?: string | null
+        }
+        Update: {
+          accepted?: boolean | null
+          created_at?: string
+          id?: number
+          sender?: string | null
+          target?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendshipRequest_sender_fkey"
+            columns: ["sender"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendshipRequest_target_fkey"
+            columns: ["target"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friendships: {
         Row: {
           created_at: string
