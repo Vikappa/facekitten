@@ -330,11 +330,19 @@ export default function ModificaProfilePage() {
             setFavoriteToy(payload.profile.favToy ?? "");
             setSelectedLettino(payload.profile.tipoCuccia ?? "");
             if (payload.profile.location_id) {
-                setTrueLocationStateObj({
-                    id: payload.profile.location_id,
-                    descr: payload.profile.location_id,
-                });
-                setLocationInputValue(payload.profile.location_id);
+                const savedLocationId = payload.profile.location_id;
+                const resolvedLocation =
+                    trueLocationStateObj?.id === savedLocationId
+                        ? trueLocationStateObj
+                        : await getLocDescById(savedLocationId);
+
+                const nextLocation = resolvedLocation ?? {
+                    id: savedLocationId,
+                    descr: savedLocationId,
+                };
+
+                setTrueLocationStateObj(nextLocation);
+                setLocationInputValue(nextLocation.descr);
             } else {
                 setTrueLocationStateObj(undefined);
                 setLocationInputValue("");

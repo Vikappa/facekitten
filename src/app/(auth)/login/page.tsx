@@ -54,27 +54,6 @@ const toAbsoluteAssetUrl = (url: string) => {
   return new URL(url, window.location.origin).toString();
 };
 
-const downloadAssetContent = async (url?: string): Promise<Uint8Array | []> => {
-  if (!url) {
-    return [];
-  }
-
-  try {
-    const absoluteUrl = toAbsoluteAssetUrl(url);
-    const response = await fetch(absoluteUrl);
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const buffer = await response.arrayBuffer();
-    return new Uint8Array(buffer);
-  } catch {
-    return [];
-  }
-};
-
-
 
 export default function LoginPage() {
   const router = useRouter();
@@ -91,6 +70,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
+    let shouldResetSubmitting = true;
 
     try {
       const response = await fetch("/login/request", {
@@ -135,6 +115,7 @@ export default function LoginPage() {
 
         dispatch(setCurrentProfile(downloadedProfileData))
 
+        shouldResetSubmitting = false;
         router.replace("/");
         router.refresh();
         return;
@@ -160,7 +141,9 @@ export default function LoginPage() {
     } catch {
       setError("Si è verificato un errore durante il login. Riprova più tardi.");
     } finally {
-      setIsSubmitting(false);
+      if (shouldResetSubmitting) {
+        setIsSubmitting(false);
+      }
     }
   };
 
