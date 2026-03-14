@@ -1,12 +1,28 @@
 'use client';
 
-import { useAppSelector } from "@/lib/redux/hooks";
+import { type PostData } from "@/lib/interfaces/CommonInterfaces";
+import { prependHomepagePost } from "@/lib/redux/homepagePostsSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { ProfilePicture } from "../NavbarParts/MidNavbarButtonFunction";
 import { ImFilePicture } from "react-icons/im";
 import type { NewPostPayload } from "@/app/api/v1/post/add/route";
 import { useState, type FormEvent } from "react";
 
+type CreatedPostResponse = {
+    code?: string;
+    post?: {
+        id?: string;
+        authorId?: string;
+        content?: string;
+        mediaUrl?: string | null;
+        postType?: PostData["postType"] | null;
+        createdAt?: string;
+    };
+    error?: string;
+};
+
 export default function PostForm() {
+    const dispatch = useAppDispatch();
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const profileName = currentProfile?.username?.trim() ? currentProfile.username : "Name";
     const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
@@ -39,12 +55,41 @@ export default function PostForm() {
                 credentials: "include",
                 body: JSON.stringify(postPayload),
             });
+            const payload = (await response.json().catch(() => null)) as CreatedPostResponse | null;
 
             if (!response.ok) {
-                setPostError("Impossibile pubblicare il post.");
+                setPostError(payload?.error ?? "Impossibile pubblicare il post.");
                 return;
             }
 
+            const createdPost = payload?.post;
+            if (
+                !createdPost ||
+                typeof createdPost.id !== "string" ||
+                typeof createdPost.authorId !== "string" ||
+                typeof createdPost.createdAt !== "string"
+            ) {
+                setPostError("Post creato ma risposta server non valida.");
+                return;
+            }
+
+            const postForStore: PostData = {
+                postId: createdPost.id,
+                postType: createdPost.postType ?? "post",
+                text: typeof createdPost.content === "string" ? createdPost.content : normalizedPostText,
+                imageUrl: profileAvatar,
+                authorId: createdPost.authorId,
+                authorName: profileName,
+                postImageUrl: typeof createdPost.mediaUrl === "string" ? createdPost.mediaUrl : undefined,
+                postedAt: createdPost.createdAt,
+                comments: [],
+                commentNumber: 0,
+                reactions: [],
+                reactionsNumber: 0,
+                shares: { sharePostId: 0 },
+            };
+
+            dispatch(prependHomepagePost(postForStore));
             setPostTextValue("");
         } catch {
             setPostError("Errore di rete durante la pubblicazione.");
