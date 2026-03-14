@@ -110,82 +110,90 @@ export default function ProfilePageHero() {
     }
 
     return (
-        <div className="relative h-80 bg-white">
-            <div className="relative h-2/5">
-                <div className="h-full overflow-hidden">
-                    <Image
-                        src={profileBanner}
-                        alt="Profile banner"
-                        width={1600}
-                        height={900}
-                        className="w-full h-auto"
-                    />
-                </div>
-                <div className="absolute bottom-0 right-0 z-20 rounded-full bg-secondary ring-2 ring-white p-2.5 -translate-y-1/2 hover:cursor-pointer me-2" onClick={handleUploadProfilePicture}>
-                    <FaCamera className="" />
-                </div>
+        <div className="relative overflow-hidden bg-white shadow-sm">
+            <div className="relative h-40 sm:h-48">
+                <Image
+                    src={profileBanner}
+                    alt="Profile banner"
+                    width={1600}
+                    height={900}
+                    className="h-full w-full object-cover"
+                />
+                <button
+                    type="button"
+                    className="absolute bottom-3 right-3 z-20 rounded-full bg-secondary p-2.5 ring-2 ring-white hover:cursor-pointer"
+                    onClick={handleUploadProfilePicture}
+                    aria-label="Carica nuova immagine profilo"
+                >
+                    <FaCamera />
+                </button>
             </div>
 
-            <div className="flex h-1/5 items-center">
+            <div className="bg-white px-5 pb-4">
+                <div className="-mt-12 flex items-end gap-3 sm:-mt-14">
+                    <div className="relative h-[100px] w-[100px] shrink-0">
+                        <div className="h-full w-full overflow-hidden rounded-full bg-white ring-5 ring-white">
+                            {
+                                !isLoading ?
+                                    <Image
+                                        src={profileAvatar}
+                                        alt={`${profileName} profile image`}
+                                        width={100}
+                                        height={100}
+                                        className="h-full w-full object-cover"
+                                    /> :
+                                    <div className="flex h-full w-full items-center justify-center">
+                                        <span className="loaderProfilePictures"></span>
+                                    </div>
+                            }
+                        </div>
 
-                <div className="relative ms-3 w-[100px] h-[100px] shrink-0">
-                    <div className="w-full h-full rounded-full overflow-hidden ring-5 ring-white bg-white">
-                        {
-                            !isLoading ?
-                                <Image
-                                    src={profileAvatar}
-                                    alt={`${profileName} profile image`}
-                                    width={100}
-                                    height={100}
-                                    className="w-full h-full object-cover"
-                                /> :
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <span className="loaderProfilePictures"></span>
-                                </div>
-                        }
-                    </div>
-
-                    <div className="absolute bottom-0 right-0 rounded-full bg-secondary p-2.5 hover:cursor-pointer" onClick={handleUploadProfilePicture}>
-                        <FaCamera className="" />
+                        <button
+                            type="button"
+                            className="absolute bottom-0 right-0 rounded-full bg-secondary p-2.5 hover:cursor-pointer"
+                            onClick={handleUploadProfilePicture}
+                            aria-label="Aggiorna foto profilo"
+                        >
+                            <FaCamera />
+                        </button>
                         <input ref={fileInputRef} onChange={handleChangeProfilePictureInput} type="file" accept="image/*" className="hidden" />
                     </div>
+                    <h3 className="pb-2 text-2xl font-semibold">{profileName}</h3>
                 </div>
-                <h3 className="self-center px-3 text-2xl font-semibold">{profileName}</h3>
-            </div>
 
-            <div className="flex flex-col align-middle bg-white px-5 pt-8 ">
-                <span className="flex w-full text-gray-400 italic">
-                    {profileBio}
-                </span>
-                <div className="mt-2 grid grid-cols-1 gap-2 text-sm text-gray-600 sm:grid-cols-2">
-                    <div className="flex flex-col">
-                        <label htmlFor="profile-location" className="font-medium text-black">Location</label>
-                        <input id="profile-location" className="rounded-md px-2 py-1" disabled value={location} />
+                <div className="mt-3 flex flex-col bg-white">
+                    <span className="flex w-full italic text-gray-400">
+                        {profileBio}
+                    </span>
+                    <div className="mt-2 grid grid-cols-1 gap-2 text-sm text-gray-600 sm:grid-cols-2">
+                        <div className="flex flex-col">
+                            <label htmlFor="profile-location" className="font-medium text-black">Location</label>
+                            <input id="profile-location" className="rounded-md px-2 py-1" disabled value={location} />
+                        </div>
+                        <div className="flex flex-col">
+                            <label htmlFor="profile-cuccia" className="font-medium text-black">Tipo di cuccetta</label>
+                            <input id="profile-cuccia" className="rounded-md px-2 py-1" disabled value={cuccetta} />
+                        </div>
+                        <div className="flex flex-col">
+                            <label htmlFor="profile-favtoy" className="font-medium text-black">Giocattolo prefe</label>
+                            <input id="profile-favtoy" className="rounded-md px-2 py-1" disabled value={favToy} />
+                        </div>
+                        <div className="flex flex-col">
+                            <label htmlFor="profile-birthdate" className="font-medium text-black">Data di Nascita</label>
+                            <input id="profile-birthdate" className="rounded-md px-2 py-1" disabled value={birthDate} />
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <label htmlFor="profile-cuccia" className="font-medium text-black">Tipo di cuccetta</label>
-                        <input id="profile-cuccia" className="rounded-md px-2 py-1" disabled value={cuccetta} />
+                    <div className="mt-4 flex gap-2">
+                        <button className="mb-2 w-1/2 rounded-md bg-primary py-1.5 font-bold text-white">Crea Post</button>
+                        <Link
+                            href="/profile/modifica"
+                            className="mb-2 w-1/2 rounded-md bg-tertiary py-1.5 text-center font-semibold text-gra"
+                        >
+                            Modifica Profilo
+                        </Link>
                     </div>
-                    <div className="flex flex-col">
-                        <label htmlFor="profile-favtoy" className="font-medium text-black">Giocattolo prefe</label>
-                        <input id="profile-favtoy" className="rounded-md px-2 py-1" disabled value={favToy} />
-                    </div>
-                    <div className="flex flex-col">
-                        <label htmlFor="profile-birthdate" className="font-medium text-black">Data di Nascita</label>
-                        <input id="profile-birthdate" className="rounded-md px-2 py-1" disabled value={birthDate} />
-                    </div>
-                </div>
-                <div className="flex gap-2 mt-4">
-                    <button className="bg-primary text-white w-1/2 font-bold mb-2 rounded-md py-1.5">Crea Post</button>
-                    <Link
-                        href="/profile/modifica"
-                        className="bg-tertiary text-gra w-1/2 font-semibold mb-2 rounded-md py-1.5 text-center"
-                    >
-                        Modifica Profilo
-                    </Link>
                 </div>
             </div>
-
         </div>
     );
 }
