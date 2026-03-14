@@ -282,6 +282,83 @@ export default function ModificaProfilePage() {
         };
     }, []);
 
+    const handleCancelEdit = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch("/profile/modifica/getdata", {
+                method: "GET",
+                cache: "no-store",
+            });
+
+            let payload: unknown = null;
+            try {
+                payload = await response.json();
+            } catch {
+                payload = null;
+            }
+
+            if (!response.ok) {
+                const errorPayload = (payload as ProfileEditErrorResponse | null) ?? null;
+                setError(errorPayload?.error ?? "Errore nel recupero del profilo");
+                return;
+            }
+
+            if (!isProfileEditSuccessResponse(payload)) {
+                setError("Risposta profilo non valida");
+                return;
+            }
+
+            setCurrentProfile(payload.profile);
+            setBirthDate(payload.profile.dataDiNascita ?? "");
+            setFavoriteToy(payload.profile.favToy ?? "");
+            setSelectedLettino(payload.profile.tipoCuccia ?? "");
+
+            let resolvedLocationLabel = "";
+            if (payload.profile.location_id) {
+                const resolvedLocation = await getLocDescById(payload.profile.location_id);
+                const nextLocation = resolvedLocation ?? {
+                    id: payload.profile.location_id,
+                    descr: payload.profile.location_id,
+                };
+
+                setTrueLocationStateObj(nextLocation);
+                setLocationInputValue(nextLocation.descr);
+                resolvedLocationLabel = nextLocation.descr;
+            } else {
+                setTrueLocationStateObj(undefined);
+                setLocationInputValue("");
+            }
+
+            dispatch(
+                patchCurrentProfile({
+                    username: payload.profile.username,
+                    bio: payload.profile.bio ?? "",
+                    ...(payload.profile.avatarUrl !== null
+                        ? { avatarUrl: payload.profile.avatarUrl }
+                        : {}),
+                    ...(payload.profile.bannerUrl !== null
+                        ? { bannerUrl: payload.profile.bannerUrl }
+                        : {}),
+                    ...(typeof payload.profile.confirmedAccount === "boolean"
+                        ? { confirmedAccount: payload.profile.confirmedAccount }
+                        : {}),
+                    dataDiNascita: payload.profile.dataDiNascita,
+                    giocattoloPreferito: payload.profile.favToy ?? "",
+                    location: resolvedLocationLabel,
+                    tipoCuccia: payload.profile.tipoCuccia ?? null,
+                })
+            );
+
+            router.replace("/profile");
+        } catch {
+            setError("Errore di rete durante il recupero del profilo");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleSaveProfile = async () => {
         if (!currentProfile) {
             return;
@@ -567,7 +644,7 @@ export default function ModificaProfilePage() {
                 </div>
             </div>
             <div className="flex justify-content-end p-2 gap-2">
-                <button className="ms-auto bg-tertiary w-1/3 rounded-lg py-1 font-semibold text-dark-700">Annulla</button>
+                <button className="ms-auto bg-tertiary w-1/3 rounded-lg py-1 font-semibold text-dark-700" onClick={handleCancelEdit}>Annulla</button>
                 <button
                     className="bg-primary w-1/3 rounded-lg py-1 font-semibold text-white disabled:opacity-60"
                     onClick={handleSaveProfile}

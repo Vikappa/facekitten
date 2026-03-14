@@ -12,6 +12,41 @@ function getValidImageUrl(url: string | null | undefined, fallbackUrl: string) {
     return normalizedUrl ? normalizedUrl : fallbackUrl;
 }
 
+function formatLocalizedDate(
+    isoDate: string | null | undefined,
+    fallbackLabel: string
+) {
+    const normalizedDate = isoDate?.trim();
+    if (!normalizedDate) {
+        return fallbackLabel;
+    }
+
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(normalizedDate);
+    if (!match) {
+        return normalizedDate;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+
+    if (
+        Number.isNaN(date.getTime()) ||
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ) {
+        return normalizedDate;
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    }).format(date);
+}
+
 export default function ProfilePageHero() {
     const dispatch = useAppDispatch();
 
@@ -26,7 +61,10 @@ export default function ProfilePageHero() {
     const location = currentProfile?.location?.trim() || "Nessuna location impostata";
     const cuccetta = currentProfile?.tipoCuccia ?? "Nessuna cuccia impostata";
     const favToy = currentProfile?.giocattoloPreferito?.trim() || "Nessun giocattolo preferito";
-    const birthDate = currentProfile?.dataDiNascita?.trim() || "Data di nascita non impostata";
+    const birthDate = formatLocalizedDate(
+        currentProfile?.dataDiNascita,
+        "Data di nascita non impostata"
+    );
 
     const [isLoading, setIsLoading] = useState(false);
 
