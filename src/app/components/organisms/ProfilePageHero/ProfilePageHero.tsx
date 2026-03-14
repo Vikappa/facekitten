@@ -135,7 +135,7 @@ export default function ProfilePageHero() {
                         <input id="profile-birthdate" className="rounded-md px-2 py-1" disabled value={birthDate} />
                     </div>
                 </div>
-                <div className="flex gap-2 mt-auto">
+                <div className="flex gap-2 mt-4">
                     <button className="bg-primary text-white w-1/2 font-bold mb-2 rounded-md py-1.5">Crea Post</button>
                     <Link
                         href="/profile/modifica"
