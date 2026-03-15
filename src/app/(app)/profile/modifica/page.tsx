@@ -83,7 +83,7 @@ function isProfileSetDataSuccessResponse(payload: unknown): payload is ProfileSe
     return !!profile && typeof profile.username === "string";
 }
 
-function isLocationOption(payload: unknown): payload is ILocationOptions {
+export function isLocationOption(payload: unknown): payload is ILocationOptions {
     if (typeof payload !== "object" || payload === null) {
         return false;
     }

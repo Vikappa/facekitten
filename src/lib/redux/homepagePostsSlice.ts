@@ -24,6 +24,14 @@ const homepagePostsSlice = createSlice({
             state.posts.unshift(action.payload);
             state.lastUpdatedAt = Date.now();
         },
+        prependHomepagePosts(state, action: PayloadAction<PostData[]>) {
+        const incomingIds = new Set(action.payload.map((p) => p.postId));
+        state.posts = [
+            ...action.payload,
+            ...state.posts.filter((p) => !incomingIds.has(p.postId)),
+        ];
+        state.lastUpdatedAt = Date.now();
+        },
         hydrateHomepagePostsState(state, action: PayloadAction<HomepagePostsState>) {
             state.posts = action.payload.posts;
             state.lastUpdatedAt = action.payload.lastUpdatedAt;
@@ -35,5 +43,5 @@ const homepagePostsSlice = createSlice({
     },
 });
 
-export const { setHomepagePosts, prependHomepagePost, hydrateHomepagePostsState, clearHomepagePosts } = homepagePostsSlice.actions;
+export const { setHomepagePosts, prependHomepagePost, prependHomepagePosts, hydrateHomepagePostsState, clearHomepagePosts } = homepagePostsSlice.actions;
 export default homepagePostsSlice.reducer;

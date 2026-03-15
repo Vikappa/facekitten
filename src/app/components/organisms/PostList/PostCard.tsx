@@ -1,6 +1,7 @@
 'use client'
 
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
+import { useAppSelector } from "@/lib/redux/hooks"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -9,6 +10,9 @@ interface PostCardProp {
 }
 
 export default function PostCard(prop: PostCardProp) {
+
+    const userId = useAppSelector((state) => state.profile.currentProfile?.id)
+
     return (
         <div className="flex flex-col shadow-sm bg-white m-2 rounded-md p-2 mb-0">
             <div className="flex items-center gap-2">
@@ -21,7 +25,7 @@ export default function PostCard(prop: PostCardProp) {
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <Link className="text-center text-black font-semibold" href={`/profile/${prop.data.authorId}`}>{prop.data.authorName}</Link>
+                <Link className="text-center text-black font-semibold" href={prop.data.authorId === userId ? `/profile/` : `/profile/${prop.data.authorId}`}>{prop.data.authorName}</Link>
             </div>
             <div className="p-2">
                 <p>{prop.data.text}</p>

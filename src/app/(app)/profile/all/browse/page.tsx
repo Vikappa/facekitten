@@ -4,12 +4,13 @@ import { useEffect, useState } from "react"
 import Image from "next/image";
 import type { ProfileDto } from "@/types/db";
 import Link from "next/link";
+import {
+    FRIENDSHIP_STATUS,
+    type WithFriendshipStatus,
+} from "@/types/friendship";
 
-type FriendshipStatus = "amico" | "non_amico" | "richiesta_inviata";
-
-type ProfileWithFriendshipDto = {
+type ProfileWithFriendshipDto = WithFriendshipStatus & {
     profile: ProfileDto;
-    friendshipStatus: FriendshipStatus;
 };
 
 type ProfilesSuccessResponse = {
@@ -17,10 +18,9 @@ type ProfilesSuccessResponse = {
     profiles: ProfileWithFriendshipDto[];
 };
 
-type SendFriendRequestSuccessResponse = {
+type SendFriendRequestSuccessResponse = WithFriendshipStatus & {
     code: "FRIEND_REQUEST_SENT" | "FRIEND_REQUEST_ALREADY_SENT";
     targetProfileId: string;
-    friendshipStatus: "richiesta_inviata";
 };
 
 function isProfilesSuccessResponse(payload: unknown): payload is ProfilesSuccessResponse {
@@ -47,7 +47,7 @@ function isSendFriendRequestSuccessResponse(payload: unknown): payload is SendFr
 
     return (
         typeof candidate.targetProfileId === "string" &&
-        candidate.friendshipStatus === "richiesta_inviata"
+        candidate.friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_INVIATA
     );
 }
 
@@ -84,7 +84,10 @@ export default function BrowseMici(){
             setProfiles((previousProfiles) =>
                 previousProfiles.map((item) =>
                     item.profile.id === payload.targetProfileId
-                        ? { ...item, friendshipStatus: "richiesta_inviata" }
+                        ? {
+                            ...item,
+                            friendshipStatus: FRIENDSHIP_STATUS.RICHIESTA_INVIATA,
+                        }
                         : item
                 )
             );
@@ -175,13 +178,17 @@ export default function BrowseMici(){
                             </div>
 
                             {
-                                friendshipStatus === "amico" ? (
+                                friendshipStatus === FRIENDSHIP_STATUS.AMICO ? (
                                     <span className="shrink-0 text-xs px-3 py-1 rounded-full font-medium bg-blue-100 text-blue-800">
                                         Amico
                                     </span>
-                                ) : friendshipStatus === "richiesta_inviata" ? (
+                                ) : friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_INVIATA ? (
                                     <span className="shrink-0 text-xs px-3 py-1 rounded-full font-medium bg-secondary text-gray-700">
                                         Richiesta inviata
+                                    </span>
+                                ) : friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_RICEVUTA ? (
+                                    <span className="shrink-0 text-xs px-3 py-1 rounded-full font-medium bg-amber-100 text-amber-800">
+                                        Richiesta ricevuta
                                     </span>
                                 ) : (
                                     <button

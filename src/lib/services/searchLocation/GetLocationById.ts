@@ -29,6 +29,7 @@ export const GetLocationById = async (placeId: string): Promise<ILocationOptions
       cache: "no-store",
     });
 
+
     if (!response.ok) {
       console.error("Geoapify location by id request failed:", response.status, response.statusText);
       return null;

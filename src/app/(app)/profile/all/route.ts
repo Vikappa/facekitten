@@ -13,15 +13,13 @@ import {
   type ProfileDto,
   type ProfilePublicDb,
 } from "@/types/db";
+import {
+  FRIENDSHIP_STATUS,
+  type WithFriendshipStatus,
+} from "@/types/friendship";
 
-export type FriendshipStatus =
-  | "amico"
-  | "non_amico"
-  | "richiesta_inviata";
-
-export type ProfileWithFriendshipDto = {
+export type ProfileWithFriendshipDto = WithFriendshipStatus & {
   profile: ProfileDto;
-  friendshipStatus: FriendshipStatus;
 };
 
 type PendingFriendRequestRow = {
@@ -121,6 +119,30 @@ export async function GET(req: NextRequest) {
       .filter((profileId): profileId is string => typeof profileId === "string")
   );
 
+  const { data: receivedRequestsRows, error: receivedRequestsError } = await supabase
+    .from("friendshipRequest")
+    .select("sender, target, accepted")
+    .eq("target", auth.profileId)
+    .is("accepted", null)
+    .returns<PendingFriendRequestRow[]>();
+
+  if (receivedRequestsError) {
+    console.error(
+      "Errore durante il recupero richieste ricevute:",
+      receivedRequestsError
+    );
+    return NextResponse.json(
+      { code: "RECEIVED_REQUESTS_FETCH_ERROR", error: "Errore interno" },
+      { status: 500 }
+    );
+  }
+
+  const receivedRequestIds = new Set<string>(
+    (receivedRequestsRows ?? [])
+      .map((request) => request.sender)
+      .filter((profileId): profileId is string => typeof profileId === "string")
+  );
+
   const { data: profilesRows, error: profilesError } = await supabase
     .from("Profile")
     .select(PROFILE_PUBLIC_SAFE_SELECT)
@@ -140,10 +162,12 @@ export async function GET(req: NextRequest) {
     (profile) => ({
       profile,
       friendshipStatus: friendIds.has(profile.id)
-        ? "amico"
+        ? FRIENDSHIP_STATUS.AMICO
         : sentRequestIds.has(profile.id)
-          ? "richiesta_inviata"
-          : "non_amico",
+          ? FRIENDSHIP_STATUS.RICHIESTA_INVIATA
+          : receivedRequestIds.has(profile.id)
+            ? FRIENDSHIP_STATUS.RICHIESTA_RICEVUTA
+            : FRIENDSHIP_STATUS.NON_AMICO,
     })
   );
 

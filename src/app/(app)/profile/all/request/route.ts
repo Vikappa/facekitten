@@ -6,6 +6,7 @@ import type {
   FriendshipRequestRow,
 } from "@/types/db.generated";
 import { FRIENDSHIP_SAFE_SELECT, type FriendshipDb } from "@/types/db";
+import { FRIENDSHIP_STATUS } from "@/types/friendship";
 import { NextRequest, NextResponse } from "next/server";
 
 type SendFriendRequestBody = {
@@ -165,7 +166,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       code: "FRIEND_REQUEST_ALREADY_SENT",
       targetProfileId,
-      friendshipStatus: "richiesta_inviata" as const,
+      friendshipStatus: FRIENDSHIP_STATUS.RICHIESTA_INVIATA,
     });
   }
 
@@ -190,6 +191,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     code: "FRIEND_REQUEST_SENT",
     targetProfileId,
-    friendshipStatus: "richiesta_inviata" as const,
+    friendshipStatus: FRIENDSHIP_STATUS.RICHIESTA_INVIATA,
   });
 }

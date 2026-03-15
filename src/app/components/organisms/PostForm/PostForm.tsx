@@ -7,6 +7,7 @@ import { ProfilePicture } from "../NavbarParts/MidNavbarButtonFunction";
 import { ImFilePicture } from "react-icons/im";
 import type { NewPostPayload } from "@/app/api/v1/post/add/route";
 import { useState, type FormEvent } from "react";
+import { VercelLogger } from "@/lib/logging/VercelLogger";
 
 type CreatedPostResponse = {
     code?: string;
@@ -36,7 +37,6 @@ export default function PostForm() {
 
         const normalizedPostText = postTextValue.trim();
         if (!normalizedPostText) {
-            setPostError("Scrivi qualcosa prima di pubblicare.");
             return;
         }
 
@@ -59,6 +59,7 @@ export default function PostForm() {
 
             if (!response.ok) {
                 setPostError(payload?.error ?? "Impossibile pubblicare il post.");
+                VercelLogger(payload?.error ?? "Impossibile pubblicare il post.");
                 return;
             }
 
@@ -69,7 +70,7 @@ export default function PostForm() {
                 typeof createdPost.authorId !== "string" ||
                 typeof createdPost.createdAt !== "string"
             ) {
-                setPostError("Post creato ma risposta server non valida.");
+                VercelLogger("Post creato ma risposta server non valida.");
                 return;
             }
 

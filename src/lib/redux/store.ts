@@ -12,7 +12,7 @@ import { type CommentData, type PostData, type ReactionData, ReactionType } from
 
 const PROFILE_STORAGE_KEY = "fk_profile_state";
 const HOMEPAGE_POSTS_STORAGE_KEY = "fk_homepage_posts_state";
-const LETTINO_OPTIONS = new Set<NonNullable<UserProfile["tipoCuccia"]>>([
+export const LETTINO_OPTIONS = new Set<NonNullable<UserProfile["tipoCuccia"]>>([
     "Cuccia",
     "Scatola",
     "Cassetto dei calzini (scassinato)",

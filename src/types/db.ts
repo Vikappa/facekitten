@@ -53,6 +53,12 @@ export type ProfilePublicDb = Pick<
   | 'updatedAt'
 >
 
+export type ProfilePublicFriendDb = ProfilePublicDb &
+  Pick<
+    ProfileRow,
+    'dataDiNascita' | 'giocattoloPreferito' | 'tipoCuccia' | 'locationId'
+  >
+
 export type ProfileAuthDb = Pick<
   ProfileRow,
   'id' | 'email' | 'username' | 'password' | 'confirmedAccount'
@@ -73,6 +79,10 @@ export interface ProfileDto {
   confirmedAccount: boolean
   createdAt?: Date
   updatedAt?: Date
+  locationId?: string | null
+  dataDiNascita?: Date | null
+  giocattoloPreferito?: string
+  tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
 }
 
 export interface ProfileAuthDto {
@@ -86,13 +96,24 @@ export interface ProfileAuthDto {
 export const PROFILE_PUBLIC_SAFE_SELECT =
   'id, email, username, avatarUrl, bannerUrl, bio, confirmedAccount, createdAt, updatedAt' as const
 
+export const PROFILE_PUBLIC_FRIEND_SELECT =
+  `${PROFILE_PUBLIC_SAFE_SELECT}, dataDiNascita, giocattoloPreferito, tipoCuccia, locationId` as const
+
 export const PROFILE_AUTH_SAFE_SELECT =
   'id, email, username, password, confirmedAccount' as const
 
 export const PROFILE_VERIFICATION_SAFE_SELECT =
   'id, email, username, password, confirmedAccount, createdAt' as const
 
-export function toProfileDto(row: ProfilePublicDb): ProfileDto {
+export function toProfileDto(row: ProfilePublicDb | ProfilePublicFriendDb): ProfileDto {
+  const friendRow = row as Partial<ProfilePublicFriendDb>
+
+  const hasFriendFields =
+    'giocattoloPreferito' in row ||
+    'tipoCuccia' in row ||
+    'locationId' in row ||
+    'dataDiNascita' in row
+
   return {
     id: row.id,
     email: toRequiredString(row.email),
@@ -103,6 +124,14 @@ export function toProfileDto(row: ProfilePublicDb): ProfileDto {
     confirmedAccount: toBoolean(row.confirmedAccount),
     createdAt: toDate(row.createdAt),
     updatedAt: toDate(row.updatedAt),
+    ...(hasFriendFields
+      ? {
+          giocattoloPreferito: friendRow.giocattoloPreferito ?? '',
+          tipoCuccia: friendRow.tipoCuccia ?? null,
+          locationId: friendRow.locationId ?? null,
+          dataDiNascita: toDate(friendRow.dataDiNascita) ?? null,
+        }
+      : {}),
   }
 }
 
