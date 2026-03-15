@@ -119,12 +119,11 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                             <button className="mb-2 w-1/2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">Accetta Richiesta Micizia</button>
                         }
                         
-                        <Link
-                            href="/profile/modifica"
+                        <button
                             className="mb-2 w-1/2 rounded-md bg-tertiary py-1.5 text-center font-semibold text-gra"
                         >
-                            Modifica Profilo
-                        </Link>
+                            Messaggia
+                        </button>
                     </div>
                 </div>
             </div>
