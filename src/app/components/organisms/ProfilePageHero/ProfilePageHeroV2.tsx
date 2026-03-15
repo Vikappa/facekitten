@@ -6,7 +6,14 @@ import { Database } from "@/types/database.types";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { FaCamera } from "react-icons/fa6";
+import {
+    FaCamera,
+    FaCheck,
+    FaFacebookMessenger,
+    FaPaperPlane,
+    FaUserClock,
+    FaUserPlus,
+} from "react-icons/fa6";
 
 export interface ProfilePageHeroV2Props {
     userToRender?: FriendUserProfile
@@ -104,25 +111,37 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     <div className="mt-4 flex gap-2">
                         {
                             props.friendshipStatus === "amico" && 
-                            <button className="mb-2 w-1/2 rounded-md bg-blue-200 py-1.5 font-bold text-white">Mici</button>
+                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-bold text-dark-800">
+                                <FaCheck className="shrink-0 text-sm" />
+                                Mici
+                            </button>
                         }
                         {
                             props.friendshipStatus === "non amico" && 
-                            <button className="mb-2 w-1/2 rounded-md bg-primary py-1.5 font-bold text-white">Aggiungi ai mici</button>
+                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-primary py-1.5 font-bold text-white">
+                                <FaUserPlus className="shrink-0 text-sm" />
+                                Aggiungi ai mici
+                            </button>
                         }
                         {
                             props.friendshipStatus === "richiesta inviata" && 
-                            <button className="mb-2 w-1/2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">Richiesta di micizia inviata</button>
+                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">
+                                <FaPaperPlane className="shrink-0 text-sm" />
+                                Richiesta di micizia inviata
+                            </button>
                         }
                         {
                             props.friendshipStatus === "richiesta ricevuta" && 
-                            <button className="mb-2 w-1/2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">Accetta Richiesta Micizia</button>
+                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">
+                                <FaUserClock className="shrink-0 text-sm" />
+                                Accetta Richiesta Micizia
+                            </button>
                         }
                         
                         <button
-                            className="mb-2 w-1/2 rounded-md bg-tertiary py-1.5 text-center font-semibold text-gra"
+                            className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-semibold text-gra"
                         >
-                            Messaggia
+                            Messaggia <FaFacebookMessenger className="shrink-0 text-base" />
                         </button>
                     </div>
                 </div>
