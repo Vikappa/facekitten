@@ -208,6 +208,14 @@ export default function ViewUserProfilePage() {
     },
         [profileId])
 
+    if (!renderedProfile || !friendshipStatus) {
+        return (
+            <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center bg-white">
+                <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
+            </div>
+        )
+    }
+
     return (
         <div className="flex flex-col">
             <ProfilePageHeroV2 userToRender={renderedProfile} friendshipStatus={friendshipStatus} />
