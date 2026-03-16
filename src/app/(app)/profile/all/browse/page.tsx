@@ -142,8 +142,10 @@ export default function BrowseMici(){
         <div className="max-w-2xl mx-auto w-full flex flex-col gap-3 p-4">
             {
                 isLoading && (
-                    <p className="text-sm text-gray-600">Caricamento profili...</p>
-                )
+            <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center bg-white">
+                <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
+            </div>
+        )
             }
             {
                 error && (

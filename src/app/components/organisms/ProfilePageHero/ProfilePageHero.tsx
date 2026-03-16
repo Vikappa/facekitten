@@ -109,6 +109,8 @@ export default function ProfilePageHero() {
         }
     }
 
+    if(!currentProfile) return (<></>)
+
     return (
         <div className="relative overflow-hidden bg-white shadow-sm">
             <div className="relative h-40 sm:h-48">
