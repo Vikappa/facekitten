@@ -2,7 +2,7 @@
 
 import { MutableRefObject, useRef } from "react";
 import ProfileModal from "../modals/ProfileModal";
-import Navbar from "./NavbarParts/Navbar";
+import Navbar from "../cells/NavbarParts/Navbar";
 
 export enum PageFocus {
     Home,

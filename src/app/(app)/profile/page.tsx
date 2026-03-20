@@ -1,8 +1,7 @@
 
 'use client'
-import PostForm from "@/app/components/organisms/PostForm/PostForm";
-import PostList from "@/app/components/organisms/PostList/PostList";
-import ProfilePageHero from "@/app/components/organisms/ProfilePageHero/ProfilePageHero";
+import PostList from "@/app/components/cells/posts/PostList/PostList";
+import ProfilePageHero from "@/app/components/cells/ProfilePageHero/ProfilePageHero";
 import { useAppSelector } from "@/lib/redux/hooks";
 
 export default function ProfilePage() {

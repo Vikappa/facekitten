@@ -1,12 +1,12 @@
 'use client'
-import PostForm from "@/app/components/organisms/PostForm/PostForm";
-import PostList from "@/app/components/organisms/PostList/PostList";
-import SideBars from "@/app/components/organisms/SideBars/SideBars";
-import MobileMiniNavBar from "../components/organisms/NavbarParts/MobileMiniNavBar";
+import PostList from "@/app/components/cells/posts/PostList/PostList";
+import SideBars from "@/app/components/cells/SideBars/SideBars";
+import MobileMiniNavBar from "../components/cells/NavbarParts/MobileMiniNavBar";
 import { PostData } from "@/lib/interfaces/CommonInterfaces";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setHomepagePosts } from "@/lib/redux/homepagePostsSlice";
 import { useCallback, useEffect, useRef } from "react";
+import PostForm from "../components/cells/posts/PostForm/PostForm";
 
 const MIN_UPDATE_INTERVAL_MS = 60_000;
 const AUTO_FETCH_INTERVAL_MS = 180_000;

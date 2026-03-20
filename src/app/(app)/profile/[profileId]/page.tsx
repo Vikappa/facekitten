@@ -1,8 +1,8 @@
 'use client'
 
 import { GetFriendPostRequest } from "@/app/api/v1/post/get/friends/route"
-import PostList from "@/app/components/organisms/PostList/PostList"
-import ProfilePageHeroV2, { FriendUserProfile } from "@/app/components/organisms/ProfilePageHero/ProfilePageHeroV2"
+import PostList from "@/app/components/cells/posts/PostList/PostList"
+import ProfilePageHeroV2, { FriendUserProfile } from "@/app/components/cells/ProfilePageHero/ProfilePageHeroV2"
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
 import { prependHomepagePosts } from "@/lib/redux/homepagePostsSlice"
 import { useAppSelector } from "@/lib/redux/hooks"
