@@ -51,7 +51,7 @@ function isSendFriendRequestSuccessResponse(payload: unknown): payload is SendFr
     );
 }
 
-export default function BrowseMici(){
+export default function BrowseMici() {
 
     const [profiles, setProfiles] = useState<ProfileWithFriendshipDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -100,10 +100,10 @@ export default function BrowseMici(){
         }
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         const controller = new AbortController();
 
-        const request = async () =>{
+        const request = async () => {
             setIsLoading(true);
             setError(null);
 
@@ -138,22 +138,25 @@ export default function BrowseMici(){
         };
     }, [])
 
+    if (isLoading) {
+        return (
+            <div className="max-w-2xl mx-auto w-full bg-white">
+                <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center">
+                    <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-2xl mx-auto w-full flex flex-col gap-3 p-4">
-            {
-                isLoading && (
-            <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center bg-white">
-                <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
-            </div>
-        )
-            }
             {
                 error && (
                     <p className="text-sm text-red-600">{error}</p>
                 )
             }
             {
-                profiles.map(({ profile, friendshipStatus }) =>  {
+                profiles.map(({ profile, friendshipStatus }) => {
                     const avatarUrl = profile.avatarUrl?.trim() ? profile.avatarUrl : "/assets/blankprofile.png";
                     const username = profile.username?.trim() ? profile.username : "Profilo senza nome";
                     const bio = profile.bio?.trim() ? profile.bio : "Nessuna bio";

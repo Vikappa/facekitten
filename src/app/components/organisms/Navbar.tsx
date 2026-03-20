@@ -1,11 +1,11 @@
 'use client'
 import { useAppSelector } from "@/lib/redux/hooks";
 import Image from "next/image";
-import Midnavbar from "./MidNavbar";
-import NavbarFunctions from "./NavBarFunctions";
-import NavBarSearchLeft from "./NavBarSearchLeft";
 import { MutableRefObject } from "react";
 import Link from "next/link";
+import NavBarSearchLeft from "../cells/NavbarParts/NavBarSearchLeft";
+import NavbarFunctions from "../cells/NavbarParts/NavBarFunctions";
+import Midnavbar from "../cells/NavbarParts/MidNavbar";
 
 interface NavbarProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;

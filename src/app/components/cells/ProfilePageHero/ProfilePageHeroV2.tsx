@@ -35,7 +35,6 @@ export interface FriendUserProfile {
 }
 
 export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
-    console.log(props)
     return (
         <div className="relative overflow-hidden bg-white shadow-sm">
             <div className="relative h-40 sm:h-48">

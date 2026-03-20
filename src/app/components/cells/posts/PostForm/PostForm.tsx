@@ -3,11 +3,11 @@
 import { type PostData } from "@/lib/interfaces/CommonInterfaces";
 import { prependHomepagePost } from "@/lib/redux/homepagePostsSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { ProfilePicture } from "../../cells/NavbarParts/MidNavbarButtonFunction";
 import { ImFilePicture } from "react-icons/im";
 import type { NewPostPayload } from "@/app/api/v1/post/add/route";
 import { useState, type FormEvent } from "react";
 import { VercelLogger } from "@/lib/logging/VercelLogger";
+import { ProfilePicture } from "../../NavbarParts/MidNavbarButtonFunction";
 
 type CreatedPostResponse = {
     code?: string;
