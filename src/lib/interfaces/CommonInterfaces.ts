@@ -1,4 +1,5 @@
 import { PostType } from "@/types/db.generated";
+import { Database } from "@/types/database.types";
 
 export interface IResponseModelFormat {
 
@@ -65,4 +66,15 @@ export type ReactionData = {
 
 export type SharePostDTO = {
     sharePostId: number
+}
+
+export type NotificationData = {
+    id: number;
+    activityFrom: string | null;
+    to: string | null;
+    createdAt: string;
+    generatedNavigation: string | null;
+    notificationType: Database["public"]["Enums"]["notificationtype"] | null;
+    seen: boolean;
+    type: PostType | null;
 }

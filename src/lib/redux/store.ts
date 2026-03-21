@@ -7,6 +7,7 @@ import profileReducer, {
 import homepagePostsReducer, {
     type HomepagePostsState,
 } from "./homepagePostsSlice";
+import notificationsReducer from "./notificationsSlice";
 import uiReducer from "./uiSlice";
 import { type CommentData, type PostData, type ReactionData, ReactionType } from "@/lib/interfaces/CommonInterfaces";
 
@@ -297,6 +298,7 @@ export const makeStore = () => {
             ui: uiReducer,
             profile: profileReducer,
             homepagePosts: homepagePostsReducer,
+            notifications: notificationsReducer,
         },
     });
 

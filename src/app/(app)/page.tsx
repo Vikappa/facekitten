@@ -2,14 +2,42 @@
 import PostList from "@/app/components/cells/posts/PostList/PostList";
 import SideBars from "@/app/components/cells/SideBars/SideBars";
 import MobileMiniNavBar from "../components/cells/NavbarParts/MobileMiniNavBar";
-import { PostData } from "@/lib/interfaces/CommonInterfaces";
+import { NotificationData, PostData } from "@/lib/interfaces/CommonInterfaces";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setHomepagePosts } from "@/lib/redux/homepagePostsSlice";
+import { setUnreadNotifications } from "@/lib/redux/notificationsSlice";
 import { useCallback, useEffect, useRef } from "react";
 import PostForm from "../components/cells/posts/PostForm/PostForm";
 
 const MIN_UPDATE_INTERVAL_MS = 60_000;
 const AUTO_FETCH_INTERVAL_MS = 180_000;
+
+const isNotificationData = (payload: unknown): payload is NotificationData => {
+    if (typeof payload !== "object" || payload === null) {
+        return false
+    }
+
+    const candidate = payload as Partial<NotificationData>
+    return (
+        typeof candidate.id === "number" &&
+        typeof candidate.createdAt === "string" &&
+        typeof candidate.seen === "boolean"
+    )
+}
+
+type HomepageRefreshPayload = {
+    posts: PostData[];
+    unreadNotifications: NotificationData[];
+}
+
+const isHomepageRefreshPayload = (payload: unknown): payload is HomepageRefreshPayload => {
+    if (typeof payload !== "object" || payload === null) {
+        return false
+    }
+
+    const candidate = payload as Partial<HomepageRefreshPayload>
+    return Array.isArray(candidate.posts) && Array.isArray(candidate.unreadNotifications)
+}
 
 export default function Home() {
     const dispatch = useAppDispatch();
@@ -17,7 +45,7 @@ export default function Home() {
     const lastUpdatedAt = useAppSelector((state) => state.homepagePosts.lastUpdatedAt);
     const isFetchingRef = useRef(false);
 
-    const loadHomepagePosts = useCallback(async () => {
+    const loadHomepageUpdates = useCallback(async () => {
         if (isFetchingRef.current) {
             return;
         }
@@ -38,32 +66,39 @@ export default function Home() {
 
             if (!response.ok) {
                 const errorPayload = await response.json().catch(() => null)
-                console.error("Errore fetch homepage posts:", response.status, errorPayload)
+                console.error("Errore fetch aggiornamento homepage:", response.status, errorPayload)
                 return
             }
 
             const data = (await response.json()) as unknown
-            dispatch(setHomepagePosts(Array.isArray(data) ? (data as PostData[]) : []))
+            if (!isHomepageRefreshPayload(data)) {
+                console.error("Payload aggiornamento homepage non valido:", data)
+                return
+            }
+
+            const unreadNotifications = data.unreadNotifications.filter(isNotificationData)
+            dispatch(setHomepagePosts(data.posts))
+            dispatch(setUnreadNotifications(unreadNotifications))
         } catch (e) {
-            console.error("Non sono riuscito a scaricare i post, dettagli:", e)
+            console.error("Non sono riuscito a scaricare gli aggiornamenti homepage, dettagli:", e)
         } finally {
             isFetchingRef.current = false;
         }
     }, [dispatch, lastUpdatedAt])
 
     useEffect(() => {
-        void loadHomepagePosts()
-    }, [loadHomepagePosts])
+        void loadHomepageUpdates()
+    }, [loadHomepageUpdates])
 
     useEffect(() => {
         const intervalId = window.setInterval(() => {
-            void loadHomepagePosts()
+            void loadHomepageUpdates()
         }, AUTO_FETCH_INTERVAL_MS)
 
         return () => {
             window.clearInterval(intervalId)
         }
-    }, [loadHomepagePosts])
+    }, [loadHomepageUpdates])
 
     return (
         <SideBars>

@@ -343,27 +343,6 @@ export function toChatMessageDto(row: ChatMessageDb): ChatMessageDto {
   }
 }
 
-// Social graph
-export type FollowsRow = Tables<'follows'>
-export type FollowsInsert = TablesInsert<'follows'>
-export type FollowsUpdate = TablesUpdate<'follows'>
-
-export type FollowsDb = Pick<FollowsRow, 'follower_id' | 'followed_id'>
-
-export interface FollowDto {
-  followerId: string
-  followedId: string
-}
-
-export const FOLLOWS_SAFE_SELECT = 'follower_id, followed_id' as const
-
-export function toFollowDto(row: FollowsDb): FollowDto {
-  return {
-    followerId: row.follower_id,
-    followedId: row.followed_id,
-  }
-}
-
 export type FriendshipRow = Tables<'friendships'>
 export type FriendshipInsert = TablesInsert<'friendships'>
 export type FriendshipUpdate = TablesUpdate<'friendships'>
@@ -453,7 +432,6 @@ export type CommentReply = CommentReplyDto
 export type ChatMessage = ChatMessageDto
 export type PostReaction = PostReactionDto
 export type CommentReaction = CommentReactionDto
-export type Follow = FollowDto
 export type Friendship = FriendshipDto
 export type Notification = NotificationDto
 export type RegistrationCode = RegistrationCodeDto

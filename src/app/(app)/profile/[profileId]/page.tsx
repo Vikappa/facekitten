@@ -218,7 +218,10 @@ export default function ViewUserProfilePage() {
 
     return (
         <div className="flex flex-col">
-            <ProfilePageHeroV2 userToRender={renderedProfile} friendshipStatus={friendshipStatus} />
+            <ProfilePageHeroV2
+                userToRender={renderedProfile}
+                friendshipStatus={friendshipStatus}
+            />
             <PostList posts={postData} />
         </div>
     )

@@ -1,13 +1,10 @@
 'use client'
 
-import type { FriendshipStatus } from "@/types/friendship";
-import { UserProfile } from "@/lib/redux/profileSlice"
+import { FRIENDSHIP_STATUS, type FriendshipStatus } from "@/types/friendship";
 import { Database } from "@/types/database.types";
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    FaCamera,
     FaCheck,
     FaFacebookMessenger,
     FaPaperPlane,
@@ -34,7 +31,134 @@ export interface FriendUserProfile {
     tipoCuccia: Database["public"]["Enums"]["Lettino"] | null;
 }
 
+type SendFriendRequestSuccessResponse = {
+    code: "FRIEND_REQUEST_SENT" | "FRIEND_REQUEST_ALREADY_SENT";
+    targetProfileId: string;
+    friendshipStatus: FriendshipStatus;
+};
+
+type AcceptFriendRequestSuccessResponse = {
+    code: "FRIEND_REQUEST_ACCEPTED";
+    friendshipStatus: FriendshipStatus;
+};
+
+function isErrorPayload(payload: unknown): payload is { error?: string } {
+    return typeof payload === "object" && payload !== null;
+}
+
+function isSendFriendRequestSuccessResponse(payload: unknown): payload is SendFriendRequestSuccessResponse {
+    if (typeof payload !== "object" || payload === null) {
+        return false;
+    }
+
+    const candidate = payload as Partial<SendFriendRequestSuccessResponse>;
+    return (
+        (candidate.code === "FRIEND_REQUEST_SENT" || candidate.code === "FRIEND_REQUEST_ALREADY_SENT") &&
+        typeof candidate.targetProfileId === "string"
+    );
+}
+
+function isAcceptFriendRequestSuccessResponse(payload: unknown): payload is AcceptFriendRequestSuccessResponse {
+    if (typeof payload !== "object" || payload === null) {
+        return false;
+    }
+
+    const candidate = payload as Partial<AcceptFriendRequestSuccessResponse>;
+    return candidate.code === "FRIEND_REQUEST_ACCEPTED";
+}
+
 export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
+    const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>(props.friendshipStatus);
+    const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false);
+    const [isAcceptingFriendRequest, setIsAcceptingFriendRequest] = useState(false);
+    const [friendshipActionError, setFriendshipActionError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setFriendshipStatus(props.friendshipStatus);
+    }, [props.friendshipStatus]);
+
+    const handleSendFriendRequest = async () => {
+        const targetProfileId = props.userToRender?.id?.trim();
+        if (!targetProfileId || isSendingFriendRequest) {
+            return;
+        }
+
+        setIsSendingFriendRequest(true);
+        setFriendshipActionError(null);
+
+        try {
+            const response = await fetch(
+                `/api/v1/friendship/request/send/${encodeURIComponent(targetProfileId)}`,
+                {
+                    method: "POST",
+                }
+            );
+
+            const payload: unknown = await response.json().catch(() => null);
+            if (!response.ok) {
+                setFriendshipActionError(
+                    isErrorPayload(payload) ? payload.error ?? "Impossibile inviare la richiesta di amicizia" : "Impossibile inviare la richiesta di amicizia"
+                );
+                return;
+            }
+
+            if (isSendFriendRequestSuccessResponse(payload)) {
+                setFriendshipStatus(FRIENDSHIP_STATUS.RICHIESTA_INVIATA);
+                return;
+            }
+
+            setFriendshipActionError("Risposta non valida durante l'invio della richiesta");
+        } catch {
+            setFriendshipActionError("Errore di rete durante l'invio della richiesta");
+        } finally {
+            setIsSendingFriendRequest(false);
+        }
+    };
+
+    const handleAcceptFriendRequest = async () => {
+        if (isAcceptingFriendRequest) {
+            return;
+        }
+
+        const PLACEHOLDER_REQUEST_ID = -1;
+
+        setIsAcceptingFriendRequest(true);
+        setFriendshipActionError(null);
+
+        try {
+            const response = await fetch("/api/v1/friendship/request/accept", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    requestId: PLACEHOLDER_REQUEST_ID,
+                }),
+            });
+
+            const payload: unknown = await response.json().catch(() => null);
+            if (!response.ok) {
+                setFriendshipActionError(
+                    isErrorPayload(payload)
+                        ? payload.error ?? "Accettazione non disponibile: sostituire il requestId placeholder quando avremo la lista richieste"
+                        : "Accettazione non disponibile: sostituire il requestId placeholder quando avremo la lista richieste"
+                );
+                return;
+            }
+
+            if (isAcceptFriendRequestSuccessResponse(payload)) {
+                setFriendshipStatus(FRIENDSHIP_STATUS.AMICO);
+                return;
+            }
+
+            setFriendshipActionError("Risposta non valida durante l'accettazione");
+        } catch {
+            setFriendshipActionError("Errore di rete durante l'accettazione della richiesta");
+        } finally {
+            setIsAcceptingFriendRequest(false);
+        }
+    };
+
     return (
         <div className="relative overflow-hidden bg-white shadow-sm">
             <div className="relative h-40 sm:h-48">
@@ -109,40 +233,57 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     </div>
                     <div className="mt-4 flex gap-2">
                         {
-                            props.friendshipStatus === "amico" && 
-                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-bold text-dark-800">
+                            friendshipStatus === FRIENDSHIP_STATUS.AMICO &&
+                            <button className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-bold text-dark-800">
                                 <FaCheck className="shrink-0 text-sm" />
                                 Mici
                             </button>
                         }
                         {
-                            props.friendshipStatus === "non amico" && 
-                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-primary py-1.5 font-bold text-white">
+                            friendshipStatus === FRIENDSHIP_STATUS.NON_AMICO &&
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    void handleSendFriendRequest();
+                                }}
+                                disabled={isSendingFriendRequest}
+                                className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-primary py-1.5 font-bold text-white disabled:opacity-60"
+                            >
                                 <FaUserPlus className="shrink-0 text-sm" />
-                                Aggiungi ai mici
+                                {isSendingFriendRequest ? "Invio..." : "Aggiungi ai mici"}
                             </button>
                         }
                         {
-                            props.friendshipStatus === "richiesta inviata" && 
-                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">
+                            friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_INVIATA &&
+                            <button className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">
                                 <FaPaperPlane className="shrink-0 text-sm" />
                                 Richiesta di micizia inviata
                             </button>
                         }
                         {
-                            props.friendshipStatus === "richiesta ricevuta" && 
-                            <button className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700">
+                            friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_RICEVUTA &&
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    void handleAcceptFriendRequest();
+                                }}
+                                disabled={isAcceptingFriendRequest}
+                                className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700 disabled:opacity-60"
+                            >
                                 <FaUserClock className="shrink-0 text-sm" />
-                                Accetta Richiesta Micizia
+                                {isAcceptingFriendRequest ? "Conferma..." : "Accetta Richiesta di Micizia"}
                             </button>
                         }
-                        
                         <button
-                            className="mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-semibold text-gra"
+                            className={`mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md ${props.friendshipStatus ? "bg-primary" : "bg-tertiary"} py-1.5 font-semibold ${props.friendshipStatus ? "text-white":""}`}
                         >
-                            Messaggia <FaFacebookMessenger className="shrink-0 text-base" />
+                            Messaggia <FaFacebookMessenger className="shrink-0 text-base px-0" />
                         </button>
                     </div>
+                    {
+                        friendshipActionError &&
+                        <span className="text-xs text-red-600">{friendshipActionError}</span>
+                    }
                 </div>
             </div>
         </div >

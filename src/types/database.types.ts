@@ -188,39 +188,6 @@ export type Database = {
           },
         ]
       }
-      follows: {
-        Row: {
-          created_at: string
-          followed_id: string
-          follower_id: string
-        }
-        Insert: {
-          created_at: string
-          followed_id: string
-          follower_id: string
-        }
-        Update: {
-          created_at?: string
-          followed_id?: string
-          follower_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "follows_followed_id_fkey"
-            columns: ["followed_id"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "follows_follower_id_fkey"
-            columns: ["follower_id"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       friendshipRequest: {
         Row: {
           accepted: boolean | null
@@ -297,7 +264,11 @@ export type Database = {
         Row: {
           activity_from: string | null
           created_at: string
+          generatedNavigation: string | null
           id: number
+          notificationType:
+            | Database["public"]["Enums"]["notificationtype"]
+            | null
           seen: boolean | null
           to: string | null
           type: Database["public"]["Enums"]["postType"] | null
@@ -305,7 +276,11 @@ export type Database = {
         Insert: {
           activity_from?: string | null
           created_at?: string
+          generatedNavigation?: string | null
           id?: number
+          notificationType?:
+            | Database["public"]["Enums"]["notificationtype"]
+            | null
           seen?: boolean | null
           to?: string | null
           type?: Database["public"]["Enums"]["postType"] | null
@@ -313,7 +288,11 @@ export type Database = {
         Update: {
           activity_from?: string | null
           created_at?: string
+          generatedNavigation?: string | null
           id?: number
+          notificationType?:
+            | Database["public"]["Enums"]["notificationtype"]
+            | null
           seen?: boolean | null
           to?: string | null
           type?: Database["public"]["Enums"]["postType"] | null
@@ -513,6 +492,13 @@ export type Database = {
         | "Divano"
         | "Sedia"
         | "Poltrona"
+      notificationtype:
+        | "friendRequestRecieved"
+        | "friendRequestAccepted"
+        | "postCommented"
+        | "commentReplied"
+        | "postReacted"
+        | "commentReacted"
       postType:
         | "post"
         | "image"
@@ -668,6 +654,14 @@ export const Constants = {
         "Divano",
         "Sedia",
         "Poltrona",
+      ],
+      notificationtype: [
+        "friendRequestRecieved",
+        "friendRequestAccepted",
+        "postCommented",
+        "commentReplied",
+        "postReacted",
+        "commentReacted",
       ],
       postType: [
         "post",

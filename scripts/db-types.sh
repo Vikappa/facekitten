@@ -20,6 +20,16 @@ read_env_var() {
     | tail -n1
 }
 
+access_token="${SUPABASE_ACCESS_TOKEN:-}"
+if [[ -z "$access_token" ]]; then
+  access_token="$(read_env_var SUPABASE_ACCESS_TOKEN .env.local)"
+fi
+if [[ -z "$access_token" ]]; then
+  access_token="$(read_env_var SUPABASE_ACCESS_TOKEN .env)"
+fi
+: "${access_token:?SUPABASE_ACCESS_TOKEN non impostata (env, .env.local o .env)}"
+export SUPABASE_ACCESS_TOKEN="$access_token"
+
 project_id="${SUPABASE_PROJECT_ID:-}"
 if [[ -z "$project_id" ]]; then
   project_id="$(read_env_var SUPABASE_PROJECT_ID .env.local)"

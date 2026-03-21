@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import type { FriendshipsRow } from "@/types/db.generated";
+import type { FriendshipsRow, NotificationsRow } from "@/types/db.generated";
 import type { Database } from "@/types/database.types";
 import {
   CommentData,
+  NotificationData,
   PostData,
   ReactionData,
   ReactionType as UiReactionType,
@@ -53,6 +54,18 @@ type FeedPost = {
   comments: FeedComment[] | null;
   postReactions: FeedPostReaction[] | null;
 };
+
+type UnreadNotificationRow = Pick<
+  NotificationsRow,
+  | "id"
+  | "activity_from"
+  | "to"
+  | "created_at"
+  | "generatedNavigation"
+  | "notificationType"
+  | "seen"
+  | "type"
+>;
 
 const REACTION_TYPE_MAP: Record<DbReactionType, UiReactionType> = {
   like: UiReactionType.like,
@@ -223,7 +236,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const responseArray: PostData[] = ((feedRows ?? []) as FeedPost[]).map((post) => {
+  const posts: PostData[] = ((feedRows ?? []) as FeedPost[]).map((post) => {
     const comments = mapComments(post.comments);
     const reactions = mapReactions(post.postReactions);
 
@@ -246,7 +259,37 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  console.log("Responsearray ", responseArray)
+  const { data: unreadNotificationRows, error: unreadNotificationsError } = await supabase
+    .from("notifications")
+    .select("id, activity_from, to, created_at, generatedNavigation, notificationType, seen, type")
+    .eq("to", auth.profileId)
+    .or("seen.is.null,seen.eq.false")
+    .order("created_at", { ascending: false })
+    .limit(100);
 
-  return NextResponse.json(responseArray);
+  if (unreadNotificationsError) {
+    console.error("Errore recupero notifiche non viste homepage:", unreadNotificationsError);
+    return NextResponse.json(
+      { code: "UNREAD_NOTIFICATIONS_FETCH_ERROR", error: "Errore interno" },
+      { status: 500 }
+    );
+  }
+
+  const unreadNotifications: NotificationData[] = (
+    (unreadNotificationRows ?? []) as UnreadNotificationRow[]
+  ).map((notification) => ({
+    id: notification.id,
+    activityFrom: notification.activity_from ?? null,
+    to: notification.to ?? null,
+    createdAt: notification.created_at,
+    generatedNavigation: notification.generatedNavigation ?? null,
+    notificationType: notification.notificationType ?? null,
+    seen: notification.seen === true,
+    type: notification.type ?? null,
+  }));
+
+  return NextResponse.json({
+    posts,
+    unreadNotifications,
+  });
 }

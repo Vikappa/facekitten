@@ -1,6 +1,8 @@
 'use client'
 
 import { useAppDispatch } from "@/lib/redux/hooks";
+import { NotificationData } from "@/lib/interfaces/CommonInterfaces";
+import { setUnreadNotifications } from "@/lib/redux/notificationsSlice";
 import { setCurrentProfile, UserProfile } from "@/lib/redux/profileSlice";
 import { Database } from "@/types/database.types";
 import Image from "next/image";
@@ -23,6 +25,7 @@ type PreloadPayload = {
   locationName?: string;
   cuccetta?: Database["public"]["Enums"]["Lettino"] | null;
   favToy?: string;
+  unreadNotifications?: NotificationData[];
 };
 
 type LoginErrorResponse = {
@@ -57,6 +60,19 @@ const toAbsoluteAssetUrl = (url: string) => {
     return url;
   }
   return new URL(url, window.location.origin).toString();
+};
+
+const isNotificationData = (payload: unknown): payload is NotificationData => {
+  if (typeof payload !== "object" || payload === null) {
+    return false;
+  }
+
+  const candidate = payload as Partial<NotificationData>;
+  return (
+    typeof candidate.id === "number" &&
+    typeof candidate.createdAt === "string" &&
+    typeof candidate.seen === "boolean"
+  );
 };
 
 
@@ -122,7 +138,12 @@ export default function LoginPage() {
           tipoCuccia: successPayload.preloadData?.cuccetta ?? null,
         };
 
+        const unreadNotifications = Array.isArray(successPayload.preloadData?.unreadNotifications)
+          ? successPayload.preloadData.unreadNotifications.filter(isNotificationData)
+          : [];
+
         dispatch(setCurrentProfile(downloadedProfileData));
+        dispatch(setUnreadNotifications(unreadNotifications));
 
         shouldResetSubmitting = false;
         router.replace("/");

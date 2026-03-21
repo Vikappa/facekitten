@@ -4,9 +4,9 @@
 
 import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database.types'
 
-export const DB_TABLES = ["ChatMessage","comment","commentReaction","commentReply","follows","friendshipRequest","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
+export const DB_TABLES = ["ChatMessage","comment","commentReaction","commentReply","friendshipRequest","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
 export type DbTableName = (typeof DB_TABLES)[number]
-export const DB_ENUMS = ["Lettino","postType","ReactionType"] as const
+export const DB_ENUMS = ["Lettino","notificationtype","postType","ReactionType"] as const
 export type DbEnumName = (typeof DB_ENUMS)[number]
 
 export type DbEnum<T extends DbEnumName> = Enums<T>
@@ -23,6 +23,11 @@ export const toDbDto = <T extends DbTableName>(row: DbRow<T>): DbDto<T> => row
 // enum Lettino
 export type Lettino = Enums<'Lettino'>
 export const toLettino = (value: Lettino): Lettino => value
+
+// enum notificationtype
+export type notificationtype = Enums<'notificationtype'>
+export type Notificationtype = Enums<'notificationtype'>
+export const toNotificationtype = (value: Notificationtype): Notificationtype => value
 
 // enum postType
 export type postType = Enums<'postType'>
@@ -68,15 +73,6 @@ export type CommentReply = CommentReplyRow
 export type CommentReplyDto = CommentReplyRow
 export const toCommentReply = (row: CommentReplyRow): CommentReply => row
 export const toCommentReplyDto = (row: CommentReplyRow): CommentReplyDto => row
-
-// follows
-export type FollowsRow = Tables<'follows'>
-export type FollowsInsert = TablesInsert<'follows'>
-export type FollowsUpdate = TablesUpdate<'follows'>
-export type Follows = FollowsRow
-export type FollowsDto = FollowsRow
-export const toFollows = (row: FollowsRow): Follows => row
-export const toFollowsDto = (row: FollowsRow): FollowsDto => row
 
 // friendshipRequest
 export type FriendshipRequestRow = Tables<'friendshipRequest'>
