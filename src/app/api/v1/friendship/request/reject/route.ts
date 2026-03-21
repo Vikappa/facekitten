@@ -4,16 +4,11 @@ import {
 } from "@/lib/Security/SessionRequestProfileResolver";
 import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import type {
-  FriendshipRequestRow,
-  FriendshipsInsert,
-  NotificationsInsert,
-} from "@/types/db.generated";
-import { FRIENDSHIP_SAFE_SELECT, type FriendshipDb } from "@/types/db";
+import type { FriendshipRequestRow } from "@/types/db.generated";
 import { FRIENDSHIP_STATUS } from "@/types/friendship";
 import { NextRequest, NextResponse } from "next/server";
 
-type AcceptFriendRequestBody = {
+type RejectFriendRequestBody = {
   requestId?: number | string;
   senderProfileId?: string;
 };
@@ -28,7 +23,7 @@ function parseRequestId(payload: unknown): number | null {
     return null;
   }
 
-  const candidate = payload as AcceptFriendRequestBody;
+  const candidate = payload as RejectFriendRequestBody;
   const rawValue = candidate.requestId;
 
   let parsedValue: number;
@@ -52,7 +47,7 @@ function parseSenderProfileId(payload: unknown): string | null {
     return null;
   }
 
-  const candidate = payload as AcceptFriendRequestBody;
+  const candidate = payload as RejectFriendRequestBody;
   if (typeof candidate.senderProfileId !== "string") {
     return null;
   }
@@ -88,7 +83,7 @@ function toAuthErrorResponse(
   }
 
   if (auth.code === "PROFILE_RESOLUTION_ERROR") {
-    console.error("Errore risoluzione profilo accettazione richiesta API:", auth.error);
+    console.error("Errore risoluzione profilo rifiuto richiesta API:", auth.error);
     return NextResponse.json(
       { code: "PROFILE_RESOLUTION_ERROR", error: "Errore interno" },
       { status: 500 }
@@ -159,7 +154,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (friendRequestError) {
-    console.error("Errore recupero richiesta amicizia API:", friendRequestError);
+    console.error("Errore recupero richiesta amicizia da rifiutare API:", friendRequestError);
     return NextResponse.json(
       { code: "FRIEND_REQUEST_FETCH_ERROR", error: "Errore interno" },
       { status: 500 }
@@ -189,111 +184,48 @@ export async function POST(req: NextRequest) {
 
   if (friendRequest.accepted === true) {
     return NextResponse.json(
-      {
-        code: "FRIEND_REQUEST_ALREADY_ACCEPTED",
-        requestId: friendRequest.id,
-        friendshipStatus: FRIENDSHIP_STATUS.AMICO,
-      },
+      { code: "FRIEND_REQUEST_ALREADY_ACCEPTED", error: "Richiesta già accettata" },
       { status: 409 }
     );
   }
 
   if (friendRequest.accepted === false) {
     return NextResponse.json(
-      { code: "FRIEND_REQUEST_ALREADY_PROCESSED", error: "Richiesta già processata" },
-      { status: 409 }
+      {
+        code: "FRIEND_REQUEST_ALREADY_REJECTED",
+        requestId: friendRequest.id,
+        friendshipStatus: FRIENDSHIP_STATUS.NON_AMICO,
+      }
     );
   }
 
-  const { data: existingFriendship, error: existingFriendshipError } = await supabase
-    .from("friendships")
-    .select(FRIENDSHIP_SAFE_SELECT)
-    .or(
-      `and(user_a.eq.${friendRequest.sender},user_b.eq.${friendRequest.target}),and(user_a.eq.${friendRequest.target},user_b.eq.${friendRequest.sender})`
-    )
-    .limit(1)
-    .maybeSingle<FriendshipDb>();
-
-  if (existingFriendshipError) {
-    console.error("Errore verifica amicizia prima di accettare API:", existingFriendshipError);
-    return NextResponse.json(
-      { code: "FRIENDSHIP_CHECK_ERROR", error: "Errore interno" },
-      { status: 500 }
-    );
-  }
-
-  if (!existingFriendship) {
-    const newFriendship: FriendshipsInsert = {
-      user_a: friendRequest.sender,
-      user_b: friendRequest.target,
-    };
-
-    const { error: createFriendshipError } = await supabase
-      .from("friendships")
-      .insert(newFriendship);
-
-    if (createFriendshipError && createFriendshipError.code !== "23505") {
-      console.error("Errore creazione amicizia da richiesta API:", createFriendshipError);
-      return NextResponse.json(
-        { code: "FRIENDSHIP_CREATE_ERROR", error: "Errore interno" },
-        { status: 500 }
-      );
-    }
-  }
-
-  const { data: acceptedRequest, error: acceptRequestError } = await supabase
+  const { data: rejectedRequest, error: rejectRequestError } = await supabase
     .from("friendshipRequest")
-    .update({ accepted: true })
+    .update({ accepted: false })
     .eq("id", friendRequest.id)
     .is("accepted", null)
     .select("id")
     .limit(1)
     .maybeSingle<{ id: number }>();
 
-  if (acceptRequestError) {
-    console.error("Errore conferma richiesta amicizia API:", acceptRequestError);
+  if (rejectRequestError) {
+    console.error("Errore rifiuto richiesta amicizia API:", rejectRequestError);
     return NextResponse.json(
-      { code: "FRIEND_REQUEST_ACCEPT_ERROR", error: "Errore interno" },
+      { code: "FRIEND_REQUEST_REJECT_ERROR", error: "Errore interno" },
       { status: 500 }
     );
   }
 
-  if (!acceptedRequest) {
+  if (!rejectedRequest) {
     return NextResponse.json(
       { code: "FRIEND_REQUEST_ALREADY_PROCESSED", error: "Richiesta già processata" },
       { status: 409 }
     );
   }
 
-  const newNotification: NotificationsInsert = {
-    activity_from: auth.profileId,
-    to: friendRequest.sender,
-    notificationType: "friendRequestAccepted",
-    seen: false,
-  };
-
-  const { error: createNotificationError } = await supabase
-    .from("notifications")
-    .insert(newNotification);
-
-  if (createNotificationError) {
-    console.error(
-      "Errore creazione notifica accettazione richiesta amicizia API:",
-      createNotificationError
-    );
-    return NextResponse.json(
-      { code: "NOTIFICATION_CREATE_ERROR", error: "Errore interno" },
-      { status: 500 }
-    );
-  }
-
   return NextResponse.json({
-    code: "FRIEND_REQUEST_ACCEPTED",
+    code: "FRIEND_REQUEST_REJECTED",
     requestId: friendRequest.id,
-    friendship: {
-      userA: friendRequest.sender,
-      userB: friendRequest.target,
-    },
-    friendshipStatus: FRIENDSHIP_STATUS.AMICO,
+    friendshipStatus: FRIENDSHIP_STATUS.NON_AMICO,
   });
 }

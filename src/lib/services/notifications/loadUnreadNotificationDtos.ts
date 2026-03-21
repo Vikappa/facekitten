@@ -44,6 +44,8 @@ type LoadUnreadNotificationsResult =
     };
 
 const PREVIEW_MAX_LENGTH = 90;
+const FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT =
+  "ti ha inviato una richiesta di amicizia";
 
 function toPreviewSnippet(rawText: string | null | undefined): string | null {
   if (!rawText) {
@@ -176,6 +178,10 @@ async function resolveNotificationPreviewText(
       activityFromId,
       notification.created_at
     );
+  }
+
+  if (notificationType === "friendRequestRecieved") {
+    return FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT;
   }
 
   return null;

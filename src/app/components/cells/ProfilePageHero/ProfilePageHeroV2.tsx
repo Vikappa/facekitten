@@ -49,6 +49,12 @@ type RemoveFriendSuccessResponse = {
     friendshipStatus: FriendshipStatus;
 };
 
+type RejectFriendRequestSuccessResponse = {
+    code: "FRIEND_REQUEST_REJECTED";
+    requestId: number;
+    friendshipStatus: FriendshipStatus;
+};
+
 function isErrorPayload(payload: unknown): payload is { error?: string } {
     return typeof payload === "object" && payload !== null;
 }
@@ -86,13 +92,32 @@ function isRemoveFriendSuccessResponse(payload: unknown): payload is RemoveFrien
     );
 }
 
+function isRejectFriendRequestSuccessResponse(payload: unknown): payload is RejectFriendRequestSuccessResponse {
+    if (typeof payload !== "object" || payload === null) {
+        return false;
+    }
+
+    const candidate = payload as Partial<RejectFriendRequestSuccessResponse>;
+    return (
+        candidate.code === "FRIEND_REQUEST_REJECTED" &&
+        typeof candidate.requestId === "number"
+    );
+}
+
 export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
     const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>(props.friendshipStatus);
     const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false);
     const [isAcceptingFriendRequest, setIsAcceptingFriendRequest] = useState(false);
+    const [isRejectingFriendRequest, setIsRejectingFriendRequest] = useState(false);
     const [isRemovingFriend, setIsRemovingFriend] = useState(false);
     const [isFriendMenuOpen, setIsFriendMenuOpen] = useState(false);
+    const [isRequestMenuOpen, setIsRequestMenuOpen] = useState(false);
     const [friendMenuPosition, setFriendMenuPosition] = useState<{
+        top: number;
+        left: number;
+        width: number;
+    } | null>(null);
+    const [requestMenuPosition, setRequestMenuPosition] = useState<{
         top: number;
         left: number;
         width: number;
@@ -101,6 +126,9 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
     const friendMenuContainerRef = useRef<HTMLDivElement | null>(null);
     const friendMenuButtonRef = useRef<HTMLButtonElement | null>(null);
     const friendMenuDropdownRef = useRef<HTMLButtonElement | null>(null);
+    const requestMenuContainerRef = useRef<HTMLDivElement | null>(null);
+    const requestMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+    const requestMenuDropdownRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         setFriendshipStatus(props.friendshipStatus);
@@ -109,6 +137,12 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
     useEffect(() => {
         if (friendshipStatus !== FRIENDSHIP_STATUS.AMICO) {
             setIsFriendMenuOpen(false);
+        }
+    }, [friendshipStatus]);
+
+    useEffect(() => {
+        if (friendshipStatus !== FRIENDSHIP_STATUS.RICHIESTA_RICEVUTA) {
+            setIsRequestMenuOpen(false);
         }
     }, [friendshipStatus]);
 
@@ -137,6 +171,32 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
             document.removeEventListener("mousedown", closeOnOutsideClick);
         };
     }, [isFriendMenuOpen]);
+
+    useEffect(() => {
+        if (!isRequestMenuOpen) {
+            return;
+        }
+
+        const closeOnOutsideClick = (event: MouseEvent) => {
+            const menuContainer = requestMenuContainerRef.current;
+            const menuDropdown = requestMenuDropdownRef.current;
+            if (!(event.target instanceof Node)) {
+                return;
+            }
+
+            const clickedInsideContainer = menuContainer?.contains(event.target) ?? false;
+            const clickedInsideDropdown = menuDropdown?.contains(event.target) ?? false;
+            if (!clickedInsideContainer && !clickedInsideDropdown) {
+                setIsRequestMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", closeOnOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", closeOnOutsideClick);
+        };
+    }, [isRequestMenuOpen]);
 
     useEffect(() => {
         if (!isFriendMenuOpen) {
@@ -168,6 +228,37 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
             window.removeEventListener("scroll", updateFriendMenuPosition, true);
         };
     }, [isFriendMenuOpen]);
+
+    useEffect(() => {
+        if (!isRequestMenuOpen) {
+            setRequestMenuPosition(null);
+            return;
+        }
+
+        const updateRequestMenuPosition = () => {
+            const requestMenuButton = requestMenuButtonRef.current;
+            if (!requestMenuButton) {
+                setRequestMenuPosition(null);
+                return;
+            }
+
+            const buttonRect = requestMenuButton.getBoundingClientRect();
+            setRequestMenuPosition({
+                top: Math.round(buttonRect.bottom + 4),
+                left: Math.round(buttonRect.left),
+                width: Math.round(buttonRect.width),
+            });
+        };
+
+        updateRequestMenuPosition();
+        window.addEventListener("resize", updateRequestMenuPosition);
+        window.addEventListener("scroll", updateRequestMenuPosition, true);
+
+        return () => {
+            window.removeEventListener("resize", updateRequestMenuPosition);
+            window.removeEventListener("scroll", updateRequestMenuPosition, true);
+        };
+    }, [isRequestMenuOpen]);
 
     const handleSendFriendRequest = async () => {
         const targetProfileId = props.userToRender?.id?.trim();
@@ -212,7 +303,11 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
             return;
         }
 
-        const PLACEHOLDER_REQUEST_ID = -1;
+        const senderProfileId = props.userToRender?.id?.trim();
+        if (!senderProfileId) {
+            setFriendshipActionError("Profilo mittente richiesta non valido");
+            return;
+        }
 
         setIsAcceptingFriendRequest(true);
         setFriendshipActionError(null);
@@ -224,7 +319,7 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    requestId: PLACEHOLDER_REQUEST_ID,
+                    senderProfileId,
                 }),
             });
 
@@ -232,14 +327,15 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
             if (!response.ok) {
                 setFriendshipActionError(
                     isErrorPayload(payload)
-                        ? payload.error ?? "Accettazione non disponibile: sostituire il requestId placeholder quando avremo la lista richieste"
-                        : "Accettazione non disponibile: sostituire il requestId placeholder quando avremo la lista richieste"
+                        ? payload.error ?? "Impossibile accettare la richiesta di amicizia"
+                        : "Impossibile accettare la richiesta di amicizia"
                 );
                 return;
             }
 
             if (isAcceptFriendRequestSuccessResponse(payload)) {
                 setFriendshipStatus(FRIENDSHIP_STATUS.AMICO);
+                setIsRequestMenuOpen(false);
                 return;
             }
 
@@ -248,6 +344,55 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
             setFriendshipActionError("Errore di rete durante l'accettazione della richiesta");
         } finally {
             setIsAcceptingFriendRequest(false);
+        }
+    };
+
+    const handleRejectFriendRequest = async () => {
+        if (isRejectingFriendRequest) {
+            return;
+        }
+
+        const senderProfileId = props.userToRender?.id?.trim();
+        if (!senderProfileId) {
+            setFriendshipActionError("Profilo mittente richiesta non valido");
+            return;
+        }
+
+        setIsRejectingFriendRequest(true);
+        setFriendshipActionError(null);
+
+        try {
+            const response = await fetch("/api/v1/friendship/request/reject", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    senderProfileId,
+                }),
+            });
+
+            const payload: unknown = await response.json().catch(() => null);
+            if (!response.ok) {
+                setFriendshipActionError(
+                    isErrorPayload(payload)
+                        ? payload.error ?? "Impossibile rifiutare la richiesta di amicizia"
+                        : "Impossibile rifiutare la richiesta di amicizia"
+                );
+                return;
+            }
+
+            if (isRejectFriendRequestSuccessResponse(payload)) {
+                setFriendshipStatus(FRIENDSHIP_STATUS.NON_AMICO);
+                setIsRequestMenuOpen(false);
+                return;
+            }
+
+            setFriendshipActionError("Risposta non valida durante il rifiuto della richiesta");
+        } catch {
+            setFriendshipActionError("Errore di rete durante il rifiuto della richiesta");
+        } finally {
+            setIsRejectingFriendRequest(false);
         }
     };
 
@@ -403,17 +548,20 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                         }
                         {
                             friendshipStatus === FRIENDSHIP_STATUS.RICHIESTA_RICEVUTA &&
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    void handleAcceptFriendRequest();
-                                }}
-                                disabled={isAcceptingFriendRequest}
-                                className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700 disabled:opacity-60"
-                            >
-                                <FaUserClock className="shrink-0 text-sm" />
-                                {isAcceptingFriendRequest ? "Conferma..." : "Accetta Richiesta di Micizia"}
-                            </button>
+                            <div ref={requestMenuContainerRef} className="mb-2 w-1/2">
+                                <button
+                                    ref={requestMenuButtonRef}
+                                    type="button"
+                                    onClick={() => {
+                                        setIsRequestMenuOpen((previousValue) => !previousValue);
+                                    }}
+                                    disabled={isAcceptingFriendRequest || isRejectingFriendRequest}
+                                    className="px-2 text-sm flex w-full items-center justify-center gap-2 rounded-md bg-secondary py-1.5 font-bold text-gray-700 disabled:opacity-60"
+                                >
+                                    <FaUserClock className="shrink-0 text-sm" />
+                                    Accetta Richiesta di Micizia
+                                </button>
+                            </div>
                         }
                         <button
                             className={`mb-2 flex w-1/2 items-center justify-center gap-2 rounded-md ${props.friendshipStatus ? "bg-primary" : "bg-tertiary"} py-1.5 font-semibold ${props.friendshipStatus ? "text-white":""}`}
@@ -450,6 +598,45 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     >
                         {isRemovingFriend ? "Rimozione..." : "Ne-Mici"}
                     </button>,
+                    document.body
+                )
+            }
+            {
+                isRequestMenuOpen &&
+                requestMenuPosition &&
+                typeof document !== "undefined" &&
+                createPortal(
+                    <div
+                        ref={requestMenuDropdownRef}
+                        style={{
+                            top: requestMenuPosition.top,
+                            left: requestMenuPosition.left,
+                            width: requestMenuPosition.width,
+                            position: "fixed",
+                        }}
+                        className="z-[100] overflow-hidden rounded-md border border-gray-200 bg-white shadow-md"
+                    >
+                        <button
+                            type="button"
+                            onClick={() => {
+                                void handleAcceptFriendRequest();
+                            }}
+                            disabled={isAcceptingFriendRequest || isRejectingFriendRequest}
+                            className="w-full border-b border-gray-200 px-3 py-2 text-left text-sm font-semibold text-gray-700 disabled:opacity-60"
+                        >
+                            {isAcceptingFriendRequest ? "Conferma..." : "Accetta"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                void handleRejectFriendRequest();
+                            }}
+                            disabled={isAcceptingFriendRequest || isRejectingFriendRequest}
+                            className="w-full px-3 py-2 text-left text-sm font-semibold text-red-600 disabled:opacity-60"
+                        >
+                            {isRejectingFriendRequest ? "Rifiuto..." : "Rifiuta"}
+                        </button>
+                    </div>,
                     document.body
                 )
             }
