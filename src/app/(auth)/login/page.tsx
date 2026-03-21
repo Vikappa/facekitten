@@ -68,10 +68,16 @@ const isNotificationData = (payload: unknown): payload is NotificationData => {
   }
 
   const candidate = payload as Partial<NotificationData>;
+  const activityFrom = candidate.activityFrom as Partial<NotificationData["activityFrom"]> | undefined;
+
   return (
     typeof candidate.id === "number" &&
     typeof candidate.createdAt === "string" &&
-    typeof candidate.seen === "boolean"
+    typeof activityFrom === "object" &&
+    activityFrom !== null &&
+    typeof activityFrom.name === "string" &&
+    (activityFrom.avatarUrl === null || typeof activityFrom.avatarUrl === "string") &&
+    (candidate.previewText === null || typeof candidate.previewText === "string")
   );
 };
 

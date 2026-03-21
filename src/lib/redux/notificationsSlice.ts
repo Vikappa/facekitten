@@ -33,9 +33,6 @@ function mergeUniqueUnreadNotifications(
     const byId = new Map<number, NotificationData>();
 
     for (const notification of [...baseNotifications, ...incomingNotifications]) {
-        if (notification.seen) {
-            continue;
-        }
         byId.set(notification.id, notification);
     }
 

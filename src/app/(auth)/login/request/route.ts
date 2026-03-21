@@ -1,9 +1,9 @@
 import { normalizeEmail, verifyProfilePassword } from "@/lib/Security/ProfilePasswordSecurity";
 import { issueSessionCookie } from "@/lib/Security/SessionSecurity";
 import { NotificationData } from "@/lib/interfaces/CommonInterfaces";
+import { loadUnreadNotificationDtosForProfile } from "@/lib/services/notifications/loadUnreadNotificationDtos";
 import { GetLocationById } from "@/lib/services/searchLocation/GetLocationById";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import { NotificationsRow } from "@/types/db.generated";
 import { Database } from "@/types/database.types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -42,18 +42,6 @@ type PreloadMediaData = {
   cuccetta?: Database["public"]["Enums"]["Lettino"] | null;
   unreadNotifications?: NotificationData[];
 };
-
-type UnreadNotificationRow = Pick<
-  NotificationsRow,
-  | "id"
-  | "activity_from"
-  | "to"
-  | "created_at"
-  | "generatedNavigation"
-  | "notificationType"
-  | "seen"
-  | "type"
->;
 
 const loadProfileMedia = async (profile: ProfilePreloadRow): Promise<PreloadMediaData> => {
   const locationData = profile.locationId
@@ -157,33 +145,23 @@ export async function POST(req: NextRequest) {
 
   const preloadData = await loadProfileMedia(profile);
 
-  const { data: unreadNotificationRows, error: unreadNotificationsError } = await supabase
-    .from("notifications")
-    .select("id, activity_from, to, created_at, generatedNavigation, notificationType, seen, type")
-    .eq("to", profile.id)
-    .or("seen.is.null,seen.eq.false")
-    .order("created_at", { ascending: false });
+  const unreadNotificationsResult = await loadUnreadNotificationDtosForProfile({
+    profileId: profile.id,
+    supabase,
+  });
 
-  if (unreadNotificationsError) {
-    console.error("Errore recupero notifiche non viste in login:", unreadNotificationsError);
+  if (!unreadNotificationsResult.ok) {
+    console.error(
+      "Errore recupero notifiche non viste in login:",
+      unreadNotificationsResult.error
+    );
     return NextResponse.json(
       { code: "LOGIN_INTERNAL_ERROR", error: "Errore interno durante il login" },
       { status: 500 }
     );
   }
 
-  const unreadNotifications: NotificationData[] = (
-    (unreadNotificationRows ?? []) as UnreadNotificationRow[]
-  ).map((notification) => ({
-    id: notification.id,
-    activityFrom: notification.activity_from ?? null,
-    to: notification.to ?? null,
-    createdAt: notification.created_at,
-    generatedNavigation: notification.generatedNavigation ?? null,
-    notificationType: notification.notificationType ?? null,
-    seen: notification.seen === true,
-    type: notification.type ?? null,
-  }));
+  const unreadNotifications = unreadNotificationsResult.notifications;
 
   const response = NextResponse.json({
     code: "LOGIN_OK",

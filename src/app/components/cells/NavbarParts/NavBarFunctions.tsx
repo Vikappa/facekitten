@@ -46,6 +46,7 @@ export default function NavbarFunctions(){
                 onClick={(nextState) => setExclusiveButtonState("bell", nextState)}
                 className={navbarbuttonsClassName}
                 isActive={isBellButtonActive}
+                ariaLabel="Notifications"
             />
             <ProfilePicture
                 imageSrc={profileAvatar ?? "/assets/blankprofile.png"}

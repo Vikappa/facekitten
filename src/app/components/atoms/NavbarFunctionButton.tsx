@@ -7,6 +7,7 @@ interface NavbarButtonFunctionProps {
     onClick: (v: boolean) => void;
     isActive: boolean;
     className: string;
+    ariaLabel?: string;
 }
 
 export default function NavbarButtonFunction(props: NavbarButtonFunctionProps) {
@@ -19,6 +20,7 @@ export default function NavbarButtonFunction(props: NavbarButtonFunctionProps) {
     return (
         <button 
         onClick={handleClick} 
+        aria-label={props.ariaLabel}
         className={`${props.className} ${props.isActive ? "text-primary bg-secondary" : ""} transition-[color,background-color] duration-300 ease-in`}
         >
             {props.icon}

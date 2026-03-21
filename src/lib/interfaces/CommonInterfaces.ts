@@ -70,11 +70,13 @@ export type SharePostDTO = {
 
 export type NotificationData = {
     id: number;
-    activityFrom: string | null;
-    to: string | null;
     createdAt: string;
+    activityFrom: {
+        id: string | null;
+        name: string;
+        avatarUrl: string | null;
+    };
     generatedNavigation: string | null;
     notificationType: Database["public"]["Enums"]["notificationtype"] | null;
-    seen: boolean;
-    type: PostType | null;
+    previewText: string | null;
 }

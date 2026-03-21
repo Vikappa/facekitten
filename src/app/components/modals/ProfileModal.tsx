@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setActiveNavFunction } from "@/lib/redux/uiSlice";
 import Image from "next/image";
 import { MutableRefObject, useEffect, useRef, useState } from "react";
-import ProfileModalRectangle from "./ProfileModalParts/ProfileModalRectangle";
+import ProfileModalRectangle from "../cells/ProfileModalParts/ProfileModalRectangle";
 import { IoMdSettings } from "react-icons/io";
 import { BiSolidDoorOpen } from "react-icons/bi";
 import { RiErrorWarningFill } from "react-icons/ri";

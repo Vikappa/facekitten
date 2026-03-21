@@ -3,6 +3,8 @@
 import { MutableRefObject, useRef } from "react";
 import ProfileModal from "../modals/ProfileModal";
 import Navbar from "./Navbar";
+import NotificationModal from "../modals/NotificationModal";
+import MessengerModal from "../modals/MessengerModal";
 
 export enum PageFocus {
     Home,
@@ -24,6 +26,8 @@ export default function CommonLayout({
         <div>
         <Navbar navbarRef={navbarRef} />
         <ProfileModal navbarRef={navbarRef} />
+        <MessengerModal />
+        <NotificationModal navbarRef={navbarRef} />
                 {children}
         </div>
     );

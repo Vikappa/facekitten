@@ -3,7 +3,8 @@
 import { FRIENDSHIP_STATUS, type FriendshipStatus } from "@/types/friendship";
 import { Database } from "@/types/database.types";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
     FaCheck,
     FaFacebookMessenger,
@@ -42,6 +43,12 @@ type AcceptFriendRequestSuccessResponse = {
     friendshipStatus: FriendshipStatus;
 };
 
+type RemoveFriendSuccessResponse = {
+    code: "FRIEND_REMOVED" | "FRIENDSHIP_ALREADY_REMOVED";
+    targetProfileId: string;
+    friendshipStatus: FriendshipStatus;
+};
+
 function isErrorPayload(payload: unknown): payload is { error?: string } {
     return typeof payload === "object" && payload !== null;
 }
@@ -67,15 +74,100 @@ function isAcceptFriendRequestSuccessResponse(payload: unknown): payload is Acce
     return candidate.code === "FRIEND_REQUEST_ACCEPTED";
 }
 
+function isRemoveFriendSuccessResponse(payload: unknown): payload is RemoveFriendSuccessResponse {
+    if (typeof payload !== "object" || payload === null) {
+        return false;
+    }
+
+    const candidate = payload as Partial<RemoveFriendSuccessResponse>;
+    return (
+        (candidate.code === "FRIEND_REMOVED" || candidate.code === "FRIENDSHIP_ALREADY_REMOVED") &&
+        typeof candidate.targetProfileId === "string"
+    );
+}
+
 export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
     const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>(props.friendshipStatus);
     const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false);
     const [isAcceptingFriendRequest, setIsAcceptingFriendRequest] = useState(false);
+    const [isRemovingFriend, setIsRemovingFriend] = useState(false);
+    const [isFriendMenuOpen, setIsFriendMenuOpen] = useState(false);
+    const [friendMenuPosition, setFriendMenuPosition] = useState<{
+        top: number;
+        left: number;
+        width: number;
+    } | null>(null);
     const [friendshipActionError, setFriendshipActionError] = useState<string | null>(null);
+    const friendMenuContainerRef = useRef<HTMLDivElement | null>(null);
+    const friendMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+    const friendMenuDropdownRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
         setFriendshipStatus(props.friendshipStatus);
     }, [props.friendshipStatus]);
+
+    useEffect(() => {
+        if (friendshipStatus !== FRIENDSHIP_STATUS.AMICO) {
+            setIsFriendMenuOpen(false);
+        }
+    }, [friendshipStatus]);
+
+    useEffect(() => {
+        if (!isFriendMenuOpen) {
+            return;
+        }
+
+        const closeOnOutsideClick = (event: MouseEvent) => {
+            const menuContainer = friendMenuContainerRef.current;
+            const menuDropdown = friendMenuDropdownRef.current;
+            if (!(event.target instanceof Node)) {
+                return;
+            }
+
+            const clickedInsideContainer = menuContainer?.contains(event.target) ?? false;
+            const clickedInsideDropdown = menuDropdown?.contains(event.target) ?? false;
+            if (!clickedInsideContainer && !clickedInsideDropdown) {
+                setIsFriendMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", closeOnOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", closeOnOutsideClick);
+        };
+    }, [isFriendMenuOpen]);
+
+    useEffect(() => {
+        if (!isFriendMenuOpen) {
+            setFriendMenuPosition(null);
+            return;
+        }
+
+        const updateFriendMenuPosition = () => {
+            const friendMenuButton = friendMenuButtonRef.current;
+            if (!friendMenuButton) {
+                setFriendMenuPosition(null);
+                return;
+            }
+
+            const buttonRect = friendMenuButton.getBoundingClientRect();
+            setFriendMenuPosition({
+                top: Math.round(buttonRect.bottom + 4),
+                left: Math.round(buttonRect.left),
+                width: Math.round(buttonRect.width),
+            });
+        };
+
+        updateFriendMenuPosition();
+        window.addEventListener("resize", updateFriendMenuPosition);
+        window.addEventListener("scroll", updateFriendMenuPosition, true);
+
+        return () => {
+            window.removeEventListener("resize", updateFriendMenuPosition);
+            window.removeEventListener("scroll", updateFriendMenuPosition, true);
+        };
+    }, [isFriendMenuOpen]);
 
     const handleSendFriendRequest = async () => {
         const targetProfileId = props.userToRender?.id?.trim();
@@ -159,8 +251,48 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
         }
     };
 
+    const handleRemoveFriend = async () => {
+        const targetProfileId = props.userToRender?.id?.trim();
+        if (!targetProfileId || isRemovingFriend) {
+            return;
+        }
+
+        setIsRemovingFriend(true);
+        setFriendshipActionError(null);
+
+        try {
+            const response = await fetch(
+                `/api/v1/friendship/remove/${encodeURIComponent(targetProfileId)}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            const payload: unknown = await response.json().catch(() => null);
+            if (!response.ok) {
+                setFriendshipActionError(
+                    isErrorPayload(payload) ? payload.error ?? "Impossibile rimuovere l'amicizia" : "Impossibile rimuovere l'amicizia"
+                );
+                return;
+            }
+
+            if (isRemoveFriendSuccessResponse(payload)) {
+                setFriendshipStatus(FRIENDSHIP_STATUS.NON_AMICO);
+                setIsFriendMenuOpen(false);
+                return;
+            }
+
+            setFriendshipActionError("Risposta non valida durante la rimozione amicizia");
+        } catch {
+            setFriendshipActionError("Errore di rete durante la rimozione amicizia");
+        } finally {
+            setIsRemovingFriend(false);
+        }
+    };
+
     return (
-        <div className="relative overflow-hidden bg-white shadow-sm">
+        <>
+            <div className="relative overflow-hidden bg-white shadow-sm">
             <div className="relative h-40 sm:h-48">
                 <Image
                     src={(props.userToRender?.bannerUrl && props.userToRender?.bannerUrl.trim() !== "") ? props.userToRender?.bannerUrl : "/assets/grumpy-cat-background-facebook-cover.jpg"}
@@ -234,10 +366,19 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     <div className="mt-4 flex gap-2">
                         {
                             friendshipStatus === FRIENDSHIP_STATUS.AMICO &&
-                            <button className="mb-2 px-2 text-sm flex w-1/2 items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-bold text-dark-800">
-                                <FaCheck className="shrink-0 text-sm" />
-                                Mici
-                            </button>
+                            <div ref={friendMenuContainerRef} className="mb-2 w-1/2">
+                                <button
+                                    ref={friendMenuButtonRef}
+                                    type="button"
+                                    onClick={() => {
+                                        setIsFriendMenuOpen((previousValue) => !previousValue);
+                                    }}
+                                    className="px-2 text-sm flex w-full items-center justify-center gap-2 rounded-md bg-tertiary py-1.5 font-bold text-dark-800"
+                                >
+                                    <FaCheck className="shrink-0 text-sm" />
+                                    Mici
+                                </button>
+                            </div>
                         }
                         {
                             friendshipStatus === FRIENDSHIP_STATUS.NON_AMICO &&
@@ -286,6 +427,32 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                     }
                 </div>
             </div>
-        </div >
+            </div>
+            {
+                isFriendMenuOpen &&
+                friendMenuPosition &&
+                typeof document !== "undefined" &&
+                createPortal(
+                    <button
+                        ref={friendMenuDropdownRef}
+                        type="button"
+                        onClick={() => {
+                            void handleRemoveFriend();
+                        }}
+                        disabled={isRemovingFriend}
+                        style={{
+                            top: friendMenuPosition.top,
+                            left: friendMenuPosition.left,
+                            width: friendMenuPosition.width,
+                            position: "fixed",
+                        }}
+                        className="z-[100] rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm font-semibold text-red-600 shadow-md disabled:opacity-60"
+                    >
+                        {isRemovingFriend ? "Rimozione..." : "Ne-Mici"}
+                    </button>,
+                    document.body
+                )
+            }
+        </>
     );
 }
