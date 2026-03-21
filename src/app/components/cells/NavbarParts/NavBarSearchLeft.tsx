@@ -1,13 +1,37 @@
 'use client'
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { resetNavbarUiState, setActiveNavFunction, setSearchTerm, setSmallSearchBarVisible, toggleSmallSearchBarVisible } from "@/lib/redux/uiSlice";
-import { useEffect } from "react";
+import { setActiveNavFunction, setSearchTerm, setSmallSearchBarVisible, toggleSmallSearchBarVisible } from "@/lib/redux/uiSlice";
+import { useEffect, useRef } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 
 export default function NavBarSearchLeft() {
     const dispatch = useAppDispatch();
     const searchTerm = useAppSelector((state) => state.ui.searchTerm);
     const isSmallSearchBarVisible = useAppSelector((state) => state.ui.isSmallSearchBarVisible);
+    const searchContainerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!isSmallSearchBarVisible) {
+            return;
+        }
+
+        const closeOnOutsideClick = (event: MouseEvent) => {
+            const searchContainer = searchContainerRef.current;
+            if (!(event.target instanceof Node) || !searchContainer) {
+                return;
+            }
+
+            if (!searchContainer.contains(event.target)) {
+                dispatch(setSmallSearchBarVisible(false));
+            }
+        };
+
+        document.addEventListener("mousedown", closeOnOutsideClick);
+
+        return () => {
+            document.removeEventListener("mousedown", closeOnOutsideClick);
+        };
+    }, [dispatch, isSmallSearchBarVisible]);
 
     function openSmallSearchBar() {
         dispatch(toggleSmallSearchBarVisible())
@@ -15,7 +39,7 @@ export default function NavBarSearchLeft() {
     }
 
     return (
-        <div className="relative ps-2">
+        <div ref={searchContainerRef} className="relative ps-2">
             <div
                 className="
                     md:hidden
