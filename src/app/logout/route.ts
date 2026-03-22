@@ -1,15 +1,9 @@
-import { SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS } from "@/lib/Security/SessionSecurity";
+import { clearAuthCookies } from "@/lib/Security/SessionSecurity";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   const response = NextResponse.json({ code: "LOGOUT_OK" });
-
-  response.cookies.set({
-    name: SESSION_COOKIE_NAME,
-    value: "",
-    ...SESSION_COOKIE_OPTIONS,
-    maxAge: 0,
-  });
+  clearAuthCookies(response);
 
   return response;
 }

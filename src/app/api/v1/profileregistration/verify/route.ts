@@ -1,5 +1,5 @@
 import { VercelLogger } from '@/lib/logging/VercelLogger'
-import { issueSessionCookie } from '@/lib/Security/SessionSecurity'
+import { issueIdentityCookie, issueSessionCookie } from '@/lib/Security/SessionSecurity'
 import { createSupabaseAdminClient } from '@/lib/supabase/serverAdminClient'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -71,6 +71,10 @@ export async function POST(req: NextRequest) {
   )
 
   await issueSessionCookie(response, {
+    profileId: updatedProfile.id,
+    email: updatedProfile.email,
+  })
+  await issueIdentityCookie(response, {
     profileId: updatedProfile.id,
     email: updatedProfile.email,
   })

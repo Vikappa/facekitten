@@ -1,5 +1,5 @@
 import { normalizeEmail, verifyProfilePassword } from "@/lib/Security/ProfilePasswordSecurity";
-import { issueSessionCookie } from "@/lib/Security/SessionSecurity";
+import { issueIdentityCookie, issueSessionCookie } from "@/lib/Security/SessionSecurity";
 import { NotificationData } from "@/lib/interfaces/CommonInterfaces";
 import { loadUnreadNotificationDtosForProfile } from "@/lib/services/notifications/loadUnreadNotificationDtos";
 import { GetLocationById } from "@/lib/services/searchLocation/GetLocationById";
@@ -173,6 +173,10 @@ export async function POST(req: NextRequest) {
   });
 
   await issueSessionCookie(response, {
+    profileId: loginProfile.id,
+    email: loginProfile.email,
+  });
+  await issueIdentityCookie(response, {
     profileId: loginProfile.id,
     email: loginProfile.email,
   });

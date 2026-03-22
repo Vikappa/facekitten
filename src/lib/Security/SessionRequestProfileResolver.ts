@@ -5,8 +5,10 @@ import type { NextRequest } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import {
+  IDENTITY_COOKIE_NAME,
   SESSION_COOKIE_NAME,
   extractSessionIdentity,
+  verifyIdentityToken,
   verifySession,
 } from "./SessionSecurity";
 
@@ -60,23 +62,28 @@ export type AuthenticatedProfileIdResult =
   | SessionIdentityFailure
   | ProfileIdFailure;
 
-function getRequestSessionTokens(req: Pick<NextRequest, "cookies">): string[] {
+function getRequestTokens(
+  req: Pick<NextRequest, "cookies">,
+  cookieName: string
+): string[] {
   return req.cookies
-    .getAll(SESSION_COOKIE_NAME)
+    .getAll(cookieName)
     .map(({ value }) => value.trim())
     .filter((value) => value.length > 0);
 }
 
-export async function resolveSessionIdentityFromToken(
-  sessionToken: string
-): Promise<
+type ResolveTokenIdentityResult =
   | SessionIdentitySuccess
   | {
       ok: false;
       code: "INVALID_SESSION" | "INVALID_SESSION_IDENTITY";
-    }
-> {
-  const normalizedToken = sessionToken.trim();
+    };
+
+async function resolveIdentityFromToken(
+  token: string,
+  verifyToken: (token: string) => Promise<JWTPayload>
+): Promise<ResolveTokenIdentityResult> {
+  const normalizedToken = token.trim();
   if (normalizedToken.length === 0) {
     return { ok: false, code: "INVALID_SESSION" };
   }
@@ -84,7 +91,7 @@ export async function resolveSessionIdentityFromToken(
   let payload: JWTPayload;
 
   try {
-    payload = await verifySession(normalizedToken);
+    payload = await verifyToken(normalizedToken);
   } catch {
     return { ok: false, code: "INVALID_SESSION" };
   }
@@ -98,24 +105,38 @@ export async function resolveSessionIdentityFromToken(
   return { ok: true, payload, identity };
 }
 
-export async function resolveSessionIdentityFromRequest(
-  req: Pick<NextRequest, "cookies">
-): Promise<SessionIdentityResult> {
-  const sessionTokens = getRequestSessionTokens(req);
+export async function resolveSessionIdentityFromToken(
+  sessionToken: string
+): Promise<ResolveTokenIdentityResult> {
+  return resolveIdentityFromToken(sessionToken, verifySession);
+}
 
-  if (sessionTokens.length === 0) {
+export async function resolveIdentityCookieFromToken(
+  identityToken: string
+): Promise<ResolveTokenIdentityResult> {
+  return resolveIdentityFromToken(identityToken, verifyIdentityToken);
+}
+
+async function resolveIdentityFromRequest(
+  req: Pick<NextRequest, "cookies">,
+  cookieName: string,
+  resolveFromToken: (token: string) => Promise<ResolveTokenIdentityResult>
+): Promise<SessionIdentityResult> {
+  const tokens = getRequestTokens(req, cookieName);
+
+  if (tokens.length === 0) {
     return { ok: false, code: "SESSION_REQUIRED" };
   }
 
   let hasInvalidIdentity = false;
 
-  for (const sessionToken of sessionTokens) {
-    const sessionResult = await resolveSessionIdentityFromToken(sessionToken);
-    if (sessionResult.ok) {
-      return sessionResult;
+  for (const token of tokens) {
+    const identityResult = await resolveFromToken(token);
+    if (identityResult.ok) {
+      return identityResult;
     }
 
-    if (sessionResult.code === "INVALID_SESSION_IDENTITY") {
+    if (identityResult.code === "INVALID_SESSION_IDENTITY") {
       hasInvalidIdentity = true;
     }
   }
@@ -125,6 +146,26 @@ export async function resolveSessionIdentityFromRequest(
   }
 
   return { ok: false, code: "INVALID_SESSION" };
+}
+
+export async function resolveSessionIdentityFromRequest(
+  req: Pick<NextRequest, "cookies">
+): Promise<SessionIdentityResult> {
+  return resolveIdentityFromRequest(
+    req,
+    SESSION_COOKIE_NAME,
+    resolveSessionIdentityFromToken
+  );
+}
+
+export async function resolveIdentityCookieFromRequest(
+  req: Pick<NextRequest, "cookies">
+): Promise<SessionIdentityResult> {
+  return resolveIdentityFromRequest(
+    req,
+    IDENTITY_COOKIE_NAME,
+    resolveIdentityCookieFromToken
+  );
 }
 
 export async function resolveProfileIdFromSessionIdentity(
