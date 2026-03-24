@@ -454,7 +454,7 @@ export default function ProfilePageHeroV2(props: ProfilePageHeroV2Props) {
                         <div className="h-full w-full overflow-hidden rounded-full bg-white ring-5 ring-white">
 
                             <Image
-                                src={props.userToRender?.avatarUrl ?? '/assets/blankprofile.png'}
+                                src={props.userToRender?.avatarUrl && props.userToRender?.avatarUrl !== "" ? props.userToRender?.avatarUrl : '/assets/blankprofile.png'}
                                 alt={`${props.userToRender?.username} profile image`}
                                 width={100}
                                 height={100}

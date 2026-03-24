@@ -9,22 +9,39 @@ import ShareCount from "./PostCardParts/ShareCount"
 import ReactionSpan from "./PostCardParts/ReactionSpan"
 import CommentSpan from "./PostCardParts/CommentSpan"
 import CondividiSpan from "./PostCardParts/CondividiSpan"
-import { ReactNode, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import CommentForm from "../CommentForm"
 import CommentList from "./PostCardParts/CommentList"
 
 interface PostCardProp {
     data:PostData
+    nowMs?: number
 }
 
 export default function PostCard(prop: PostCardProp) {
 
     const userId = useAppSelector((state) => state.profile.currentProfile?.id)
     const [isCommenting, setIsCommenting] = useState(false)
+    const [fallbackNowMs, setFallbackNowMs] = useState(() => Date.now());
+    const effectiveNowMs = prop.nowMs ?? fallbackNowMs;
 
     function toggleIsCommenting(){
         setIsCommenting(!isCommenting)
     }
+
+    useEffect(() => {
+        if (prop.nowMs !== undefined) {
+            return;
+        }
+
+        const intervalId = window.setInterval(() => {
+            setFallbackNowMs(Date.now());
+        }, 15_000);
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [prop.nowMs]);
 
     function formatPostDate(postedAt: string): ReactNode {
         const postDate = new Date(postedAt);
@@ -32,22 +49,25 @@ export default function PostCard(prop: PostCardProp) {
             return postedAt;
         }
 
-        const now = Date.now();
-        const diffMs = now - postDate.getTime();
+        const diffMs = effectiveNowMs - postDate.getTime();
         const minuteMs = 60 * 1000;
         const hourMs = 60 * minuteMs;
         const dayMs = 24 * hourMs;
 
-        if (diffMs < 0) {
+        if (diffMs < -minuteMs) {
             return (
                 <span className="future-post-rainbow">
-                    questo post viene dal futuro!!
+                    questo post arriva dal futuro!!
                 </span>
             );
         }
 
+        if (Math.abs(diffMs) < minuteMs) {
+            return "Adesso";
+        }
+
         if (diffMs < hourMs) {
-            const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
+            const minutes = Math.floor(diffMs / minuteMs);
             return minutes === 1 ? "1 minuto fa" : `${minutes} minuti fa`;
         }
 
@@ -93,7 +113,7 @@ export default function PostCard(prop: PostCardProp) {
                 <CondividiSpan />
             </div>
             {isCommenting && <CommentForm postId={prop.data.postId} />}
-            {isCommenting && <CommentList commentData={prop.data.comments} />}
+            {isCommenting && <CommentList commentData={prop.data.comments} nowMs={effectiveNowMs} />}
             
         </div>
     )

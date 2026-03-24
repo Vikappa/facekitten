@@ -7,9 +7,10 @@ import { ReactNode } from "react"
 
 interface CommentLiProp {
     comment: CommentData
+    nowMs: number
 }
 
-export default function CommentLi({ comment }: CommentLiProp) {
+export default function CommentLi({ comment, nowMs }: CommentLiProp) {
 
     function formatCommentDate(commentedAt: string): ReactNode {
         const commentDate = new Date(commentedAt);
@@ -17,22 +18,25 @@ export default function CommentLi({ comment }: CommentLiProp) {
             return commentedAt;
         }
 
-        const now = Date.now();
-        const diffMs = now - commentDate.getTime();
+        const diffMs = nowMs - commentDate.getTime();
         const minuteMs = 60 * 1000;
         const hourMs = 60 * minuteMs;
         const dayMs = 24 * hourMs;
 
-        if (diffMs < 0) {
+        if (diffMs < -minuteMs) {
             return (
                 <span className="future-post-rainbow">
-                    questo post viene dal futuro!!
+                    questo commento arriva dal futuro!!
                 </span>
             );
         }
 
+        if (Math.abs(diffMs) < minuteMs) {
+            return "Adesso";
+        }
+
         if (diffMs < hourMs) {
-            const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
+            const minutes = Math.floor(diffMs / minuteMs);
             return minutes === 1 ? "1 minuto fa" : `${minutes} minuti fa`;
         }
 
