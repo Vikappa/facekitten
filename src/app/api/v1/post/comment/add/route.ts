@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
     const newNotification: NotificationsInsert = {
       activity_from: auth.profileId,
       to: targetPost.authorId,
-      generatedNavigation: `/profile/${encodeURIComponent(auth.profileId)}`,
+      generatedNavigation: `/post/${encodeURIComponent(targetPost.id)}`,
       notificationType: "postCommented",
       seen: false,
     };

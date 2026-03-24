@@ -228,7 +228,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const newNotification: NotificationsInsert = {
     activity_from: auth.profileId,
     to: targetProfileId,
-    generatedNavigation: `/profile/${encodeURIComponent(auth.profileId)}`,
+    generatedNavigation: `/friendship/requests?sender=${encodeURIComponent(auth.profileId)}`,
     notificationType: "friendRequestRecieved",
     seen: false,
   };

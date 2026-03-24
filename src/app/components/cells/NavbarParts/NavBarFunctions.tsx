@@ -5,7 +5,7 @@ import { setActiveNavFunction, type NavFunction } from "@/lib/redux/uiSlice";
 import NavbarButtonFunction, { ProfilePicture } from "../../atoms/NavbarFunctionButton";
 import { PiSquaresFourFill } from "react-icons/pi";
 import { FaFacebookMessenger } from "react-icons/fa";
-import { FaBell } from "react-icons/fa";
+import NotificationNavButton from "./NotificationNavButton";
 
 export default function NavbarFunctions(){
 
@@ -18,6 +18,9 @@ export default function NavbarFunctions(){
     const isBellButtonActive = activeNavFunction === "bell";
     const isProfileButtonActive = activeNavFunction === "profile";
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
+    const unreadNotificationsCount = useAppSelector(
+        (state) => state.notifications.unreadNotifications.length
+    );
     const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
     
     const setExclusiveButtonState = (
@@ -41,12 +44,11 @@ export default function NavbarFunctions(){
                 isActive={isMessengerButtonActive}
                 className={navbarbuttonsClassName}
             />
-            <NavbarButtonFunction
-                icon={<FaBell className="text-2xl" />}
+            <NotificationNavButton
                 onClick={(nextState) => setExclusiveButtonState("bell", nextState)}
                 className={navbarbuttonsClassName}
                 isActive={isBellButtonActive}
-                ariaLabel="Notifications"
+                unreadCount={unreadNotificationsCount}
             />
             <ProfilePicture
                 imageSrc={profileAvatar ?? "/assets/blankprofile.png"}

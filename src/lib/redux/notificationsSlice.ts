@@ -54,6 +54,12 @@ const notificationsSlice = createSlice({
             );
             state.lastUpdatedAt = Date.now();
         },
+        removeUnreadNotificationById(state, action: PayloadAction<number>) {
+            state.unreadNotifications = state.unreadNotifications.filter(
+                (notification) => notification.id !== action.payload
+            );
+            state.lastUpdatedAt = Date.now();
+        },
         clearUnreadNotifications(state) {
             state.unreadNotifications = [];
             state.lastUpdatedAt = null;
@@ -64,6 +70,7 @@ const notificationsSlice = createSlice({
 export const {
     setUnreadNotifications,
     mergeUnreadNotifications,
+    removeUnreadNotificationById,
     clearUnreadNotifications,
 } = notificationsSlice.actions;
 
