@@ -1,4 +1,4 @@
-import { PostData } from "@/lib/interfaces/CommonInterfaces";
+import { CommentData, PostData } from "@/lib/interfaces/CommonInterfaces";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface HomepagePostsState {
@@ -10,6 +10,11 @@ export const initialHomepagePostsState: HomepagePostsState = {
     posts: [],
     lastUpdatedAt: null,
 };
+
+export interface AddCommentReduxPayload{
+    CommentData :CommentData;
+    PostId: string;
+}
 
 const homepagePostsSlice = createSlice({
     name: "homepagePosts",
@@ -40,8 +45,15 @@ const homepagePostsSlice = createSlice({
             state.posts = [];
             state.lastUpdatedAt = null;
         },
+        addCommentToPost(state, action: PayloadAction<AddCommentReduxPayload>){
+            const target = state.posts.find(p => p.postId === action.payload.PostId)
+            if (target) {
+                target.comments.push(action.payload.CommentData)
+                target.commentNumber = target.comments.length
+            }
+        }
     },
 });
 
-export const { setHomepagePosts, prependHomepagePost, prependHomepagePosts, hydrateHomepagePostsState, clearHomepagePosts } = homepagePostsSlice.actions;
+export const { setHomepagePosts, prependHomepagePost, prependHomepagePosts, hydrateHomepagePostsState, clearHomepagePosts, addCommentToPost } = homepagePostsSlice.actions;
 export default homepagePostsSlice.reducer;

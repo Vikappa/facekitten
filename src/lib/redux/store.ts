@@ -55,18 +55,29 @@ function normalizeCommentData(value: unknown): CommentData | null {
         typeof comment.authorId !== "string" ||
         typeof comment.authorName !== "string" ||
         typeof comment.commentedAt !== "string" ||
-        typeof comment.reactions !== "string" ||
-        typeof comment.reactionNumbers !== "number"
+        typeof comment.reactionNumbers !== "number" ||
+        typeof comment.commentAuthorPropic !== "string" ||
+        typeof comment.commentText !== "string" ||
+        !Array.isArray(comment.reactions)
     ) {
+        return null;
+    }
+
+    const normalizedCommentReactions = comment.reactions
+        .map((reaction) => normalizeReactionData(reaction))
+        .filter((reaction): reaction is ReactionData => reaction !== null);
+    if (normalizedCommentReactions.length !== comment.reactions.length) {
         return null;
     }
 
     return {
         authorId: comment.authorId,
         authorName: comment.authorName,
+        commentAuthorPropic: comment.commentAuthorPropic,
         commentedAt: comment.commentedAt,
-        reactions: comment.reactions,
+        reactions: normalizedCommentReactions,
         reactionNumbers: comment.reactionNumbers,
+        commentText: comment.commentText,
     };
 }
 

@@ -53,9 +53,11 @@ export type PostData = {
 export type CommentData = {
     authorId:string;
     authorName:string;
+    commentAuthorPropic:string;
     commentedAt:string;
-    reactions:string;
+    reactions:ReactionData[];
     reactionNumbers:number;
+    commentText:string;
 }
 
 export type ReactionData = {

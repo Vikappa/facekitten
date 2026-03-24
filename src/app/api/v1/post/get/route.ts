@@ -81,12 +81,15 @@ function mapComments(rawComments: FeedComment[] | null): CommentData[] {
     return {
       authorId: comment.authorId ?? "",
       authorName: comment.author?.username ?? "",
+      commentAuthorPropic: comment.author?.avatarUrl ?? "",
       commentedAt: comment.created_at,
-      reactions: commentReactions
-        .map((reaction) => reaction.reactionType ?? "")
-        .filter((reaction) => reaction.length > 0)
-        .join(","),
+      reactions: commentReactions.map((reaction) => ({
+        reactionId: String(reaction.id),
+        reactionType: mapReactionType(reaction.reactionType),
+        author: "",
+      })),
       reactionNumbers: commentReactions.length,
+      commentText: comment.commentText ?? "",
     };
   });
 }

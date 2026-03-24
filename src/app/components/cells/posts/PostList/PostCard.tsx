@@ -9,7 +9,9 @@ import ShareCount from "./PostCardParts/ShareCount"
 import ReactionSpan from "./PostCardParts/ReactionSpan"
 import CommentSpan from "./PostCardParts/CommentSpan"
 import CondividiSpan from "./PostCardParts/CondividiSpan"
-import { useState } from "react"
+import { ReactNode, useState } from "react"
+import CommentForm from "../CommentForm"
+import CommentList from "./PostCardParts/CommentList"
 
 interface PostCardProp {
     data:PostData
@@ -20,19 +22,63 @@ export default function PostCard(prop: PostCardProp) {
     const userId = useAppSelector((state) => state.profile.currentProfile?.id)
     const [isCommenting, setIsCommenting] = useState(false)
 
+    function toggleIsCommenting(){
+        setIsCommenting(!isCommenting)
+    }
+
+    function formatPostDate(postedAt: string): ReactNode {
+        const postDate = new Date(postedAt);
+        if (Number.isNaN(postDate.getTime())) {
+            return postedAt;
+        }
+
+        const now = Date.now();
+        const diffMs = now - postDate.getTime();
+        const minuteMs = 60 * 1000;
+        const hourMs = 60 * minuteMs;
+        const dayMs = 24 * hourMs;
+
+        if (diffMs < 0) {
+            return (
+                <span className="future-post-rainbow">
+                    questo post viene dal futuro!!
+                </span>
+            );
+        }
+
+        if (diffMs < hourMs) {
+            const minutes = Math.max(1, Math.floor(diffMs / minuteMs));
+            return minutes === 1 ? "1 minuto fa" : `${minutes} minuti fa`;
+        }
+
+        if (diffMs < dayMs) {
+            const hours = Math.floor(diffMs / hourMs);
+            return hours === 1 ? "1 ora fa" : `${hours} ore fa`;
+        }
+
+        return new Intl.DateTimeFormat("it-IT", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        }).format(postDate);
+    }
+
     return (
         <div className="flex flex-col shadow-sm bg-white m-2 rounded-md p-2 mb-0">
             <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
                     <Image
-                        src={prop.data.imageUrl ?? "/assets/blankprofile.png"}
+                        src={prop.data.imageUrl && prop.data.imageUrl !== "" ? prop.data.imageUrl : "/assets/blankprofile.png"}
                         alt={prop.data.authorName ?? ""}
                         width={36}
                         height={36}
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <Link className="text-center text-black font-semibold" href={prop.data.authorId === userId ? `/profile/` : `/profile/${prop.data.authorId}`}>{prop.data.authorName}</Link>
+                <div className="flex items-baseline gap-2">
+                    <Link className="text-center text-black font-semibold" href={prop.data.authorId === userId ? `/profile/` : `/profile/${prop.data.authorId}`}>{prop.data.authorName}</Link>
+                    <span className="text-[11px] text-gray-400">{formatPostDate(prop.data.postedAt)}</span>
+                </div>
             </div>
             <div className="p-2">
                 <p>{prop.data.text}</p>
@@ -43,9 +89,12 @@ export default function PostCard(prop: PostCardProp) {
             </div>
             <div className="flex w-full text-gray-900 text-sm">
                 <ReactionSpan reactData={prop.data.reactions} />
-                <CommentSpan isCommenting={isCommenting} />
+                <CommentSpan isCommenting={isCommenting} updateSetIsCommenting={toggleIsCommenting} commentsCount={prop.data.commentNumber} />
                 <CondividiSpan />
             </div>
+            {isCommenting && <CommentForm postId={prop.data.postId} />}
+            {isCommenting && <CommentList commentData={prop.data.comments} />}
+            
         </div>
     )
 }
