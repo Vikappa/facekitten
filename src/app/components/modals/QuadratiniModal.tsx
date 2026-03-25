@@ -5,16 +5,17 @@ import { setActiveNavFunction } from "@/lib/redux/uiSlice";
 import { usePathname } from "next/navigation";
 import { MutableRefObject, useEffect, useRef } from "react";
 
-interface MessengerModalProps {
+interface QuadratiniModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
 }
 
-export default function MessengerModal({ navbarRef }: MessengerModalProps){
+export default function QuadratiniModal({ navbarRef }: QuadratiniModalProps){
     const dispatch = useAppDispatch();
     const pathname = usePathname();
     const previousPathnameRef = useRef(pathname);
     const modalRef = useRef<HTMLDivElement | null>(null);
-    const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "messenger");
+
+    const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "squares");
 
     useEffect(() => {
         const previousPathname = previousPathnameRef.current;
@@ -64,6 +65,6 @@ export default function MessengerModal({ navbarRef }: MessengerModalProps){
     }
 
     return (
-        <div ref={modalRef}>MESSAGGI</div>
+        <div ref={modalRef}>QUADRATINI</div>
     )
 }

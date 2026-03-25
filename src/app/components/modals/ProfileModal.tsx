@@ -23,6 +23,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
     const router = useRouter();
     const pathname = usePathname();
     const previousPathnameRef = useRef(pathname);
+    const modalRef = useRef<HTMLDivElement | null>(null);
     const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "profile");
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
     const [navbarHeight, setNavbarHeight] = useState(0);
@@ -91,12 +92,43 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
         }
     }, [pathname, isOpen, dispatch]);
 
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+            const target = event.target as Node | null;
+            if (!target) {
+                return;
+            }
+
+            const clickedInsideModal = modalRef.current?.contains(target) ?? false;
+            const clickedInsideNavbar = navbarRef.current?.contains(target) ?? false;
+
+            if (clickedInsideModal || clickedInsideNavbar) {
+                return;
+            }
+
+            dispatch(setActiveNavFunction(null));
+        };
+
+        document.addEventListener("mousedown", handlePointerDown);
+        document.addEventListener("touchstart", handlePointerDown);
+
+        return () => {
+            document.removeEventListener("mousedown", handlePointerDown);
+            document.removeEventListener("touchstart", handlePointerDown);
+        };
+    }, [isOpen, dispatch, navbarRef]);
+
     if (!isOpen) {
         return null;
     }
 
     return (
         <div
+            ref={modalRef}
             style={{ top: `${navbarHeight}px` }}
             className="fixed left-0 right-0 z-50 w-full p-2 flex flex-col items-center align-content-center"
         >

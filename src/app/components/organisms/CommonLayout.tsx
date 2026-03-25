@@ -6,6 +6,7 @@ import Navbar from "./Navbar";
 import NotificationModal from "../modals/NotificationModal";
 import MessengerModal from "../modals/MessengerModal";
 import GlobalNotificationsPolling from "./GlobalNotificationsPolling";
+import QuadratiniModal from "../modals/QuadratiniModal";
 
 export enum PageFocus {
     Home,
@@ -28,7 +29,8 @@ export default function CommonLayout({
         <GlobalNotificationsPolling />
         <Navbar navbarRef={navbarRef} />
         <ProfileModal navbarRef={navbarRef} />
-        <MessengerModal />
+        <QuadratiniModal navbarRef={navbarRef}/>
+        <MessengerModal navbarRef={navbarRef} />
         <NotificationModal navbarRef={navbarRef} />
                 {children}
         </div>
