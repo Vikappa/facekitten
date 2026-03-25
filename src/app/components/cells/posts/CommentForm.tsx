@@ -43,7 +43,9 @@ export default function CommentForm(props: CommentFormProps) {
             Array.isArray(comment.reactions) &&
             comment.reactions.every((reaction) => isReactionData(reaction)) &&
             typeof comment.reactionNumbers === "number" &&
-            typeof comment.commentText === "string"
+            typeof comment.commentText === "string" &&
+            Array.isArray(comment.commentReplies) &&
+            typeof comment.commentRepliesCount === "number"
         );
     }
 

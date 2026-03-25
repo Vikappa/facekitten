@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat: {
+        Row: {
+          attachments: string | null
+          created_at: string
+          from: string | null
+          id: number
+          text: string | null
+          to: string | null
+        }
+        Insert: {
+          attachments?: string | null
+          created_at?: string
+          from?: string | null
+          id?: number
+          text?: string | null
+          to?: string | null
+        }
+        Update: {
+          attachments?: string | null
+          created_at?: string
+          from?: string | null
+          id?: number
+          text?: string | null
+          to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_from_fkey"
+            columns: ["from"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_to_fkey"
+            columns: ["to"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ChatMessage: {
         Row: {
           created_at: string
@@ -271,7 +313,6 @@ export type Database = {
             | null
           seen: boolean | null
           to: string | null
-          type: Database["public"]["Enums"]["postType"] | null
         }
         Insert: {
           activity_from?: string | null
@@ -283,7 +324,6 @@ export type Database = {
             | null
           seen?: boolean | null
           to?: string | null
-          type?: Database["public"]["Enums"]["postType"] | null
         }
         Update: {
           activity_from?: string | null
@@ -295,7 +335,6 @@ export type Database = {
             | null
           seen?: boolean | null
           to?: string | null
-          type?: Database["public"]["Enums"]["postType"] | null
         }
         Relationships: [
           {

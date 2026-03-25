@@ -7,6 +7,7 @@ import type { FriendshipsRow } from "@/types/db.generated";
 import type { Database } from "@/types/database.types";
 import {
   CommentData,
+  CommentReplyData,
   PostData,
   ReactionData,
   ReactionType as UiReactionType,
@@ -25,6 +26,16 @@ type FeedAuthor = {
 type FeedCommentReaction = {
   id: number;
   reactionType: DbReactionType | null;
+  athorId: string | null;
+  author: FeedAuthor | null;
+};
+
+type FeedCommentReply = {
+  id: number;
+  authorId: string | null;
+  text: string | null;
+  created_at: string;
+  author: FeedAuthor | null;
 };
 
 type FeedComment = {
@@ -34,6 +45,7 @@ type FeedComment = {
   created_at: string;
   author: FeedAuthor | null;
   commentReactions: FeedCommentReaction[] | null;
+  commentReplies: FeedCommentReply[] | null;
 };
 
 type FeedPostReaction = {
@@ -78,6 +90,7 @@ function mapReactionType(value: DbReactionType | null): UiReactionType {
 function mapComments(rawComments: FeedComment[] | null): CommentData[] {
   return (rawComments ?? []).map((comment) => {
     const commentReactions = comment.commentReactions ?? [];
+    const commentReplies = mapCommentReplies(comment.commentReplies);
 
     return {
       authorId: comment.authorId ?? "",
@@ -87,12 +100,37 @@ function mapComments(rawComments: FeedComment[] | null): CommentData[] {
       reactions: commentReactions.map((reaction) => ({
         reactionId: String(reaction.id),
         reactionType: mapReactionType(reaction.reactionType),
-        author: "",
+        author: reaction.author?.username ?? "",
       })),
       reactionNumbers: commentReactions.length,
       commentText: comment.commentText ?? "",
+      commentReplies,
+      commentRepliesCount: commentReplies.length,
     };
   });
+}
+
+function mapCommentReplies(rawReplies: FeedCommentReply[] | null): CommentReplyData[] {
+  return [...(rawReplies ?? [])]
+    .sort((a, b) => {
+      const aTimestamp = Date.parse(a.created_at);
+      const bTimestamp = Date.parse(b.created_at);
+      const hasValidATimestamp = Number.isFinite(aTimestamp);
+      const hasValidBTimestamp = Number.isFinite(bTimestamp);
+
+      if (hasValidATimestamp && hasValidBTimestamp && aTimestamp !== bTimestamp) {
+        return aTimestamp - bTimestamp;
+      }
+
+      return a.id - b.id;
+    })
+    .map((reply) => ({
+    authorId: reply.authorId ?? "",
+    authorName: reply.author?.username ?? "",
+    replyAuthorPropic: reply.author?.avatarUrl ?? "",
+    repliedAt: reply.created_at,
+    commentReplyReactions: [],
+  }));
 }
 
 function mapReactions(rawReactions: FeedPostReaction[] | null): ReactionData[] {
@@ -200,7 +238,24 @@ export async function GET(req: NextRequest) {
           ),
           commentReactions:commentReaction!commentReaction_commentId_fkey (
             id,
-            reactionType
+            reactionType,
+            athorId,
+            author:Profile!commentReaction_athorId_fkey (
+              id,
+              username,
+              avatarUrl
+            )
+          ),
+          commentReplies:commentReply!commentReply_commentId_fkey (
+            id,
+            authorId,
+            text,
+            created_at,
+            author:Profile!commentReply_authorId_fkey (
+              id,
+              username,
+              avatarUrl
+            )
           )
         ),
         postReactions:postReaction!postReaction_postId_fkey (

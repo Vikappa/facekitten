@@ -45,6 +45,10 @@ function isReactionType(value: unknown): value is ReactionType {
     return typeof value === "number" && REACTION_TYPE_OPTIONS.has(value);
 }
 
+function isCommentReplyDataArray(value: unknown): value is CommentData["commentReplies"] {
+    return Array.isArray(value);
+}
+
 function normalizeCommentData(value: unknown): CommentData | null {
     if (typeof value !== "object" || value === null) {
         return null;
@@ -58,6 +62,8 @@ function normalizeCommentData(value: unknown): CommentData | null {
         typeof comment.reactionNumbers !== "number" ||
         typeof comment.commentAuthorPropic !== "string" ||
         typeof comment.commentText !== "string" ||
+        typeof comment.commentRepliesCount !== "number" ||
+        !isCommentReplyDataArray(comment.commentReplies) ||
         !Array.isArray(comment.reactions)
     ) {
         return null;
@@ -78,6 +84,8 @@ function normalizeCommentData(value: unknown): CommentData | null {
         reactions: normalizedCommentReactions,
         reactionNumbers: comment.reactionNumbers,
         commentText: comment.commentText,
+        commentReplies: comment.commentReplies,
+        commentRepliesCount: comment.commentRepliesCount,
     };
 }
 

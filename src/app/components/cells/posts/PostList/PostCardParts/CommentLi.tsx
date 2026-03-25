@@ -78,9 +78,14 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
                     </div>
 
                 </div>
-                <div className="flex text-[10px] gap-3 text-gray-500">
-                    <span>Mi piace</span>
-                    <span>Rispondi</span>
+                <div className="flex flex-col">
+                    <div className="flex text-[10px] gap-3 text-gray-500">
+                        <span>Mi piace</span>
+                        <span>Rispondi</span>
+                    </div>
+                    <div className="flex">
+                        
+                    </div>
                 </div>
             </div>
         </div>

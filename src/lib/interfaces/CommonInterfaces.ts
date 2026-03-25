@@ -58,6 +58,16 @@ export type CommentData = {
     reactions:ReactionData[];
     reactionNumbers:number;
     commentText:string;
+    commentReplies:CommentReplyData[];
+    commentRepliesCount:number
+}
+
+export type CommentReplyData = {
+    authorId:string;
+    authorName:string;
+    replyAuthorPropic:string;
+    repliedAt:string;
+    commentReplyReactions:ReactionData[];
 }
 
 export type ReactionData = {

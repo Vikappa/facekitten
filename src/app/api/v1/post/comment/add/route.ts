@@ -209,6 +209,8 @@ export async function POST(req: NextRequest) {
     reactions: [],
     reactionNumbers: 0,
     commentText: createdComment.commentText ?? body.commentText,
+    commentReplies:[],
+    commentRepliesCount:0
   };
 
   return NextResponse.json(

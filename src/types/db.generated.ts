@@ -4,7 +4,7 @@
 
 import type { Enums, Tables, TablesInsert, TablesUpdate } from '@/types/database.types'
 
-export const DB_TABLES = ["ChatMessage","comment","commentReaction","commentReply","friendshipRequest","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
+export const DB_TABLES = ["chat","ChatMessage","comment","commentReaction","commentReply","friendshipRequest","friendships","notifications","post","postReaction","Profile","registrationcodes"] as const
 export type DbTableName = (typeof DB_TABLES)[number]
 export const DB_ENUMS = ["Lettino","notificationtype","postType","ReactionType"] as const
 export type DbEnumName = (typeof DB_ENUMS)[number]
@@ -37,6 +37,15 @@ export const toPostType = (value: PostType): PostType => value
 // enum ReactionType
 export type ReactionType = Enums<'ReactionType'>
 export const toReactionType = (value: ReactionType): ReactionType => value
+
+// chat
+export type ChatRow = Tables<'chat'>
+export type ChatInsert = TablesInsert<'chat'>
+export type ChatUpdate = TablesUpdate<'chat'>
+export type Chat = ChatRow
+export type ChatDto = ChatRow
+export const toChat = (row: ChatRow): Chat => row
+export const toChatDto = (row: ChatRow): ChatDto => row
 
 // ChatMessage
 export type ChatMessageRow = Tables<'ChatMessage'>

@@ -29,6 +29,7 @@ const toBoolean = (value: boolean | null | undefined, fallback = false): boolean
 export type TableName = keyof Database['public']['Tables']
 export type PostType = Enums<'postType'>
 export type ReactionType = Enums<'ReactionType'>
+export type NotificationType = Enums<'notificationtype'>
 
 export const mapRows = <TDb, TDto>(
   rows: TDb[] | null | undefined,
@@ -370,7 +371,7 @@ export type NotificationUpdate = TablesUpdate<'notifications'>
 
 export type NotificationDb = Pick<
   NotificationRow,
-  'id' | 'created_at' | 'activity_from' | 'to' | 'type' | 'seen'
+  'id' | 'created_at' | 'activity_from' | 'to' | 'generatedNavigation' | 'notificationType' | 'seen'
 >
 
 export interface NotificationDto {
@@ -378,12 +379,13 @@ export interface NotificationDto {
   createdAt?: Date
   activityFrom?: string
   to?: string
-  type?: PostType
+  generatedNavigation?: string
+  notificationType?: NotificationType
   seen: boolean
 }
 
 export const NOTIFICATION_SAFE_SELECT =
-  'id, created_at, activity_from, to, type, seen' as const
+  'id, created_at, activity_from, to, generatedNavigation, notificationType, seen' as const
 
 export function toNotificationDto(row: NotificationDb): NotificationDto {
   return {
@@ -391,7 +393,8 @@ export function toNotificationDto(row: NotificationDb): NotificationDto {
     createdAt: toDate(row.created_at),
     activityFrom: toOptionalString(row.activity_from),
     to: toOptionalString(row.to),
-    type: row.type ?? undefined,
+    generatedNavigation: toOptionalString(row.generatedNavigation),
+    notificationType: row.notificationType ?? undefined,
     seen: toBoolean(row.seen),
   }
 }
