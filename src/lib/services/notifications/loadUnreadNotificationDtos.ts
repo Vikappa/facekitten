@@ -45,7 +45,9 @@ type LoadUnreadNotificationsResult =
 
 const PREVIEW_MAX_LENGTH = 90;
 const FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT =
-  "ti ha inviato una richiesta di amicizia";
+  "ti ha inviato una richiesta di micizia";
+const FRIEND_REQUEST_ACCEPTED_PREVIEW_TEXT =
+  "ha accettato la tua richiesta di micizia";
 
 function toPreviewSnippet(rawText: string | null | undefined): string | null {
   if (!rawText) {
@@ -182,6 +184,10 @@ async function resolveNotificationPreviewText(
 
   if (notificationType === "friendRequestRecieved") {
     return FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT;
+  }
+
+  if (notificationType === "friendRequestAccepted") {
+    return FRIEND_REQUEST_ACCEPTED_PREVIEW_TEXT;
   }
 
   return null;

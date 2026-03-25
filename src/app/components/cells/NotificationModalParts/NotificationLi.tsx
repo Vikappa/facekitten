@@ -43,7 +43,7 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
 
     async function handleClickNotification(event: MouseEvent<HTMLAnchorElement>) {
         event.preventDefault();
-        if (isNavigating || generatedNavigation.length === 0) {
+        if (isNavigating) {
             return;
         }
 
@@ -51,11 +51,14 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
         try {
             await markNotificationAsSeen(props.notification.id);
             dispatch(removeUnreadNotificationById(props.notification.id));
+            dispatch(setActiveNavFunction(null));
+
+            if (generatedNavigation.length > 0) {
+                router.push(generatedNavigation);
+            }
         } catch (error) {
             console.error("Errore apertura notifica:", error);
         } finally {
-            dispatch(setActiveNavFunction(null));
-            router.push(generatedNavigation);
             setIsNavigating(false);
         }
     }
