@@ -4,7 +4,7 @@ import { GetFriendPostRequest } from "@/app/api/v1/post/get/friends/route"
 import PostList from "@/app/components/cells/posts/PostList/PostList"
 import ProfilePageHeroV2, { FriendUserProfile } from "@/app/components/cells/ProfilePageHero/ProfilePageHeroV2"
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
-import { prependHomepagePosts } from "@/lib/redux/homepagePostsSlice"
+import { clearHomepagePosts, prependHomepagePosts } from "@/lib/redux/homepagePostsSlice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { Database } from "@/types/database.types"
 import {
@@ -195,7 +195,11 @@ export default function ViewUserProfilePage() {
                 return
             }
 
-            dispatch(prependHomepagePosts(payload as PostData[]));
+            dispatch(clearHomepagePosts())
+            if (friendshipStatus == "amico") {
+                prependHomepagePosts(payload as PostData[])
+            }
+
         } catch (error) {
             console.error("Errore di rete durante il recupero post profilo", error)
         }
