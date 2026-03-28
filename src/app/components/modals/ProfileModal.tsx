@@ -13,6 +13,16 @@ import { RiUserCommunityFill } from "react-icons/ri";
 import { MdOutlineKeyboardArrowLeft } from "react-icons/md";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { IoFlagSharp } from "react-icons/io5";
+import { MdPrivacyTip } from "react-icons/md";
+import { RiGitRepositoryPrivateFill } from "react-icons/ri";
+import { MdRoomPreferences } from "react-icons/md";
+import { FaBug } from "react-icons/fa";
+import { IoIosHelpCircle } from "react-icons/io";
+import { MdAccountBox } from "react-icons/md";
+import { HiMiniInboxArrowDown } from "react-icons/hi2";
+import { MdOutlinePrivacyTip } from "react-icons/md";
+import { IoMdResize } from "react-icons/io";
 
 interface ProfileModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
@@ -126,7 +136,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
         return null;
     }
 
-    if (!!currentProfile || !!profileName)return (
+    if (!!currentProfile || !!profileName) return (
         <div
             ref={modalRef}
             style={{ top: `${navbarHeight}px` }}
@@ -178,11 +188,11 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                                 <span className="font-semibold">Settings & Privacy</span>
                             </button>
                             <ProfileModalRectangle text="Settings" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Language" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Privacy checkup" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Privacy Center" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Language" icon={<IoFlagSharp className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Privacy checkup" icon={<MdPrivacyTip className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Privacy Center" icon={<RiGitRepositoryPrivateFill className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
                             <ProfileModalRectangle text="Activity Log" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Content Preferences" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Content Preferences" icon={<MdRoomPreferences className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
 
                         </div>
                     )
@@ -198,11 +208,11 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                                 <MdOutlineKeyboardArrowLeft size={22} />
                                 <span className="font-semibold">Help & Support</span>
                             </button>
-                            <ProfileModalRectangle text="Help Center" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Account Status" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Support inbox" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Privacy Center" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
-                            <ProfileModalRectangle text="Report a problem" icon={<IoMdSettings className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Help Center" icon={<IoIosHelpCircle className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Account Status" icon={<MdAccountBox className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Support inbox" icon={<HiMiniInboxArrowDown className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Privacy Center" icon={<MdOutlinePrivacyTip className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
+                            <ProfileModalRectangle text="Report a problem" icon={<FaBug className="text-2xl mx-auto my-auto" />} showArrow={true} onClick={() => setSettingAndPrivacyOn(true)} />
                         </div>
                     )
                 }
@@ -216,7 +226,37 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
                             >
                                 <MdOutlineKeyboardArrowLeft size={22} />
                                 <span className="font-semibold">Display & Accessibility</span>
+
                             </button>
+                            <div className="flex items-center gap-2 px-2 py-1">
+                                <div className="bg-secondary flex align-items-center justify-content-center rounded-full p-2 transition-colors duration-200 group-hover:bg-gray-200 group-active:bg-gray-200">
+                                    <FaMoon className="text-lg shrink-0" />
+                                </div>
+                                <span className="font-semibold leading-none text-xl">Dark Mode</span>
+                            </div>
+                            <div className="flex items-center p-2 ms-5">
+                                On
+                                <input className="ms-auto h-5 w-5 accent-black" type="radio" name="dark-mode" />
+                            </div>
+                            <div className="flex items-center p-2 ms-5">
+                                Off
+                                <input className="ms-auto h-5 w-5 accent-black" type="radio" name="dark-mode" />
+                            </div>
+
+                            <div className="flex items-center gap-2 px-2 py-1">
+                                <div className="bg-secondary flex align-items-center justify-content-center rounded-full p-2 transition-colors duration-200 group-hover:bg-gray-200 group-active:bg-gray-200">
+                                    <IoMdResize className="text-lg shrink-0" />
+                                </div>
+                                <span className="font-semibold leading-none text-xl">Compact Mode</span>
+                            </div>
+                            <div className="flex items-center p-2 ms-5">
+                                On
+                                <input className="ms-auto h-5 w-5 accent-black" type="radio" name="dark-mode" />
+                            </div>
+                            <div className="flex items-center p-2 ms-5">
+                                Off
+                                <input className="ms-auto h-5 w-5 accent-black" type="radio" name="dark-mode" />
+                            </div>
 
                         </div>
                     )
