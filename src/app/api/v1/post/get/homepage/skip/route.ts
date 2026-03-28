@@ -3,6 +3,14 @@ import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type { FriendshipsRow } from "@/types/db.generated";
+import {
+  FEED_POST_SELECT,
+  PROFILE_METADATA_SELECT,
+  collectReplyAuthorIds,
+  mapFeedPostsToPostData,
+  type FeedAuthor,
+  type FeedPost,
+} from "@/app/api/v1/post/get/feedDto";
 
 type FriendshipPair = Pick<FriendshipsRow, "user_a" | "user_b">;
 
@@ -21,6 +29,47 @@ function parseSkip(value: string | null): number | null {
   }
 
   return parsed;
+}
+
+async function loadReplyAuthorsById(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  posts: FeedPost[]
+): Promise<
+  | { ok: true; replyAuthorsById: Map<string, FeedAuthor> }
+  | { ok: false; response: NextResponse }
+> {
+  const replyAuthorIds = collectReplyAuthorIds(posts);
+  if (replyAuthorIds.length === 0) {
+    return { ok: true, replyAuthorsById: new Map<string, FeedAuthor>() };
+  }
+
+  const { data: replyAuthors, error: replyAuthorsError } = await supabase
+    .from("Profile")
+    .select(PROFILE_METADATA_SELECT)
+    .in("id", replyAuthorIds);
+
+  if (replyAuthorsError) {
+    console.error(
+      "Errore recupero autori reply in homepage feed paginata:",
+      replyAuthorsError
+    );
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { code: "REPLY_AUTHORS_FETCH_ERROR", error: "Errore interno" },
+        { status: 500 }
+      ),
+    };
+  }
+
+  const replyAuthorsById = new Map<string, FeedAuthor>();
+  for (const author of (replyAuthors ?? []) as FeedAuthor[]) {
+    if (typeof author.id === "string" && author.id.trim().length > 0) {
+      replyAuthorsById.set(author.id, author);
+    }
+  }
+
+  return { ok: true, replyAuthorsById };
 }
 
 export async function GET(req: NextRequest) {
@@ -104,31 +153,33 @@ export async function GET(req: NextRequest) {
 
   const authorIdsList = Array.from(authorIds);
 
-  const { data: posts, error: postsError } = await supabase
+  const { data: feedRows, error: feedError } = await supabase
     .from("post")
-    .select("id, authorId, content, mediaUrl, postType, createdAt")
+    .select(FEED_POST_SELECT)
     .in("authorId", authorIdsList)
-    .order("createdAt", { ascending: false })
+    .order("created_at", { ascending: false })
     .range(skip, skip + 9);
 
-  if (postsError) {
-    console.error("Errore recupero post homepage paginata:", postsError);
+  if (feedError) {
+    console.error("Errore recupero post homepage paginata:", feedError);
     return NextResponse.json(
       { code: "POSTS_FETCH_ERROR", error: "Errore interno" },
       { status: 500 }
     );
   }
 
+  const feedPosts = (feedRows ?? []) as FeedPost[];
+
+  const replyAuthorsResult = await loadReplyAuthorsById(supabase, feedPosts);
+  if (!replyAuthorsResult.ok) {
+    return replyAuthorsResult.response;
+  }
+
+  const posts = mapFeedPostsToPostData(feedPosts, replyAuthorsResult.replyAuthorsById);
+
   return NextResponse.json({
     code: "HOMEPAGE_POSTS_PAGE_OK",
     skip,
-    posts: (posts ?? []).map((post) => ({
-      id: post.id,
-      authorId: post.authorId,
-      content: post.content ?? "",
-      mediaUrl: post.mediaUrl,
-      postType: post.postType,
-      createdAt: post.createdAt,
-    })),
+    posts,
   });
 }

@@ -9,7 +9,14 @@ import homepagePostsReducer, {
 } from "./homepagePostsSlice";
 import notificationsReducer from "./notificationsSlice";
 import uiReducer from "./uiSlice";
-import { type CommentData, type PostData, type ReactionData, ReactionType } from "@/lib/interfaces/CommonInterfaces";
+import {
+    type CommentData,
+    type CommentReplyData,
+    type PostData,
+    type ProfileMetadata,
+    type ReactionData,
+    ReactionType,
+} from "@/lib/interfaces/CommonInterfaces";
 
 const PROFILE_STORAGE_KEY = "fk_profile_state";
 const HOMEPAGE_POSTS_STORAGE_KEY = "fk_homepage_posts_state";
@@ -49,14 +56,108 @@ function isCommentReplyDataArray(value: unknown): value is CommentData["commentR
     return Array.isArray(value);
 }
 
-function normalizeCommentData(value: unknown): CommentData | null {
-    if (typeof value !== "object" || value === null) {
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null;
+}
+
+function normalizeOptionalString(value: unknown): string | undefined {
+    return typeof value === "string" ? value : undefined;
+}
+
+function normalizeNullableString(value: unknown): string | null | undefined {
+    if (value === null) {
         return null;
     }
 
-    const comment = value as Record<string, unknown>;
+    return typeof value === "string" ? value : undefined;
+}
+
+function normalizeProfileMetadata(value: unknown): ProfileMetadata | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
     if (
-        typeof comment.commentId !== "number" ||
+        typeof value.id !== "string" ||
+        typeof value.username !== "string" ||
+        typeof value.avatarUrl !== "string"
+    ) {
+        return null;
+    }
+
+    const tipoCucciaRaw = value.tipoCuccia;
+    const tipoCuccia =
+        tipoCucciaRaw === null || isLettino(tipoCucciaRaw)
+            ? tipoCucciaRaw
+            : undefined;
+
+    return {
+        id: value.id,
+        username: value.username,
+        avatarUrl: value.avatarUrl,
+        bannerUrl: normalizeNullableString(value.bannerUrl),
+        bio: normalizeNullableString(value.bio),
+        confirmedAccount:
+            typeof value.confirmedAccount === "boolean" || value.confirmedAccount === null
+                ? value.confirmedAccount
+                : undefined,
+        createdAt: normalizeOptionalString(value.createdAt),
+        updatedAt: normalizeNullableString(value.updatedAt),
+        dataDiNascita: normalizeNullableString(value.dataDiNascita),
+        giocattoloPreferito: normalizeNullableString(value.giocattoloPreferito),
+        locationId: normalizeNullableString(value.locationId),
+        tipoCuccia,
+    };
+}
+
+function normalizeCommentReplyData(value: unknown): CommentReplyData | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
+    const reply = value;
+    if (
+        typeof reply.authorId !== "string" ||
+        typeof reply.authorName !== "string" ||
+        typeof reply.replyAuthorPropic !== "string" ||
+        typeof reply.repliedAt !== "string" ||
+        !Array.isArray(reply.commentReplyReactions)
+    ) {
+        return null;
+    }
+
+    const normalizedReplyReactions = reply.commentReplyReactions
+        .map((reaction) => normalizeReactionData(reaction))
+        .filter((reaction): reaction is ReactionData => reaction !== null);
+
+    if (normalizedReplyReactions.length !== reply.commentReplyReactions.length) {
+        return null;
+    }
+
+    return {
+        authorId: reply.authorId,
+        authorName: reply.authorName,
+        replyAuthorPropic: reply.replyAuthorPropic,
+        repliedAt: reply.repliedAt,
+        commentReplyId: normalizeOptionalString(reply.commentReplyId),
+        repliedCommentId: normalizeNullableString(reply.repliedCommentId),
+        commentReplyText: normalizeOptionalString(reply.commentReplyText),
+        commentReplyMediaUrl: normalizeNullableString(reply.commentReplyMediaUrl),
+        commentReplyExtraContent: normalizeNullableString(reply.commentReplyExtraContent),
+        authorProfile: normalizeProfileMetadata(reply.authorProfile),
+        createdAt: normalizeOptionalString(reply.createdAt),
+        commentReplyReactions: normalizedReplyReactions,
+    };
+}
+
+function normalizeCommentData(value: unknown): CommentData | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
+    const comment = value;
+    if (
+        typeof comment.commentId !== "string" ||
         typeof comment.authorId !== "string" ||
         typeof comment.authorName !== "string" ||
         typeof comment.commentedAt !== "string" ||
@@ -77,6 +178,13 @@ function normalizeCommentData(value: unknown): CommentData | null {
         return null;
     }
 
+    const normalizedCommentReplies = comment.commentReplies
+        .map((reply) => normalizeCommentReplyData(reply))
+        .filter((reply): reply is CommentReplyData => reply !== null);
+    if (normalizedCommentReplies.length !== comment.commentReplies.length) {
+        return null;
+    }
+
     return {
         commentId: comment.commentId,
         authorId: comment.authorId,
@@ -86,17 +194,21 @@ function normalizeCommentData(value: unknown): CommentData | null {
         reactions: normalizedCommentReactions,
         reactionNumbers: comment.reactionNumbers,
         commentText: comment.commentText,
-        commentReplies: comment.commentReplies,
+        commentReplies: normalizedCommentReplies,
         commentRepliesCount: comment.commentRepliesCount,
+        postId: normalizeNullableString(comment.postId),
+        commentExtraContent: normalizeNullableString(comment.commentExtraContent),
+        authorProfile: normalizeProfileMetadata(comment.authorProfile),
+        createdAt: normalizeOptionalString(comment.createdAt),
     };
 }
 
 function normalizeReactionData(value: unknown): ReactionData | null {
-    if (typeof value !== "object" || value === null) {
+    if (!isObjectRecord(value)) {
         return null;
     }
 
-    const reaction = value as Record<string, unknown>;
+    const reaction = value;
     if (
         typeof reaction.reactionId !== "string" ||
         typeof reaction.author !== "string" ||
@@ -105,19 +217,41 @@ function normalizeReactionData(value: unknown): ReactionData | null {
         return null;
     }
 
+    const targetType =
+        reaction.targetType === "post" ||
+        reaction.targetType === "comment" ||
+        reaction.targetType === "commentReply"
+            ? reaction.targetType
+            : undefined;
+
     return {
         reactionId: reaction.reactionId,
         reactionType: reaction.reactionType,
         author: reaction.author,
+        authorId:
+            typeof reaction.authorId === "string" || reaction.authorId === null
+                ? reaction.authorId
+                : undefined,
+        authorAvatarUrl:
+            typeof reaction.authorAvatarUrl === "string" || reaction.authorAvatarUrl === null
+                ? reaction.authorAvatarUrl
+                : undefined,
+        authorProfile: normalizeProfileMetadata(reaction.authorProfile),
+        createdAt: normalizeOptionalString(reaction.createdAt),
+        targetType,
+        targetId:
+            typeof reaction.targetId === "string" || reaction.targetId === null
+                ? reaction.targetId
+                : undefined,
     };
 }
 
 function normalizePostData(value: unknown): PostData | null {
-    if (typeof value !== "object" || value === null) {
+    if (!isObjectRecord(value)) {
         return null;
     }
 
-    const post = value as Record<string, unknown>;
+    const post = value;
     if (
         typeof post.postId !== "string" ||
         typeof post.postType !== "string" ||
@@ -152,10 +286,7 @@ function normalizePostData(value: unknown): PostData | null {
         post.shares !== null &&
         typeof (post.shares as Record<string, unknown>).sharePostId === "number"
             ? (post.shares as Record<string, number>).sharePostId
-            : null;
-    if (sharePostId === null) {
-        return null;
-    }
+            : 0;
 
     return {
         postId: post.postId,
@@ -171,6 +302,10 @@ function normalizePostData(value: unknown): PostData | null {
         reactions: normalizedReactions,
         reactionsNumber: post.reactionsNumber,
         shares: { sharePostId },
+        postExtraContent: normalizeNullableString(post.postExtraContent),
+        postMediaUrl: normalizeNullableString(post.postMediaUrl),
+        authorProfile: normalizeProfileMetadata(post.authorProfile),
+        createdAt: normalizeOptionalString(post.createdAt),
     };
 }
 

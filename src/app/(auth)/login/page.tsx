@@ -71,7 +71,7 @@ const isNotificationData = (payload: unknown): payload is NotificationData => {
   const activityFrom = candidate.activityFrom as Partial<NotificationData["activityFrom"]> | undefined;
 
   return (
-    typeof candidate.id === "number" &&
+    typeof candidate.id === "string" &&
     typeof candidate.createdAt === "string" &&
     typeof activityFrom === "object" &&
     activityFrom !== null &&

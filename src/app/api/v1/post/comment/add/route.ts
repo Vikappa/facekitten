@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
+import { PROFILE_METADATA_SELECT } from "@/app/api/v1/post/get/feedDto";
 import type {
   CommentInsert,
   CommentRow,
   NotificationsInsert,
   PostRow,
 } from "@/types/db.generated";
-import type { CommentData } from "@/lib/interfaces/CommonInterfaces";
+import type { CommentData, ProfileMetadata } from "@/lib/interfaces/CommonInterfaces";
 
 type AddCommentBody = {
   postId?: unknown;
@@ -21,9 +22,21 @@ type CommentAuthorRow = {
   id: string;
   username: string | null;
   avatarUrl: string | null;
+  bannerUrl: string | null;
+  bio: string | null;
+  confirmedAccount: boolean | null;
+  created_at: string;
+  updated_at: string | null;
+  dataDiNascita: string | null;
+  giocattoloPreferito: string | null;
+  locationId: string | null;
+  tipoCuccia: ProfileMetadata["tipoCuccia"];
 };
 
-type CreatedCommentRow = Pick<CommentRow, "id" | "authorId" | "commentText" | "created_at"> & {
+type CreatedCommentRow = Pick<
+  CommentRow,
+  "commentId" | "commentAuthorId" | "commentText" | "created_at" | "extraContent" | "postid"
+> & {
   author: CommentAuthorRow | CommentAuthorRow[] | null;
 };
 
@@ -58,6 +71,38 @@ function pickSingleRelationRow<T extends Record<string, unknown>>(
   }
 
   return value;
+}
+
+function toProfileMetadata(
+  author: CommentAuthorRow | null,
+  fallbackId?: string | null
+): ProfileMetadata | null {
+  if (!author && !fallbackId) {
+    return null;
+  }
+
+  if (!author) {
+    return {
+      id: fallbackId ?? "",
+      username: "",
+      avatarUrl: "",
+    };
+  }
+
+  return {
+    id: author.id,
+    username: author.username ?? "",
+    avatarUrl: author.avatarUrl ?? "",
+    bannerUrl: author.bannerUrl,
+    bio: author.bio,
+    confirmedAccount: author.confirmedAccount,
+    createdAt: author.created_at,
+    updatedAt: author.updated_at,
+    dataDiNascita: author.dataDiNascita,
+    giocattoloPreferito: author.giocattoloPreferito,
+    locationId: author.locationId,
+    tipoCuccia: author.tipoCuccia,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -142,7 +187,7 @@ export async function POST(req: NextRequest) {
   }
 
   const newComment: CommentInsert = {
-    authorId: auth.profileId,
+    commentAuthorId: auth.profileId,
     postid: targetPost.id,
     commentText: body.commentText,
   };
@@ -152,14 +197,14 @@ export async function POST(req: NextRequest) {
     .insert(newComment)
     .select(
       `
-        id,
-        authorId,
+        commentId,
+        commentAuthorId,
         commentText,
+        postid,
+        extraContent,
         created_at,
-        author:Profile!comment_authorId_fkey (
-          id,
-          username,
-          avatarUrl
+        author:Profile!comment_commentAuthorId_fkey (
+          ${PROFILE_METADATA_SELECT}
         )
       `
     )
@@ -200,18 +245,26 @@ export async function POST(req: NextRequest) {
   }
 
   const author = pickSingleRelationRow(createdComment.author);
+  const authorProfile = toProfileMetadata(
+    author,
+    createdComment.commentAuthorId ?? auth.profileId
+  );
 
   const commentForClient: CommentData = {
-    commentId:createdComment.id,
-    authorId: createdComment.authorId ?? auth.profileId,
-    authorName: author?.username ?? "",
-    commentAuthorPropic: author?.avatarUrl ?? "",
+    commentId: createdComment.commentId,
+    authorId: createdComment.commentAuthorId ?? auth.profileId,
+    authorName: authorProfile?.username ?? "",
+    commentAuthorPropic: authorProfile?.avatarUrl ?? "",
     commentedAt: createdComment.created_at,
     reactions: [],
     reactionNumbers: 0,
     commentText: createdComment.commentText ?? body.commentText,
-    commentReplies:[],
-    commentRepliesCount:0
+    commentReplies: [],
+    commentRepliesCount: 0,
+    postId: createdComment.postid ?? targetPost.id,
+    commentExtraContent: createdComment.extraContent,
+    authorProfile,
+    createdAt: createdComment.created_at,
   };
 
   return NextResponse.json(

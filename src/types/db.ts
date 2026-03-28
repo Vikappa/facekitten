@@ -50,8 +50,8 @@ export type ProfilePublicDb = Pick<
   | 'bannerUrl'
   | 'bio'
   | 'confirmedAccount'
-  | 'createdAt'
-  | 'updatedAt'
+  | 'created_at'
+  | 'updated_at'
 >
 
 export type ProfilePublicFriendDb = ProfilePublicDb &
@@ -67,7 +67,7 @@ export type ProfileAuthDb = Pick<
 
 export type ProfileVerificationDb = Pick<
   ProfileRow,
-  'id' | 'email' | 'username' | 'password' | 'confirmedAccount' | 'createdAt'
+  'id' | 'email' | 'username' | 'password' | 'confirmedAccount' | 'created_at'
 >
 
 export interface ProfileDto {
@@ -95,7 +95,7 @@ export interface ProfileAuthDto {
 }
 
 export const PROFILE_PUBLIC_SAFE_SELECT =
-  'id, email, username, avatarUrl, bannerUrl, bio, confirmedAccount, createdAt, updatedAt' as const
+  'id, email, username, avatarUrl, bannerUrl, bio, confirmedAccount, created_at, updated_at' as const
 
 export const PROFILE_PUBLIC_FRIEND_SELECT =
   `${PROFILE_PUBLIC_SAFE_SELECT}, dataDiNascita, giocattoloPreferito, tipoCuccia, locationId` as const
@@ -104,7 +104,7 @@ export const PROFILE_AUTH_SAFE_SELECT =
   'id, email, username, password, confirmedAccount' as const
 
 export const PROFILE_VERIFICATION_SAFE_SELECT =
-  'id, email, username, password, confirmedAccount, createdAt' as const
+  'id, email, username, password, confirmedAccount, created_at' as const
 
 export function toProfileDto(row: ProfilePublicDb | ProfilePublicFriendDb): ProfileDto {
   const friendRow = row as Partial<ProfilePublicFriendDb>
@@ -123,8 +123,8 @@ export function toProfileDto(row: ProfilePublicDb | ProfilePublicFriendDb): Prof
     bannerUrl: toRequiredString(row.bannerUrl),
     bio: toRequiredString(row.bio),
     confirmedAccount: toBoolean(row.confirmedAccount),
-    createdAt: toDate(row.createdAt),
-    updatedAt: toDate(row.updatedAt),
+    createdAt: toDate(row.created_at),
+    updatedAt: toDate(row.updated_at),
     ...(hasFriendFields
       ? {
           giocattoloPreferito: friendRow.giocattoloPreferito ?? '',
@@ -153,7 +153,7 @@ export type PostUpdate = TablesUpdate<'post'>
 
 export type PostDb = Pick<
   PostRow,
-  'id' | 'authorId' | 'content' | 'extraContent' | 'mediaUrl' | 'postType' | 'createdAt'
+  'id' | 'authorId' | 'content' | 'extraContent' | 'mediaUrl' | 'postType' | 'created_at'
 >
 
 export interface PostDto {
@@ -167,7 +167,7 @@ export interface PostDto {
 }
 
 export const POST_SAFE_SELECT =
-  'id, authorId, content, extraContent, mediaUrl, postType, createdAt' as const
+  'id, authorId, content, extraContent, mediaUrl, postType, created_at' as const
 
 export function toPostDto(row: PostDb): PostDto {
   return {
@@ -177,7 +177,7 @@ export function toPostDto(row: PostDb): PostDto {
     extraContent: toOptionalString(row.extraContent),
     mediaUrl: toOptionalString(row.mediaUrl),
     postType: row.postType ?? undefined,
-    createdAt: toDate(row.createdAt),
+    createdAt: toDate(row.created_at),
   }
 }
 
@@ -188,11 +188,11 @@ export type CommentUpdate = TablesUpdate<'comment'>
 
 export type CommentDb = Pick<
   CommentRow,
-  'id' | 'authorId' | 'postid' | 'commentText' | 'extraContent'
+  'commentId' | 'commentAuthorId' | 'postid' | 'commentText' | 'extraContent'
 >
 
 export interface CommentDto {
-  id: number
+  id: string
   authorId?: string
   postId?: string
   commentText: string
@@ -200,12 +200,12 @@ export interface CommentDto {
 }
 
 export const COMMENT_SAFE_SELECT =
-  'id, authorId, postid, commentText, extraContent' as const
+  'commentId, commentAuthorId, postid, commentText, extraContent' as const
 
 export function toCommentDto(row: CommentDb): CommentDto {
   return {
-    id: row.id,
-    authorId: toOptionalString(row.authorId),
+    id: row.commentId,
+    authorId: toOptionalString(row.commentAuthorId),
     postId: toOptionalString(row.postid),
     commentText: toRequiredString(row.commentText),
     extraContent: toOptionalString(row.extraContent),
@@ -219,26 +219,26 @@ export type CommentReplyUpdate = TablesUpdate<'commentReply'>
 
 export type CommentReplyDb = Pick<
   CommentReplyRow,
-  'id' | 'authorId' | 'commentId' | 'text' | 'mediaUrl' | 'extraContent'
+  'commentReplyId' | 'commentReplyAuthorId' | 'repliedComment' | 'text' | 'mediaUrl' | 'extraContent'
 >
 
 export interface CommentReplyDto {
-  id: number
+  id: string
   authorId?: string
-  commentId?: number
+  repliedComment?: string
   text: string
   mediaUrl?: string
   extraContent?: string
 }
 
 export const COMMENT_REPLY_SAFE_SELECT =
-  'id, authorId, commentId, text, mediaUrl, extraContent' as const
+  'commentReplyId, commentReplyAuthorId, repliedComment, text, mediaUrl, extraContent' as const
 
 export function toCommentReplyDto(row: CommentReplyDb): CommentReplyDto {
   return {
-    id: row.id,
-    authorId: toOptionalString(row.authorId),
-    commentId: toOptionalNumber(row.commentId),
+    id: row.commentReplyId,
+    authorId: toOptionalString(row.commentReplyAuthorId),
+    repliedComment: toOptionalString(row.repliedComment),
     text: toRequiredString(row.text),
     mediaUrl: toOptionalString(row.mediaUrl),
     extraContent: toOptionalString(row.extraContent),
@@ -252,24 +252,24 @@ export type PostReactionUpdate = TablesUpdate<'postReaction'>
 
 export type PostReactionDb = Pick<
   PostReactionRow,
-  'id' | 'authorId' | 'postId' | 'reactionType'
+  'id' | 'reactedBy' | 'reactedPost' | 'reactionType'
 >
 
 export interface PostReactionDto {
-  id: number
+  id: string
   authorId?: string
   postId?: string
   reactionType?: ReactionType
 }
 
 export const POST_REACTION_SAFE_SELECT =
-  'id, authorId, postId, reactionType' as const
+  'id, reactedBy, reactedPost, reactionType' as const
 
 export function toPostReactionDto(row: PostReactionDb): PostReactionDto {
   return {
-    id: row.id,
-    authorId: toOptionalString(row.authorId),
-    postId: toOptionalString(row.postId),
+    id: String(row.id),
+    authorId: toOptionalString(row.reactedBy),
+    postId: toOptionalString(row.reactedPost),
     reactionType: row.reactionType ?? undefined,
   }
 }
@@ -281,24 +281,24 @@ export type CommentReactionUpdate = TablesUpdate<'commentReaction'>
 
 export type CommentReactionDb = Pick<
   CommentReactionRow,
-  'id' | 'athorId' | 'commentId' | 'reactionType'
+  'commReactId' | 'reactionAuthorId' | 'reactedComment' | 'reactionType'
 >
 
 export interface CommentReactionDto {
-  id: number
+  id: string
   authorId?: string
-  commentId?: number
+  commentId?: string
   reactionType?: ReactionType
 }
 
 export const COMMENT_REACTION_SAFE_SELECT =
-  'id, athorId, commentId, reactionType' as const
+  'commReactId, reactionAuthorId, reactedComment, reactionType' as const
 
 export function toCommentReactionDto(row: CommentReactionDb): CommentReactionDto {
   return {
-    id: row.id,
-    authorId: toOptionalString(row.athorId),
-    commentId: toOptionalNumber(row.commentId),
+    id: row.commReactId,
+    authorId: toOptionalString(row.reactionAuthorId),
+    commentId: toOptionalString(row.reactedComment),
     reactionType: row.reactionType ?? undefined,
   }
 }
@@ -310,7 +310,7 @@ export type ChatMessageUpdate = TablesUpdate<'ChatMessage'>
 
 export type ChatMessageDb = Pick<
   ChatMessageRow,
-  | 'id'
+  | 'chatId'
   | 'from'
   | 'to'
   | 'text'
@@ -320,7 +320,7 @@ export type ChatMessageDb = Pick<
 >
 
 export interface ChatMessageDto {
-  id: number
+  id: string
   from?: string
   to?: string
   text: string
@@ -330,11 +330,11 @@ export interface ChatMessageDto {
 }
 
 export const CHAT_MESSAGE_SAFE_SELECT =
-  'id, from, to, text, extraContent, messageType, reaction' as const
+  'chatId, from, to, text, extraContent, messageType, reaction' as const
 
 export function toChatMessageDto(row: ChatMessageDb): ChatMessageDto {
   return {
-    id: row.id,
+    id: row.chatId,
     from: toOptionalString(row.from),
     to: toOptionalString(row.to),
     text: toRequiredString(row.text),
@@ -371,11 +371,11 @@ export type NotificationUpdate = TablesUpdate<'notifications'>
 
 export type NotificationDb = Pick<
   NotificationRow,
-  'id' | 'created_at' | 'activity_from' | 'to' | 'generatedNavigation' | 'notificationType' | 'seen'
+  'notificationId' | 'created_at' | 'activity_from' | 'to' | 'generatedNavigation' | 'notificationType' | 'seen'
 >
 
 export interface NotificationDto {
-  id: number
+  id: string
   createdAt?: Date
   activityFrom?: string
   to?: string
@@ -385,11 +385,11 @@ export interface NotificationDto {
 }
 
 export const NOTIFICATION_SAFE_SELECT =
-  'id, created_at, activity_from, to, generatedNavigation, notificationType, seen' as const
+  'notificationId, created_at, activity_from, to, generatedNavigation, notificationType, seen' as const
 
 export function toNotificationDto(row: NotificationDb): NotificationDto {
   return {
-    id: row.id,
+    id: row.notificationId,
     createdAt: toDate(row.created_at),
     activityFrom: toOptionalString(row.activity_from),
     to: toOptionalString(row.to),

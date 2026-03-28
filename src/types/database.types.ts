@@ -14,74 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
-      chat: {
-        Row: {
-          attachments: string | null
-          created_at: string
-          from: string | null
-          id: number
-          text: string | null
-          to: string | null
-        }
-        Insert: {
-          attachments?: string | null
-          created_at?: string
-          from?: string | null
-          id?: number
-          text?: string | null
-          to?: string | null
-        }
-        Update: {
-          attachments?: string | null
-          created_at?: string
-          from?: string | null
-          id?: number
-          text?: string | null
-          to?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_from_fkey"
-            columns: ["from"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chat_to_fkey"
-            columns: ["to"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ChatMessage: {
         Row: {
+          chatId: string
           created_at: string
           extraContent: string | null
           from: string | null
-          id: number
           messageType: Database["public"]["Enums"]["postType"] | null
           reaction: Database["public"]["Enums"]["ReactionType"] | null
           text: string | null
           to: string | null
         }
         Insert: {
+          chatId?: string
           created_at?: string
           extraContent?: string | null
           from?: string | null
-          id?: number
           messageType?: Database["public"]["Enums"]["postType"] | null
           reaction?: Database["public"]["Enums"]["ReactionType"] | null
           text?: string | null
           to?: string | null
         }
         Update: {
+          chatId?: string
           created_at?: string
           extraContent?: string | null
           from?: string | null
-          id?: number
           messageType?: Database["public"]["Enums"]["postType"] | null
           reaction?: Database["public"]["Enums"]["ReactionType"] | null
           text?: string | null
@@ -106,33 +64,33 @@ export type Database = {
       }
       comment: {
         Row: {
-          authorId: string | null
+          commentAuthorId: string | null
+          commentId: string
           commentText: string | null
           created_at: string
           extraContent: string | null
-          id: number
           postid: string | null
         }
         Insert: {
-          authorId?: string | null
+          commentAuthorId?: string | null
+          commentId?: string
           commentText?: string | null
           created_at?: string
           extraContent?: string | null
-          id?: number
           postid?: string | null
         }
         Update: {
-          authorId?: string | null
+          commentAuthorId?: string | null
+          commentId?: string
           commentText?: string | null
           created_at?: string
           extraContent?: string | null
-          id?: number
           postid?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "comment_authorId_fkey"
-            columns: ["authorId"]
+            foreignKeyName: "comment_commentAuthorId_fkey"
+            columns: ["commentAuthorId"]
             isOneToOne: false
             referencedRelation: "Profile"
             referencedColumns: ["id"]
@@ -148,84 +106,116 @@ export type Database = {
       }
       commentReaction: {
         Row: {
-          athorId: string | null
-          commentId: number | null
+          commReactId: string
           created_at: string
-          id: number
+          reactedComment: string | null
+          reactionAuthorId: string | null
           reactionType: Database["public"]["Enums"]["ReactionType"] | null
         }
         Insert: {
-          athorId?: string | null
-          commentId?: number | null
+          commReactId?: string
           created_at?: string
-          id?: number
+          reactedComment?: string | null
+          reactionAuthorId?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Update: {
-          athorId?: string | null
-          commentId?: number | null
+          commReactId?: string
           created_at?: string
-          id?: number
+          reactedComment?: string | null
+          reactionAuthorId?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Relationships: [
           {
-            foreignKeyName: "commentReaction_athorId_fkey"
-            columns: ["athorId"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commentReaction_commentId_fkey"
-            columns: ["commentId"]
+            foreignKeyName: "commentReaction_reactedComment_fkey"
+            columns: ["reactedComment"]
             isOneToOne: false
             referencedRelation: "comment"
+            referencedColumns: ["commentId"]
+          },
+          {
+            foreignKeyName: "commentReaction_reactionAuthorId_fkey"
+            columns: ["reactionAuthorId"]
+            isOneToOne: false
+            referencedRelation: "Profile"
             referencedColumns: ["id"]
           },
         ]
       }
       commentReply: {
         Row: {
-          authorId: string | null
-          commentId: number | null
+          commentReplyAuthorId: string | null
+          commentReplyId: string
           created_at: string
           extraContent: string | null
-          id: number
           mediaUrl: string | null
+          repliedComment: string | null
           text: string | null
         }
         Insert: {
-          authorId?: string | null
-          commentId?: number | null
+          commentReplyAuthorId?: string | null
+          commentReplyId?: string
           created_at?: string
           extraContent?: string | null
-          id?: number
           mediaUrl?: string | null
+          repliedComment?: string | null
           text?: string | null
         }
         Update: {
-          authorId?: string | null
-          commentId?: number | null
+          commentReplyAuthorId?: string | null
+          commentReplyId?: string
           created_at?: string
           extraContent?: string | null
-          id?: number
           mediaUrl?: string | null
+          repliedComment?: string | null
           text?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "commentReply_authorId_fkey"
-            columns: ["authorId"]
-            isOneToOne: false
-            referencedRelation: "Profile"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commentReply_commentId_fkey"
-            columns: ["commentId"]
+            foreignKeyName: "commentReply_repliedComment_fkey"
+            columns: ["repliedComment"]
             isOneToOne: false
             referencedRelation: "comment"
+            referencedColumns: ["commentId"]
+          },
+        ]
+      }
+      CommentReplyReaction: {
+        Row: {
+          commentReplyReacted: string | null
+          commentReplyReactionAuthor: string | null
+          CommentReplyReactionId: string
+          created_at: string
+          reactionType: Database["public"]["Enums"]["ReactionType"] | null
+        }
+        Insert: {
+          commentReplyReacted?: string | null
+          commentReplyReactionAuthor?: string | null
+          CommentReplyReactionId?: string
+          created_at?: string
+          reactionType?: Database["public"]["Enums"]["ReactionType"] | null
+        }
+        Update: {
+          commentReplyReacted?: string | null
+          commentReplyReactionAuthor?: string | null
+          CommentReplyReactionId?: string
+          created_at?: string
+          reactionType?: Database["public"]["Enums"]["ReactionType"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CommentReplyReaction_commentReplyReacted_fkey"
+            columns: ["commentReplyReacted"]
+            isOneToOne: false
+            referencedRelation: "commentReply"
+            referencedColumns: ["commentReplyId"]
+          },
+          {
+            foreignKeyName: "CommentReplyReaction_commentReplyReactionAuthor_fkey"
+            columns: ["commentReplyReactionAuthor"]
+            isOneToOne: false
+            referencedRelation: "Profile"
             referencedColumns: ["id"]
           },
         ]
@@ -307,7 +297,7 @@ export type Database = {
           activity_from: string | null
           created_at: string
           generatedNavigation: string | null
-          id: number
+          notificationId: string
           notificationType:
             | Database["public"]["Enums"]["notificationtype"]
             | null
@@ -318,7 +308,7 @@ export type Database = {
           activity_from?: string | null
           created_at?: string
           generatedNavigation?: string | null
-          id?: number
+          notificationId?: string
           notificationType?:
             | Database["public"]["Enums"]["notificationtype"]
             | null
@@ -329,7 +319,7 @@ export type Database = {
           activity_from?: string | null
           created_at?: string
           generatedNavigation?: string | null
-          id?: number
+          notificationId?: string
           notificationType?:
             | Database["public"]["Enums"]["notificationtype"]
             | null
@@ -357,7 +347,7 @@ export type Database = {
         Row: {
           authorId: string
           content: string | null
-          createdAt: string
+          created_at: string
           extraContent: string | null
           id: string
           mediaUrl: string | null
@@ -366,7 +356,7 @@ export type Database = {
         Insert: {
           authorId: string
           content?: string | null
-          createdAt?: string
+          created_at?: string
           extraContent?: string | null
           id?: string
           mediaUrl?: string | null
@@ -375,7 +365,7 @@ export type Database = {
         Update: {
           authorId?: string
           content?: string | null
-          createdAt?: string
+          created_at?: string
           extraContent?: string | null
           id?: string
           mediaUrl?: string | null
@@ -393,37 +383,37 @@ export type Database = {
       }
       postReaction: {
         Row: {
-          authorId: string | null
           created_at: string
           id: number
-          postId: string | null
+          reactedBy: string | null
+          reactedPost: string | null
           reactionType: Database["public"]["Enums"]["ReactionType"] | null
         }
         Insert: {
-          authorId?: string | null
           created_at?: string
           id?: number
-          postId?: string | null
+          reactedBy?: string | null
+          reactedPost?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Update: {
-          authorId?: string | null
           created_at?: string
           id?: number
-          postId?: string | null
+          reactedBy?: string | null
+          reactedPost?: string | null
           reactionType?: Database["public"]["Enums"]["ReactionType"] | null
         }
         Relationships: [
           {
-            foreignKeyName: "postReaction_authorId_fkey"
-            columns: ["authorId"]
+            foreignKeyName: "postReaction_reactedBy_fkey"
+            columns: ["reactedBy"]
             isOneToOne: false
             referencedRelation: "Profile"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "postReaction_postId_fkey"
-            columns: ["postId"]
+            foreignKeyName: "postReaction_reactedPost_fkey"
+            columns: ["reactedPost"]
             isOneToOne: false
             referencedRelation: "post"
             referencedColumns: ["id"]
@@ -437,7 +427,6 @@ export type Database = {
           bio: string | null
           confirmedAccount: boolean | null
           created_at: string
-          createdAt: string | null
           dataDiNascita: string | null
           email: string | null
           giocattoloPreferito: string | null
@@ -445,7 +434,7 @@ export type Database = {
           locationId: string | null
           password: string | null
           tipoCuccia: Database["public"]["Enums"]["Lettino"] | null
-          updatedAt: string | null
+          updated_at: string | null
           username: string | null
         }
         Insert: {
@@ -454,7 +443,6 @@ export type Database = {
           bio?: string | null
           confirmedAccount?: boolean | null
           created_at?: string
-          createdAt?: string | null
           dataDiNascita?: string | null
           email?: string | null
           giocattoloPreferito?: string | null
@@ -462,7 +450,7 @@ export type Database = {
           locationId?: string | null
           password?: string | null
           tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
-          updatedAt?: string | null
+          updated_at?: string | null
           username?: string | null
         }
         Update: {
@@ -471,7 +459,6 @@ export type Database = {
           bio?: string | null
           confirmedAccount?: boolean | null
           created_at?: string
-          createdAt?: string | null
           dataDiNascita?: string | null
           email?: string | null
           giocattoloPreferito?: string | null
@@ -479,7 +466,7 @@ export type Database = {
           locationId?: string | null
           password?: string | null
           tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null
-          updatedAt?: string | null
+          updated_at?: string | null
           username?: string | null
         }
         Relationships: []
@@ -532,7 +519,7 @@ export type Database = {
         | "Sedia"
         | "Poltrona"
       notificationtype:
-        | "friendRequestRecieved"
+        | "friendRequestReceived"
         | "friendRequestAccepted"
         | "postCommented"
         | "commentReplied"
@@ -695,7 +682,7 @@ export const Constants = {
         "Poltrona",
       ],
       notificationtype: [
-        "friendRequestRecieved",
+        "friendRequestReceived",
         "friendRequestAccepted",
         "postCommented",
         "commentReplied",

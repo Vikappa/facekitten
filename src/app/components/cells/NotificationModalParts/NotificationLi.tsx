@@ -22,7 +22,7 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
     const previewText = props.notification.previewText?.trim() ?? "";
     const generatedNavigation = props.notification.generatedNavigation?.trim() ?? "";
 
-    async function markNotificationAsSeen(notificationId: number) {
+    async function markNotificationAsSeen(notificationId: string) {
         const response = await fetch("/api/v1/notifications/mark-seen", {
             method: "POST",
             headers: {

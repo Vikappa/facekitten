@@ -1,6 +1,9 @@
 import "server-only";
 
-import { NotificationData } from "@/lib/interfaces/CommonInterfaces";
+import {
+  NotificationData,
+  ProfileMetadata,
+} from "@/lib/interfaces/CommonInterfaces";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type { NotificationsRow, ProfileRow } from "@/types/db.generated";
 
@@ -8,14 +11,30 @@ type SupabaseAdminClient = ReturnType<typeof createSupabaseAdminClient>;
 
 type UnreadNotificationRow = Pick<
   NotificationsRow,
-  | "id"
+  | "notificationId"
   | "activity_from"
   | "created_at"
   | "generatedNavigation"
   | "notificationType"
+  | "seen"
+  | "to"
 >;
 
-type ActivityProfileRow = Pick<ProfileRow, "id" | "username" | "avatarUrl">;
+type ActivityProfileRow = Pick<
+  ProfileRow,
+  | "id"
+  | "username"
+  | "avatarUrl"
+  | "bannerUrl"
+  | "bio"
+  | "confirmedAccount"
+  | "created_at"
+  | "updated_at"
+  | "dataDiNascita"
+  | "giocattoloPreferito"
+  | "locationId"
+  | "tipoCuccia"
+>;
 
 type CommentPreviewRow = {
   commentText: string | null;
@@ -24,7 +43,10 @@ type CommentPreviewRow = {
 
 type CommentReplyPreviewRow = {
   text: string | null;
-  comment: { authorId: string | null } | { authorId: string | null }[] | null;
+  comment:
+    | { commentAuthorId: string | null }
+    | { commentAuthorId: string | null }[]
+    | null;
 };
 
 type LoadUnreadNotificationsOptions = {
@@ -42,6 +64,12 @@ type LoadUnreadNotificationsResult =
       ok: false;
       error: unknown;
     };
+
+type RelatedEntityIds = {
+  relatedPostId: string | null;
+  relatedCommentId: string | null;
+  relatedCommentReplyId: string | null;
+};
 
 const PREVIEW_MAX_LENGTH = 90;
 const FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT =
@@ -80,6 +108,118 @@ function pickSingleRelationRow<T extends Record<string, unknown>>(
   return value;
 }
 
+function sanitizeIdPart(value: string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function decodePathSegment(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function parseRelatedEntityIds(
+  generatedNavigation: string | null | undefined
+): RelatedEntityIds {
+  const emptyResult: RelatedEntityIds = {
+    relatedPostId: null,
+    relatedCommentId: null,
+    relatedCommentReplyId: null,
+  };
+
+  if (!generatedNavigation) {
+    return emptyResult;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(generatedNavigation, "https://facekitten.local");
+  } catch {
+    return emptyResult;
+  }
+
+  const pathSegments = url.pathname
+    .split("/")
+    .filter((segment) => segment.length > 0)
+    .map((segment) => decodePathSegment(segment));
+
+  let relatedPostId = sanitizeIdPart(url.searchParams.get("postId"));
+  let relatedCommentId = sanitizeIdPart(url.searchParams.get("commentId"));
+  let relatedCommentReplyId = sanitizeIdPart(
+    url.searchParams.get("commentReplyId") ?? url.searchParams.get("replyId")
+  );
+
+  const postSegmentIndex = pathSegments.findIndex(
+    (segment) => segment === "post" || segment === "posts"
+  );
+  if (!relatedPostId && postSegmentIndex >= 0) {
+    relatedPostId = sanitizeIdPart(pathSegments[postSegmentIndex + 1]);
+  }
+
+  const commentSegmentIndex = pathSegments.findIndex(
+    (segment) => segment === "comment" || segment === "comments"
+  );
+  if (!relatedCommentId && commentSegmentIndex >= 0) {
+    relatedCommentId = sanitizeIdPart(pathSegments[commentSegmentIndex + 1]);
+  }
+
+  const replySegmentIndex = pathSegments.findIndex(
+    (segment) =>
+      segment === "reply" ||
+      segment === "replies" ||
+      segment === "commentReply" ||
+      segment === "commentReplies"
+  );
+  if (!relatedCommentReplyId && replySegmentIndex >= 0) {
+    relatedCommentReplyId = sanitizeIdPart(pathSegments[replySegmentIndex + 1]);
+  }
+
+  return {
+    relatedPostId,
+    relatedCommentId,
+    relatedCommentReplyId,
+  };
+}
+
+function toProfileMetadata(
+  profile: ActivityProfileRow | null | undefined,
+  fallbackId?: string | null
+): ProfileMetadata | null {
+  if (!profile && !fallbackId) {
+    return null;
+  }
+
+  if (!profile) {
+    return {
+      id: fallbackId ?? "",
+      username: "",
+      avatarUrl: "",
+    };
+  }
+
+  return {
+    id: profile.id,
+    username: profile.username ?? "",
+    avatarUrl: profile.avatarUrl ?? "",
+    bannerUrl: profile.bannerUrl,
+    bio: profile.bio,
+    confirmedAccount: profile.confirmedAccount,
+    createdAt: profile.created_at,
+    updatedAt: profile.updated_at,
+    dataDiNascita: profile.dataDiNascita,
+    giocattoloPreferito: profile.giocattoloPreferito,
+    locationId: profile.locationId,
+    tipoCuccia: profile.tipoCuccia,
+  };
+}
+
 async function resolvePostCommentPreviewText(
   supabase: SupabaseAdminClient,
   profileId: string,
@@ -96,7 +236,7 @@ async function resolvePostCommentPreviewText(
         )
       `
     )
-    .eq("authorId", activityFromId)
+    .eq("commentAuthorId", activityFromId)
     .lte("created_at", createdAt)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -127,12 +267,12 @@ async function resolveCommentReplyPreviewText(
     .select(
       `
         text,
-        comment:comment!commentReply_commentId_fkey (
-          authorId
+        comment:comment!commentReply_repliedComment_fkey (
+          commentAuthorId
         )
       `
     )
-    .eq("authorId", activityFromId)
+    .eq("commentReplyAuthorId", activityFromId)
     .lte("created_at", createdAt)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -144,7 +284,7 @@ async function resolveCommentReplyPreviewText(
 
   for (const row of (data ?? []) as CommentReplyPreviewRow[]) {
     const commentRow = pickSingleRelationRow(row.comment);
-    if (commentRow?.authorId === profileId) {
+    if (commentRow?.commentAuthorId === profileId) {
       return toPreviewSnippet(row.text);
     }
   }
@@ -182,7 +322,7 @@ async function resolveNotificationPreviewText(
     );
   }
 
-  if (notificationType === "friendRequestRecieved") {
+  if (notificationType === "friendRequestReceived") {
     return FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT;
   }
 
@@ -200,7 +340,9 @@ export async function loadUnreadNotificationDtosForProfile(
 
   const { data: unreadNotificationRows, error: unreadNotificationsError } = await supabase
     .from("notifications")
-    .select("id, activity_from, created_at, generatedNavigation, notificationType")
+    .select(
+      "notificationId, activity_from, created_at, generatedNavigation, notificationType, seen, to"
+    )
     .eq("to", profileId)
     .or("seen.is.null,seen.eq.false")
     .order("created_at", { ascending: false })
@@ -223,7 +365,9 @@ export async function loadUnreadNotificationDtosForProfile(
   if (activityProfileIds.length > 0) {
     const { data: activityProfiles, error: activityProfilesError } = await supabase
       .from("Profile")
-      .select("id, username, avatarUrl")
+      .select(
+        "id, username, avatarUrl, bannerUrl, bio, confirmedAccount, created_at, updated_at, dataDiNascita, giocattoloPreferito, locationId, tipoCuccia"
+      )
       .in("id", activityProfileIds);
 
     if (activityProfilesError) {
@@ -237,9 +381,13 @@ export async function loadUnreadNotificationDtosForProfile(
 
   const unreadNotificationDtos = await Promise.all(
     notifications.map(async (notification) => {
-      const activityFromProfile = notification.activity_from
+      const activityFromProfileRow = notification.activity_from
         ? activityProfileById.get(notification.activity_from)
         : null;
+      const activityFromProfile = toProfileMetadata(
+        activityFromProfileRow,
+        notification.activity_from
+      );
 
       const previewText = await resolveNotificationPreviewText(
         notification,
@@ -247,17 +395,28 @@ export async function loadUnreadNotificationDtosForProfile(
         supabase
       );
 
+      const relatedEntityIds = parseRelatedEntityIds(
+        notification.generatedNavigation ?? null
+      );
+
       return {
-        id: notification.id,
+        id: notification.notificationId,
         createdAt: notification.created_at,
         generatedNavigation: notification.generatedNavigation ?? null,
         notificationType: notification.notificationType ?? null,
         activityFrom: {
           id: notification.activity_from ?? null,
-          name: activityFromProfile?.username?.trim() || "Utente",
+          name: activityFromProfile?.username.trim() || "Utente",
           avatarUrl: activityFromProfile?.avatarUrl ?? null,
         },
         previewText,
+        activityFromProfile,
+        activityFromId: notification.activity_from ?? null,
+        toProfileId: notification.to ?? null,
+        seen: notification.seen ?? null,
+        relatedPostId: relatedEntityIds.relatedPostId,
+        relatedCommentId: relatedEntityIds.relatedCommentId,
+        relatedCommentReplyId: relatedEntityIds.relatedCommentReplyId,
       } satisfies NotificationData;
     })
   );

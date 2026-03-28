@@ -34,6 +34,21 @@ export interface NewsApiPayload {
     articles: CasualArticle[]
 }
 
+export type ProfileMetadata = {
+    id: string;
+    username: string;
+    avatarUrl: string;
+    bannerUrl?: string | null;
+    bio?: string | null;
+    confirmedAccount?: boolean | null;
+    createdAt?: string;
+    updatedAt?: string | null;
+    dataDiNascita?: string | null;
+    giocattoloPreferito?: string | null;
+    locationId?: string | null;
+    tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null;
+}
+
 export type PostData = {
     postId:string;
     postType:PostType;
@@ -48,10 +63,14 @@ export type PostData = {
     reactions:ReactionData[];
     reactionsNumber:number;
     shares:SharePostDTO;
+    postExtraContent?: string | null;
+    postMediaUrl?: string | null;
+    authorProfile?: ProfileMetadata | null;
+    createdAt?: string;
 }
 
 export type CommentData = {
-    commentId:number;
+    commentId:string;
     authorId:string;
     authorName:string;
     commentAuthorPropic:string;
@@ -61,13 +80,24 @@ export type CommentData = {
     commentText:string;
     commentReplies:CommentReplyData[];
     commentRepliesCount:number
+    postId?: string | null;
+    commentExtraContent?: string | null;
+    authorProfile?: ProfileMetadata | null;
+    createdAt?: string;
 }
 
 export type CommentReplyData = {
+    commentReplyId?: string;
+    repliedCommentId?: string | null;
     authorId:string;
     authorName:string;
     replyAuthorPropic:string;
     repliedAt:string;
+    commentReplyText?: string;
+    commentReplyMediaUrl?: string | null;
+    commentReplyExtraContent?: string | null;
+    authorProfile?: ProfileMetadata | null;
+    createdAt?: string;
     commentReplyReactions:ReactionData[];
 }
 
@@ -75,6 +105,12 @@ export type ReactionData = {
     reactionId:string;
     reactionType:ReactionType;
     author:string;
+    authorId?: string | null;
+    authorAvatarUrl?: string | null;
+    authorProfile?: ProfileMetadata | null;
+    createdAt?: string;
+    targetType?: "post" | "comment" | "commentReply";
+    targetId?: string | null;
 }
 
 export type SharePostDTO = {
@@ -82,8 +118,11 @@ export type SharePostDTO = {
 }
 
 export type NotificationData = {
-    id: number;
+    id: string;
     createdAt: string;
+    activityFromId?: string | null;
+    toProfileId?: string | null;
+    seen?: boolean | null;
     activityFrom: {
         id: string | null;
         name: string;
@@ -92,4 +131,8 @@ export type NotificationData = {
     generatedNavigation: string | null;
     notificationType: Database["public"]["Enums"]["notificationtype"] | null;
     previewText: string | null;
+    activityFromProfile?: ProfileMetadata | null;
+    relatedPostId?: string | null;
+    relatedCommentId?: string | null;
+    relatedCommentReplyId?: string | null;
 }

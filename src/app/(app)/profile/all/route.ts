@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
     .from("Profile")
     .select(PROFILE_PUBLIC_SAFE_SELECT)
     .neq("id", auth.profileId)
-    .order("createdAt", { ascending: false })
+    .order("created_at", { ascending: false })
     .returns<ProfilePublicDb[]>();
 
   if (profilesError) {

@@ -229,7 +229,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     activity_from: auth.profileId,
     to: targetProfileId,
     generatedNavigation: `/friendship/requests?sender=${encodeURIComponent(auth.profileId)}`,
-    notificationType: "friendRequestRecieved",
+    notificationType: "friendRequestReceived",
     seen: false,
   };
 

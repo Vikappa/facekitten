@@ -22,7 +22,7 @@ function sortNotificationsByRecency(notifications: NotificationData[]): Notifica
             return bTimestamp - aTimestamp;
         }
 
-        return b.id - a.id;
+        return b.id.localeCompare(a.id);
     });
 }
 
@@ -30,7 +30,7 @@ function mergeUniqueUnreadNotifications(
     baseNotifications: NotificationData[],
     incomingNotifications: NotificationData[]
 ): NotificationData[] {
-    const byId = new Map<number, NotificationData>();
+    const byId = new Map<string, NotificationData>();
 
     for (const notification of [...baseNotifications, ...incomingNotifications]) {
         byId.set(notification.id, notification);
@@ -54,7 +54,7 @@ const notificationsSlice = createSlice({
             );
             state.lastUpdatedAt = Date.now();
         },
-        removeUnreadNotificationById(state, action: PayloadAction<number>) {
+        removeUnreadNotificationById(state, action: PayloadAction<string>) {
             state.unreadNotifications = state.unreadNotifications.filter(
                 (notification) => notification.id !== action.payload
             );

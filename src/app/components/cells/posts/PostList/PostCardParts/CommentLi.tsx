@@ -92,16 +92,16 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
                 </div>
             </div>
         </div>
-            <CommentReplyForm isRepling={isRepling} setIsRepling={setIsRepling} CommentId={comment.commentId} />
             <div>
                 {comment.commentReplies.map((cr, index) => <CommentReplyLi key={comment.commentId+"_"+index} replyData={{
-                    authorId: cr.authorName,
+                    authorId: cr.authorId,
                     authorName: cr.authorName,
                     replyAuthorPropic: cr.replyAuthorPropic,
                     repliedAt: cr.repliedAt,
                     commentReplyReactions: cr.commentReplyReactions
                 }} />)}
             </div>
+            <CommentReplyForm isRepling={isRepling} setIsRepling={setIsRepling} CommentId={comment.commentId} />
         </div>
     )
 }

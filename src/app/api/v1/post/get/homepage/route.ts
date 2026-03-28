@@ -4,142 +4,53 @@ import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/Session
 import { loadUnreadNotificationDtosForProfile } from "@/lib/services/notifications/loadUnreadNotificationDtos";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type { FriendshipsRow } from "@/types/db.generated";
-import type { Database } from "@/types/database.types";
 import {
-  CommentData,
-  CommentReplyData,
-  PostData,
-  ReactionData,
-  ReactionType as UiReactionType,
-} from "@/lib/interfaces/CommonInterfaces";
+  FEED_POST_SELECT,
+  PROFILE_METADATA_SELECT,
+  collectReplyAuthorIds,
+  mapFeedPostsToPostData,
+  type FeedAuthor,
+  type FeedPost,
+} from "@/app/api/v1/post/get/feedDto";
 
 type FriendshipPair = Pick<FriendshipsRow, "user_a" | "user_b">;
-type DbReactionType = Database["public"]["Enums"]["ReactionType"];
-type DbPostType = Database["public"]["Enums"]["postType"];
 
-type FeedAuthor = {
-  id: string;
-  username: string | null;
-  avatarUrl: string | null;
-};
-
-type FeedCommentReaction = {
-  id: number;
-  reactionType: DbReactionType | null;
-  athorId: string | null;
-  author: FeedAuthor | null;
-};
-
-type FeedCommentReply = {
-  id: number;
-  authorId: string | null;
-  text: string | null;
-  created_at: string;
-  author: FeedAuthor | null;
-};
-
-type FeedComment = {
-  id: number;
-  authorId: string | null;
-  commentText: string | null;
-  created_at: string;
-  author: FeedAuthor | null;
-  commentReactions: FeedCommentReaction[] | null;
-  commentReplies: FeedCommentReply[] | null;
-};
-
-type FeedPostReaction = {
-  id: number;
-  reactionType: DbReactionType | null;
-  authorId: string | null;
-  author: FeedAuthor | null;
-};
-
-type FeedPost = {
-  id: string;
-  authorId: string;
-  content: string | null;
-  mediaUrl: string | null;
-  postType: DbPostType | null;
-  createdAt: string;
-  author: FeedAuthor | null;
-  comments: FeedComment[] | null;
-  postReactions: FeedPostReaction[] | null;
-};
-
-const REACTION_TYPE_MAP: Record<DbReactionType, UiReactionType> = {
-  like: UiReactionType.like,
-  love: UiReactionType.love,
-  care: UiReactionType.care,
-  laugh: UiReactionType.laugh,
-  wow: UiReactionType.wow,
-  sad: UiReactionType.sad,
-  angry: UiReactionType.angry,
-  gay: UiReactionType.gay,
-  flower: UiReactionType.flower,
-  boom: UiReactionType.boom,
-};
-
-function mapReactionType(value: DbReactionType | null): UiReactionType {
-  if (!value) {
-    return UiReactionType.like;
+async function loadReplyAuthorsById(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  posts: FeedPost[]
+): Promise<
+  | { ok: true; replyAuthorsById: Map<string, FeedAuthor> }
+  | { ok: false; response: NextResponse }
+> {
+  const replyAuthorIds = collectReplyAuthorIds(posts);
+  if (replyAuthorIds.length === 0) {
+    return { ok: true, replyAuthorsById: new Map<string, FeedAuthor>() };
   }
-  return REACTION_TYPE_MAP[value];
-}
 
-function mapComments(rawComments: FeedComment[] | null): CommentData[] {
-  return (rawComments ?? []).map((comment) => {
-    const commentReactions = comment.commentReactions ?? [];
-    const commentReplies = mapCommentReplies(comment.commentReplies);
+  const { data: replyAuthors, error: replyAuthorsError } = await supabase
+    .from("Profile")
+    .select(PROFILE_METADATA_SELECT)
+    .in("id", replyAuthorIds);
 
+  if (replyAuthorsError) {
+    console.error("Errore recupero autori reply in homepage feed:", replyAuthorsError);
     return {
-      commentId:comment.id,
-      authorId: comment.authorId ?? "",
-      authorName: comment.author?.username ?? "",
-      commentAuthorPropic: comment.author?.avatarUrl ?? "",
-      commentedAt: comment.created_at,
-      reactions: commentReactions.map((reaction) => ({
-        reactionId: String(reaction.id),
-        reactionType: mapReactionType(reaction.reactionType),
-        author: reaction.author?.username ?? "",
-      })),
-      reactionNumbers: commentReactions.length,
-      commentText: comment.commentText ?? "",
-      commentReplies,
-      commentRepliesCount: commentReplies.length,
+      ok: false,
+      response: NextResponse.json(
+        { code: "REPLY_AUTHORS_FETCH_ERROR", error: "Errore interno" },
+        { status: 500 }
+      ),
     };
-  });
-}
+  }
 
-function mapCommentReplies(rawReplies: FeedCommentReply[] | null): CommentReplyData[] {
-  return [...(rawReplies ?? [])]
-    .sort((a, b) => {
-      const aTimestamp = Date.parse(a.created_at);
-      const bTimestamp = Date.parse(b.created_at);
-      const hasValidATimestamp = Number.isFinite(aTimestamp);
-      const hasValidBTimestamp = Number.isFinite(bTimestamp);
+  const replyAuthorsById = new Map<string, FeedAuthor>();
+  for (const author of (replyAuthors ?? []) as FeedAuthor[]) {
+    if (typeof author.id === "string" && author.id.trim().length > 0) {
+      replyAuthorsById.set(author.id, author);
+    }
+  }
 
-      if (hasValidATimestamp && hasValidBTimestamp && aTimestamp !== bTimestamp) {
-        return aTimestamp - bTimestamp;
-      }
-
-      return a.id - b.id;
-    })
-    .map((reply) => ({
-    authorId: reply.authorId ?? "",
-    authorName: reply.author?.username ?? "",
-    replyAuthorPropic: reply.author?.avatarUrl ?? "",
-    repliedAt: reply.created_at,
-    commentReplyReactions: [],
-  }));
-}
-
-function mapReactions(rawReactions: FeedPostReaction[] | null): ReactionData[] {
-  return (rawReactions ?? []).map((reaction) => ({
-    reactionId: String(reaction.id),
-    reactionType: mapReactionType(reaction.reactionType),
-    author: reaction.author?.username ?? "",
-  }));
+  return { ok: true, replyAuthorsById };
 }
 
 export async function GET(req: NextRequest) {
@@ -214,65 +125,9 @@ export async function GET(req: NextRequest) {
 
   const { data: feedRows, error: feedError } = await supabase
     .from("post")
-    .select(
-      `
-        id,
-        authorId,
-        content,
-        mediaUrl,
-        postType,
-        createdAt,
-        author:Profile!Post_authorId_fkey (
-          id,
-          username,
-          avatarUrl
-        ),
-        comments:comment!comment_postid_fkey (
-          id,
-          authorId,
-          commentText,
-          created_at,
-          author:Profile!comment_authorId_fkey (
-            id,
-            username,
-            avatarUrl
-          ),
-          commentReactions:commentReaction!commentReaction_commentId_fkey (
-            id,
-            reactionType,
-            athorId,
-            author:Profile!commentReaction_athorId_fkey (
-              id,
-              username,
-              avatarUrl
-            )
-          ),
-          commentReplies:commentReply!commentReply_commentId_fkey (
-            id,
-            authorId,
-            text,
-            created_at,
-            author:Profile!commentReply_authorId_fkey (
-              id,
-              username,
-              avatarUrl
-            )
-          )
-        ),
-        postReactions:postReaction!postReaction_postId_fkey (
-          id,
-          reactionType,
-          authorId,
-          author:Profile!postReaction_authorId_fkey (
-            id,
-            username,
-            avatarUrl
-          )
-        )
-      `
-    )
+    .select(FEED_POST_SELECT)
     .in("authorId", authorIdsList)
-    .order("createdAt", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(20);
 
   if (feedError) {
@@ -283,28 +138,14 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const posts: PostData[] = ((feedRows ?? []) as FeedPost[]).map((post) => {
-    const comments = mapComments(post.comments);
-    const reactions = mapReactions(post.postReactions);
+  const feedPosts = (feedRows ?? []) as FeedPost[];
 
-    return {
-      postId: post.id,
-      postType: post.postType ?? "post",
-      text: post.content ?? "",
-      imageUrl: post.author?.avatarUrl ?? undefined,
-      authorId: post.authorId,
-      authorName: post.author?.username ?? "",
-      postImageUrl: post.mediaUrl ?? undefined,
-      postedAt: post.createdAt,
-      comments,
-      commentNumber: comments.length,
-      reactions,
-      reactionsNumber: reactions.length,
-      shares: {
-        sharePostId: 0,
-      },
-    };
-  });
+  const replyAuthorsResult = await loadReplyAuthorsById(supabase, feedPosts);
+  if (!replyAuthorsResult.ok) {
+    return replyAuthorsResult.response;
+  }
+
+  const posts = mapFeedPostsToPostData(feedPosts, replyAuthorsResult.replyAuthorsById);
 
   const unreadNotificationsResult = await loadUnreadNotificationDtosForProfile({
     profileId: auth.profileId,

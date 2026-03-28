@@ -101,7 +101,7 @@ export async function POST(postReq: NextRequest) {
   const { data: createdPost, error: createPostError } = await supabase
     .from("post")
     .insert(newPost)
-    .select("id, authorId, content, mediaUrl, postType, createdAt")
+    .select("id, authorId, content, mediaUrl, postType, created_at")
     .single<PostRow>();
 
   if (createPostError || !createdPost) {
@@ -121,7 +121,7 @@ export async function POST(postReq: NextRequest) {
         content: createdPost.content ?? "",
         mediaUrl: createdPost.mediaUrl,
         postType: createdPost.postType,
-        createdAt: createdPost.createdAt,
+        createdAt: createdPost.created_at,
       },
     },
     { status: 201 }

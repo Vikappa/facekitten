@@ -7,21 +7,22 @@ type MarkSeenBody = {
   notificationId?: unknown;
 };
 
-function parseNotificationId(body: unknown): number | null {
+function parseNotificationId(body: unknown): string | null {
   if (typeof body !== "object" || body === null) {
     return null;
   }
 
   const candidate = body as MarkSeenBody;
-  if (typeof candidate.notificationId !== "number") {
+  if (typeof candidate.notificationId !== "string") {
     return null;
   }
 
-  if (!Number.isInteger(candidate.notificationId) || candidate.notificationId <= 0) {
+  const notificationId = candidate.notificationId.trim();
+  if (notificationId.length === 0) {
     return null;
   }
 
-  return candidate.notificationId;
+  return notificationId;
 }
 
 export async function POST(req: NextRequest) {
@@ -87,11 +88,11 @@ export async function POST(req: NextRequest) {
   const { data: updatedNotification, error: markSeenError } = await supabase
     .from("notifications")
     .update({ seen: true })
-    .eq("id", notificationId)
+    .eq("notificationId", notificationId)
     .eq("to", auth.profileId)
-    .select("id")
+    .select("notificationId")
     .limit(1)
-    .maybeSingle<{ id: number }>();
+    .maybeSingle<{ notificationId: string }>();
 
   if (markSeenError) {
     console.error("Errore mark seen notifica:", markSeenError);
@@ -110,6 +111,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     code: "NOTIFICATION_MARKED_SEEN",
-    notificationId: updatedNotification.id,
+    notificationId: updatedNotification.notificationId,
   });
 }

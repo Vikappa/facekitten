@@ -136,7 +136,7 @@ export async function PUT(req: NextRequest) {
     .update({ content: body.postText })
     .eq("id", body.postId)
     .eq("authorId", auth.profileId)
-    .select("id, authorId, content, mediaUrl, postType, createdAt")
+    .select("id, authorId, content, mediaUrl, postType, created_at")
     .single<PostRow>();
 
   if (updatePostError || !updatedPost) {
@@ -155,7 +155,7 @@ export async function PUT(req: NextRequest) {
       content: updatedPost.content ?? "",
       mediaUrl: updatedPost.mediaUrl,
       postType: updatedPost.postType,
-      createdAt: updatedPost.createdAt,
+      createdAt: updatedPost.created_at,
     },
   });
 }
