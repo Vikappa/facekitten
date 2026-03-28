@@ -51,6 +51,7 @@ export type PostData = {
 }
 
 export type CommentData = {
+    commentId:number;
     authorId:string;
     authorName:string;
     commentAuthorPropic:string;

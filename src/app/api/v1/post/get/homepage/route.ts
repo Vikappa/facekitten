@@ -93,6 +93,7 @@ function mapComments(rawComments: FeedComment[] | null): CommentData[] {
     const commentReplies = mapCommentReplies(comment.commentReplies);
 
     return {
+      commentId:comment.id,
       authorId: comment.authorId ?? "",
       authorName: comment.author?.username ?? "",
       commentAuthorPropic: comment.author?.avatarUrl ?? "",

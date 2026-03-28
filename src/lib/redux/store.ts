@@ -56,6 +56,7 @@ function normalizeCommentData(value: unknown): CommentData | null {
 
     const comment = value as Record<string, unknown>;
     if (
+        typeof comment.commentId !== "number" ||
         typeof comment.authorId !== "string" ||
         typeof comment.authorName !== "string" ||
         typeof comment.commentedAt !== "string" ||
@@ -77,6 +78,7 @@ function normalizeCommentData(value: unknown): CommentData | null {
     }
 
     return {
+        commentId: comment.commentId,
         authorId: comment.authorId,
         authorName: comment.authorName,
         commentAuthorPropic: comment.commentAuthorPropic,

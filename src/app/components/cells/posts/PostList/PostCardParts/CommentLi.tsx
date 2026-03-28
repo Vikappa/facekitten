@@ -3,7 +3,9 @@
 import { CommentData } from "@/lib/interfaces/CommonInterfaces"
 import Image from "next/image"
 import Link from "next/link"
-import { ReactNode } from "react"
+import { ReactElement, ReactEventHandler, ReactNode, useState } from "react"
+import CommentReplyForm from "./CommentReplyForm"
+import CommentReplyLi from "./CommentReplyLi"
 
 interface CommentLiProp {
     comment: CommentData
@@ -11,7 +13,7 @@ interface CommentLiProp {
 }
 
 export default function CommentLi({ comment, nowMs }: CommentLiProp) {
-
+    const [isRepling, setIsRepling] = useState(false)
     function formatCommentDate(commentedAt: string): ReactNode {
         const commentDate = new Date(commentedAt);
         if (Number.isNaN(commentDate.getTime())) {
@@ -55,10 +57,11 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
     const authorProfileHref = comment.authorId.length > 0 ? `/profile/${comment.authorId}` : "/profile/"
 
     return (
+        <div className="flex flex-col">
         <div className="flex gap-3">
             <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex flex-column justify-content-center justify-center my-auto">
                 <Image
-                    src={comment.commentAuthorPropic ?? "/assets/blankprofile.png"}
+                    src={comment?.commentAuthorPropic && comment?.commentAuthorPropic !== "" ? comment?.commentAuthorPropic : "/assets/blankprofile.png"}
                     width={28}
                     height={28}
                     alt={comment.authorName}
@@ -81,12 +84,23 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
                 <div className="flex flex-col">
                     <div className="flex text-[10px] gap-3 text-gray-500">
                         <span>Mi piace</span>
-                        <span>Rispondi</span>
-                    </div>
-                    <div className="flex">
-                        
+                        <span className={`${isRepling ? `text-blue-600` : ``}`} onClick={(e) => {
+                            e.preventDefault();
+                            setIsRepling(!isRepling)
+                        }} >Rispondi</span>
                     </div>
                 </div>
+            </div>
+        </div>
+            <CommentReplyForm isRepling={isRepling} setIsRepling={setIsRepling} CommentId={comment.commentId} />
+            <div>
+                {comment.commentReplies.map((cr, index) => <CommentReplyLi key={comment.commentId+"_"+index} replyData={{
+                    authorId: cr.authorName,
+                    authorName: cr.authorName,
+                    replyAuthorPropic: cr.replyAuthorPropic,
+                    repliedAt: cr.repliedAt,
+                    commentReplyReactions: cr.commentReplyReactions
+                }} />)}
             </div>
         </div>
     )

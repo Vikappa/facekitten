@@ -202,6 +202,7 @@ export async function POST(req: NextRequest) {
   const author = pickSingleRelationRow(createdComment.author);
 
   const commentForClient: CommentData = {
+    commentId:createdComment.id,
     authorId: createdComment.authorId ?? auth.profileId,
     authorName: author?.username ?? "",
     commentAuthorPropic: author?.avatarUrl ?? "",
