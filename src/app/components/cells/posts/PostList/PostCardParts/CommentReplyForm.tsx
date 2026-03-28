@@ -1,6 +1,10 @@
 'use client'
 
-export default function CommentReplyForm(){
+interface CommentReplyFormProps{
+    CommentId:number
+}
+
+export default function CommentReplyForm({CommentId}:CommentReplyFormProps){
 
     return (
         <></>

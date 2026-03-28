@@ -31,7 +31,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
     const [helpAndSupportOn, setHelpAndSupportOn] = useState(false);
     const [displayAndAccessybilityOn, setDisplayAndAccessybilityOn] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
-    const profileName = currentProfile?.username?.trim() ? currentProfile.username : "Name";
+    const profileName = useAppSelector((state) => state.profile.currentProfile?.username)
     const profileAvatar = currentProfile?.avatarUrl?.trim() ? currentProfile.avatarUrl : "/assets/blankprofile.png";
 
     const resetProfileModalSections = () => {
@@ -126,7 +126,7 @@ export default function ProfileModal({ navbarRef }: ProfileModalProps) {
         return null;
     }
 
-    return (
+    if (!!currentProfile || !!profileName)return (
         <div
             ref={modalRef}
             style={{ top: `${navbarHeight}px` }}
