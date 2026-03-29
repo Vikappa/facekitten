@@ -17,6 +17,7 @@ type AddCommentBody = {
 };
 
 type PostAuthorRow = Pick<PostRow, "id" | "authorId">;
+type PostCommenterRow = Pick<CommentRow, "commentAuthorId">;
 
 type CommentAuthorRow = {
   id: string;
@@ -219,22 +220,73 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const commentNavigationBase = `/post/${encodeURIComponent(
+    targetPost.id
+  )}?commentId=${encodeURIComponent(createdComment.commentId)}`;
+  const notificationsToCreate: NotificationsInsert[] = [];
+
   if (targetPost.authorId && targetPost.authorId !== auth.profileId) {
-    const newNotification: NotificationsInsert = {
+    notificationsToCreate.push({
       activity_from: auth.profileId,
       to: targetPost.authorId,
-      generatedNavigation: `/post/${encodeURIComponent(targetPost.id)}`,
+      generatedNavigation: `${commentNavigationBase}&commentNotif=owner`,
       notificationType: "postCommented",
       seen: false,
-    };
+    });
+  }
 
+  const { data: postCommenters, error: postCommentersError } = await supabase
+    .from("comment")
+    .select("commentAuthorId")
+    .eq("postid", targetPost.id);
+
+  if (postCommentersError) {
+    console.error(
+      "Errore recupero commentatori del post in comment/add:",
+      postCommentersError
+    );
+    return NextResponse.json(
+      { code: "POST_COMMENTERS_FETCH_ERROR", error: "Errore interno" },
+      { status: 500 }
+    );
+  }
+
+  const postCommenterIds = new Set<string>();
+  for (const row of (postCommenters ?? []) as PostCommenterRow[]) {
+    if (!row.commentAuthorId) {
+      continue;
+    }
+
+    const commenterId = row.commentAuthorId.trim();
+    if (
+      commenterId.length === 0 ||
+      commenterId === auth.profileId ||
+      commenterId === targetPost.authorId
+    ) {
+      continue;
+    }
+
+    postCommenterIds.add(commenterId);
+  }
+
+  for (const commenterId of postCommenterIds) {
+    notificationsToCreate.push({
+      activity_from: auth.profileId,
+      to: commenterId,
+      generatedNavigation: `${commentNavigationBase}&commentNotif=also`,
+      notificationType: "postCommented",
+      seen: false,
+    });
+  }
+
+  if (notificationsToCreate.length > 0) {
     const { error: createNotificationError } = await supabase
       .from("notifications")
-      .insert(newNotification);
+      .insert(notificationsToCreate);
 
     if (createNotificationError) {
       console.error(
-        "Errore creazione notifica commento in comment/add:",
+        "Errore creazione notifiche commento in comment/add:",
         createNotificationError
       );
       return NextResponse.json(

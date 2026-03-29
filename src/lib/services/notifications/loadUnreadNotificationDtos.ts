@@ -71,6 +71,11 @@ type RelatedEntityIds = {
   relatedCommentReplyId: string | null;
 };
 
+type NotificationNavigationContext = {
+  commentNotif: "owner" | "also" | null;
+  replyNotif: "owner" | "also" | null;
+};
+
 const PREVIEW_MAX_LENGTH = 90;
 const FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT =
   "ti ha inviato una richiesta di micizia";
@@ -188,6 +193,38 @@ function parseRelatedEntityIds(
   };
 }
 
+function parseNotificationNavigationContext(
+  generatedNavigation: string | null | undefined
+): NotificationNavigationContext {
+  const emptyResult: NotificationNavigationContext = {
+    commentNotif: null,
+    replyNotif: null,
+  };
+
+  if (!generatedNavigation) {
+    return emptyResult;
+  }
+
+  try {
+    const url = new URL(generatedNavigation, "https://facekitten.local");
+    const commentNotifParam = url.searchParams.get("commentNotif");
+    const replyNotifParam = url.searchParams.get("replyNotif");
+
+    return {
+      commentNotif:
+        commentNotifParam === "owner" || commentNotifParam === "also"
+          ? commentNotifParam
+          : null,
+      replyNotif:
+        replyNotifParam === "owner" || replyNotifParam === "also"
+          ? replyNotifParam
+          : null,
+    };
+  } catch {
+    return emptyResult;
+  }
+}
+
 function toProfileMetadata(
   profile: ActivityProfileRow | null | undefined,
   fallbackId?: string | null
@@ -295,16 +332,28 @@ async function resolveCommentReplyPreviewText(
 async function resolveNotificationPreviewText(
   notification: UnreadNotificationRow,
   profileId: string,
-  supabase: SupabaseAdminClient
+  supabase: SupabaseAdminClient,
+  activityFromName: string
 ): Promise<string | null> {
   const notificationType = notification.notificationType;
   const activityFromId = notification.activity_from;
+  const notificationNavigationContext = parseNotificationNavigationContext(
+    notification.generatedNavigation
+  );
 
   if (!activityFromId) {
     return null;
   }
 
   if (notificationType === "postCommented") {
+    if (notificationNavigationContext.commentNotif === "owner") {
+      return "ha commentato il post di";
+    }
+
+    if (notificationNavigationContext.commentNotif === "also") {
+      return `anche ${activityFromName} ha commentato il post di`;
+    }
+
     return resolvePostCommentPreviewText(
       supabase,
       profileId,
@@ -314,6 +363,14 @@ async function resolveNotificationPreviewText(
   }
 
   if (notificationType === "commentReplied") {
+    if (notificationNavigationContext.replyNotif === "owner") {
+      return "ha risposto al commento di";
+    }
+
+    if (notificationNavigationContext.replyNotif === "also") {
+      return `anche ${activityFromName} ha risposto al commento di`;
+    }
+
     return resolveCommentReplyPreviewText(
       supabase,
       profileId,
@@ -388,11 +445,13 @@ export async function loadUnreadNotificationDtosForProfile(
         activityFromProfileRow,
         notification.activity_from
       );
+      const activityFromName = activityFromProfile?.username.trim() || "Utente";
 
       const previewText = await resolveNotificationPreviewText(
         notification,
         profileId,
-        supabase
+        supabase,
+        activityFromName
       );
 
       const relatedEntityIds = parseRelatedEntityIds(
@@ -406,7 +465,7 @@ export async function loadUnreadNotificationDtosForProfile(
         notificationType: notification.notificationType ?? null,
         activityFrom: {
           id: notification.activity_from ?? null,
-          name: activityFromProfile?.username.trim() || "Utente",
+          name: activityFromName,
           avatarUrl: activityFromProfile?.avatarUrl ?? null,
         },
         previewText,

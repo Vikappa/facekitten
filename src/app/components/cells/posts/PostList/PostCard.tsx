@@ -107,7 +107,7 @@ export default function PostCard(prop: PostCardProp) {
                 <ReactionCount reactionData={prop.data.reactions} reactionCount={prop.data.reactionsNumber} />
                 <ShareCount {...prop.data.shares} />
             </div>
-            <div className="flex w-full text-gray-900 text-sm">
+            <div className="flex w-full text-gray-900 text-sm px-2">
                 <ReactionSpan reactData={prop.data.reactions} />
                 <CommentSpan isCommenting={isCommenting} updateSetIsCommenting={toggleIsCommenting} commentsCount={prop.data.commentNumber} />
                 <CondividiSpan />
