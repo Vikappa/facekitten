@@ -47,7 +47,7 @@ function formatLocalizedDate(
     }).format(date);
 }
 
-export default function ProfilePageHero() {
+export default function ProfilePageHero({isCreatingPost, setPostClicked}: {isCreatingPost: boolean, setPostClicked: (val: boolean) => void}) {
     const dispatch = useAppDispatch();
 
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
@@ -186,7 +186,7 @@ export default function ProfilePageHero() {
                         </div>
                     </div>
                     <div className="mt-4 flex gap-2">
-                        <button className="mb-2 w-1/2 rounded-md bg-primary py-1.5 font-bold text-white">Crea Post</button>
+                        <button onClick={() => setPostClicked(!isCreatingPost)} className="mb-2 w-1/2 rounded-md bg-primary py-1.5 font-bold text-white">Crea Post</button>
                         <Link
                             href="/profile/modifica"
                             className="mb-2 w-1/2 rounded-md bg-tertiary py-1.5 text-center font-semibold text-gra"
