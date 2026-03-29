@@ -1,19 +1,42 @@
 'use client'
 
-import { CommentData } from "@/lib/interfaces/CommonInterfaces"
-import Image from "next/image"
-import Link from "next/link"
-import { ReactElement, ReactEventHandler, ReactNode, useState } from "react"
-import CommentReplyForm from "./CommentReplyForm"
-import CommentReplyLi from "./CommentReplyLi"
+import ReactInput from "@/app/components/atoms/ReactInput";
+import { CommentData, ReactionData } from "@/lib/interfaces/CommonInterfaces";
+import { useAppSelector } from "@/lib/redux/hooks";
+import Image from "next/image";
+import Link from "next/link";
+import { ReactNode, useMemo, useState } from "react";
+import CommentReplyForm from "./CommentReplyForm";
+import CommentReplyLi from "./CommentReplyLi";
 
 interface CommentLiProp {
-    comment: CommentData
-    nowMs: number
+    comment: CommentData;
+    nowMs: number;
+}
+
+function findReactionFromCurrentProfile(reactions: ReactionData[], profileId: string | undefined): ReactionData | undefined {
+    if (!profileId) {
+        return undefined;
+    }
+
+    return reactions.find((reaction) => {
+        if (reaction.authorId) {
+            return reaction.authorId === profileId;
+        }
+
+        return reaction.author === profileId;
+    });
 }
 
 export default function CommentLi({ comment, nowMs }: CommentLiProp) {
-    const [isRepling, setIsRepling] = useState(false)
+    const [isRepling, setIsRepling] = useState(false);
+    const currentProfileId = useAppSelector((state) => state.profile.currentProfile?.id);
+
+    const userCommentReaction = useMemo(
+        () => findReactionFromCurrentProfile(comment.reactions, currentProfileId),
+        [comment.reactions, currentProfileId]
+    );
+
     function formatCommentDate(commentedAt: string): ReactNode {
         const commentDate = new Date(commentedAt);
         if (Number.isNaN(commentDate.getTime())) {
@@ -54,44 +77,54 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
         }).format(commentDate);
     }
 
-    const authorProfileHref = comment.authorId.length > 0 ? `/profile/${comment.authorId}` : "/profile/"
+    const authorProfileHref = comment.authorId.length > 0 ? `/profile/${comment.authorId}` : "/profile/";
 
     return (
         <div className="flex flex-col">
-        <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex flex-column justify-content-center justify-center my-auto">
-                <Image
-                    src={comment?.commentAuthorPropic && comment?.commentAuthorPropic !== "" ? comment?.commentAuthorPropic : "/assets/blankprofile.png"}
-                    width={28}
-                    height={28}
-                    alt={comment.authorName}
-                    className="w-full h-full object-cover"
-                />
-            </div>
-            <div className="flex flex-col my-1">
-                <div className="flex items-start gap-2">
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                            <Link className="text-black font-semibold" href={authorProfileHref}>
-                                {comment.authorName}
-                            </Link>
-                            <span className="text-[11px] text-gray-400">{formatCommentDate(comment.commentedAt)}</span>
+            <div className="flex gap-3">
+                <div className="my-auto flex h-7 w-7 shrink-0 justify-center overflow-hidden rounded-full">
+                    <Image
+                        src={comment.commentAuthorPropic && comment.commentAuthorPropic !== "" ? comment.commentAuthorPropic : "/assets/blankprofile.png"}
+                        width={28}
+                        height={28}
+                        alt={comment.authorName}
+                        className="h-full w-full object-cover"
+                    />
+                </div>
+                <div className="my-1 flex flex-col">
+                    <div className="flex items-start gap-2">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <Link className="font-semibold text-black" href={authorProfileHref}>
+                                    {comment.authorName}
+                                </Link>
+                                <span className="text-[11px] text-gray-400">{formatCommentDate(comment.commentedAt)}</span>
+                            </div>
+                            <span>{comment.commentText}</span>
                         </div>
-                        <span>{comment.commentText}</span>
                     </div>
 
-                </div>
-                <div className="flex flex-col">
-                    <div className="flex text-[10px] gap-3 text-gray-500 p">
-                        <span>Mi piace</span>
-                        <span onClick={(e) => {
-                            e.preventDefault();
-                            setIsRepling(!isRepling)
-                        }} >Rispondi</span>
+                    <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                        <ReactInput
+                            InputTemplateType={{ type: "comment" }}
+                            ReactionData={userCommentReaction}
+                            targetId={comment.commentId}
+                            text="Mi piace"
+                            placeholer="Mi piace"
+                            className="cursor-pointer select-none"
+                        />
+
+                        <button
+                            type="button"
+                            onClick={() => setIsRepling((prev) => !prev)}
+                            className="cursor-pointer select-none hover:text-blue-600"
+                        >
+                            Rispondi
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+
             <div>
                 {comment.commentReplies.map((reply, index) => (
                     <CommentReplyLi
@@ -103,5 +136,5 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
             </div>
             <CommentReplyForm isRepling={isRepling} setIsRepling={setIsRepling} CommentId={comment.commentId} />
         </div>
-    )
+    );
 }
