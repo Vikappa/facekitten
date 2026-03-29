@@ -1,4 +1,11 @@
 'use client'
+import { CommentReplyData, ReactionData } from "@/lib/interfaces/CommonInterfaces";
+import {
+    addCommentReplyToComment,
+    removeCommentReplyFromComment,
+    replaceCommentReplyInComment,
+} from "@/lib/redux/homepagePostsSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { BiSolidPaperPlane } from "react-icons/bi";
 import { BsEmojiSmile } from "react-icons/bs";
 import { CiCamera } from "react-icons/ci";
@@ -16,6 +23,80 @@ interface CommentReplyFormProps {
 export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }: CommentReplyFormProps) {
     const [commentReplyText, setCommentReplyText] = useState("");
     const [isSendingCommentReply, setIsSendingCommentReply] = useState(false);
+    const dispatch = useAppDispatch();
+    const currentProfile = useAppSelector((state) => state.profile.currentProfile);
+
+    function isReactionData(value: unknown): value is ReactionData {
+        if (typeof value !== "object" || value === null) {
+            return false;
+        }
+
+        const reaction = value as Record<string, unknown>;
+        return (
+            typeof reaction.reactionId === "string" &&
+            typeof reaction.author === "string" &&
+            typeof reaction.reactionType === "number"
+        );
+    }
+
+    function isCommentReplyData(value: unknown): value is CommentReplyData {
+        if (typeof value !== "object" || value === null) {
+            return false;
+        }
+
+        const reply = value as Record<string, unknown>;
+        return (
+            typeof reply.authorId === "string" &&
+            typeof reply.authorName === "string" &&
+            typeof reply.replyAuthorPropic === "string" &&
+            typeof reply.repliedAt === "string" &&
+            Array.isArray(reply.commentReplyReactions) &&
+            reply.commentReplyReactions.every((reaction) => isReactionData(reaction))
+        );
+    }
+
+    function parseAddCommentReplyResponse(
+        payload: unknown
+    ): { commentId: string; reply: CommentReplyData } | null {
+        if (typeof payload !== "object" || payload === null) {
+            return null;
+        }
+
+        const body = payload as Record<string, unknown>;
+        if (typeof body.commentId !== "string" || !isCommentReplyData(body.reply)) {
+            return null;
+        }
+
+        return {
+            commentId: body.commentId,
+            reply: body.reply,
+        };
+    }
+
+    function createOptimisticReply(commentId: string, text: string): {
+        tempReplyId: string;
+        reply: CommentReplyData;
+    } {
+        const nowIso = new Date().toISOString();
+        const tempReplyId = `temp-reply-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2, 8)}`;
+
+        return {
+            tempReplyId,
+            reply: {
+                commentReplyId: tempReplyId,
+                repliedCommentId: commentId,
+                authorId: currentProfile?.id ?? "",
+                authorName: currentProfile?.username ?? "Tu",
+                replyAuthorPropic: currentProfile?.avatarUrl ?? "/assets/blankprofile.png",
+                repliedAt: nowIso,
+                commentReplyText: text,
+                createdAt: nowIso,
+                commentReplyReactions: [],
+            },
+        };
+    }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -25,7 +106,17 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
             return;
         }
 
+        const optimisticReply = createOptimisticReply(CommentId, normalizedCommentReplyText);
+        dispatch(
+            addCommentReplyToComment({
+                CommentId,
+                CommentReplyData: optimisticReply.reply,
+            })
+        );
+        setCommentReplyText("");
+        setIsRepling(false);
         setIsSendingCommentReply(true);
+
         try {
             const response = await fetch("/api/v1/post/comment/reply/add", {
                 method: "POST",
@@ -55,9 +146,27 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
                 throw new Error(message);
             }
 
-            setCommentReplyText("");
-            setIsRepling(false);
+            const parsedResponse = parseAddCommentReplyResponse(payload);
+            if (!parsedResponse) {
+                throw new Error("Risposta API comment/reply/add non valida");
+            }
+
+            dispatch(
+                replaceCommentReplyInComment({
+                    CommentId: parsedResponse.commentId,
+                    TempCommentReplyId: optimisticReply.tempReplyId,
+                    CommentReplyData: parsedResponse.reply,
+                })
+            );
         } catch (error) {
+            dispatch(
+                removeCommentReplyFromComment({
+                    CommentId,
+                    CommentReplyId: optimisticReply.tempReplyId,
+                })
+            );
+            setCommentReplyText(normalizedCommentReplyText);
+            setIsRepling(true);
             console.error("Errore invio reply commento:", error);
         } finally {
             setIsSendingCommentReply(false);

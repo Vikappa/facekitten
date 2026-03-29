@@ -84,7 +84,7 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
                 <div className="flex flex-col">
                     <div className="flex text-[10px] gap-3 text-gray-500 p">
                         <span>Mi piace</span>
-                        <span className={`${isRepling ? `text-blue-600` : ``}`} onClick={(e) => {
+                        <span onClick={(e) => {
                             e.preventDefault();
                             setIsRepling(!isRepling)
                         }} >Rispondi</span>
@@ -97,6 +97,7 @@ export default function CommentLi({ comment, nowMs }: CommentLiProp) {
                     <CommentReplyLi
                         key={reply.commentReplyId ?? `${comment.commentId}_${index}`}
                         replyData={reply}
+                        onOpenReplyForm={() => setIsRepling((prev) => !prev)}
                     />
                 ))}
             </div>

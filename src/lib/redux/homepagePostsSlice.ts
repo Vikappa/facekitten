@@ -1,4 +1,8 @@
-import { CommentData, PostData } from "@/lib/interfaces/CommonInterfaces";
+import {
+    CommentData,
+    CommentReplyData,
+    PostData,
+} from "@/lib/interfaces/CommonInterfaces";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface HomepagePostsState {
@@ -14,6 +18,22 @@ export const initialHomepagePostsState: HomepagePostsState = {
 export interface AddCommentReduxPayload{
     CommentData :CommentData;
     PostId: string;
+}
+
+export interface AddCommentReplyReduxPayload {
+    CommentId: string;
+    CommentReplyData: CommentReplyData;
+}
+
+export interface ReplaceCommentReplyReduxPayload {
+    CommentId: string;
+    TempCommentReplyId: string;
+    CommentReplyData: CommentReplyData;
+}
+
+export interface RemoveCommentReplyReduxPayload {
+    CommentId: string;
+    CommentReplyId: string;
 }
 
 const homepagePostsSlice = createSlice({
@@ -51,9 +71,81 @@ const homepagePostsSlice = createSlice({
                 target.comments.push(action.payload.CommentData)
                 target.commentNumber = target.comments.length
             }
+        },
+        addCommentReplyToComment(state, action: PayloadAction<AddCommentReplyReduxPayload>) {
+            for (const post of state.posts) {
+                const targetComment = post.comments.find(
+                    (comment) => comment.commentId === action.payload.CommentId
+                );
+
+                if (!targetComment) {
+                    continue;
+                }
+
+                targetComment.commentReplies.push(action.payload.CommentReplyData);
+                targetComment.commentRepliesCount = targetComment.commentReplies.length;
+                return;
+            }
+        },
+        replaceCommentReplyInComment(
+            state,
+            action: PayloadAction<ReplaceCommentReplyReduxPayload>
+        ) {
+            for (const post of state.posts) {
+                const targetComment = post.comments.find(
+                    (comment) => comment.commentId === action.payload.CommentId
+                );
+
+                if (!targetComment) {
+                    continue;
+                }
+
+                const targetReplyIndex = targetComment.commentReplies.findIndex(
+                    (reply) => reply.commentReplyId === action.payload.TempCommentReplyId
+                );
+
+                if (targetReplyIndex >= 0) {
+                    targetComment.commentReplies[targetReplyIndex] = action.payload.CommentReplyData;
+                } else {
+                    targetComment.commentReplies.push(action.payload.CommentReplyData);
+                }
+
+                targetComment.commentRepliesCount = targetComment.commentReplies.length;
+                return;
+            }
+        },
+        removeCommentReplyFromComment(
+            state,
+            action: PayloadAction<RemoveCommentReplyReduxPayload>
+        ) {
+            for (const post of state.posts) {
+                const targetComment = post.comments.find(
+                    (comment) => comment.commentId === action.payload.CommentId
+                );
+
+                if (!targetComment) {
+                    continue;
+                }
+
+                targetComment.commentReplies = targetComment.commentReplies.filter(
+                    (reply) => reply.commentReplyId !== action.payload.CommentReplyId
+                );
+                targetComment.commentRepliesCount = targetComment.commentReplies.length;
+                return;
+            }
         }
     },
 });
 
-export const { setHomepagePosts, prependHomepagePost, prependHomepagePosts, hydrateHomepagePostsState, clearHomepagePosts, addCommentToPost } = homepagePostsSlice.actions;
+export const {
+    setHomepagePosts,
+    prependHomepagePost,
+    prependHomepagePosts,
+    hydrateHomepagePostsState,
+    clearHomepagePosts,
+    addCommentToPost,
+    addCommentReplyToComment,
+    replaceCommentReplyInComment,
+    removeCommentReplyFromComment,
+} = homepagePostsSlice.actions;
 export default homepagePostsSlice.reducer;
