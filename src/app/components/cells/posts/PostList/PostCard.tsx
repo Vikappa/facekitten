@@ -152,7 +152,7 @@ export default function PostCard(prop: PostCardProp) {
             <div className="p-2">
                 <p>{prop.data.text}</p>
             </div>
-            <div className="flex w-100">
+            <div className="flex w-100 text-gray-500">
                 <ReactionCount reactionCount={optimisticReactionsCount} />
                 <ShareCount {...prop.data.shares} />
             </div>
