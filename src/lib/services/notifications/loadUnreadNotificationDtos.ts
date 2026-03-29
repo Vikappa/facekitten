@@ -5,7 +5,12 @@ import {
   ProfileMetadata,
 } from "@/lib/interfaces/CommonInterfaces";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
-import type { NotificationsRow, ProfileRow } from "@/types/db.generated";
+import type {
+  CommentRow,
+  NotificationsRow,
+  PostRow,
+  ProfileRow,
+} from "@/types/db.generated";
 
 type SupabaseAdminClient = ReturnType<typeof createSupabaseAdminClient>;
 
@@ -35,6 +40,10 @@ type ActivityProfileRow = Pick<
   | "locationId"
   | "tipoCuccia"
 >;
+
+type TargetPostOwnerRow = Pick<PostRow, "authorId">;
+type TargetCommentOwnerRow = Pick<CommentRow, "commentAuthorId">;
+type TargetProfileNameRow = Pick<ProfileRow, "id" | "username">;
 
 type CommentPreviewRow = {
   commentText: string | null;
@@ -257,6 +266,106 @@ function toProfileMetadata(
   };
 }
 
+function normalizeProfileName(value: string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  return normalized;
+}
+
+async function resolveProfileNameById(
+  supabase: SupabaseAdminClient,
+  profileId: string | null
+): Promise<string | null> {
+  if (!profileId) {
+    return null;
+  }
+
+  const { data: profileRow, error: profileError } = await supabase
+    .from("Profile")
+    .select("id, username")
+    .eq("id", profileId)
+    .limit(1)
+    .maybeSingle<TargetProfileNameRow>();
+
+  if (profileError) {
+    console.error(
+      "Errore risoluzione username profilo per preview notifica:",
+      profileError
+    );
+    return null;
+  }
+
+  return normalizeProfileName(profileRow?.username);
+}
+
+async function resolvePostOwnerContext(
+  supabase: SupabaseAdminClient,
+  relatedPostId: string | null
+): Promise<{ ownerId: string | null; ownerName: string | null } | null> {
+  if (!relatedPostId) {
+    return null;
+  }
+
+  const { data: postRow, error: postError } = await supabase
+    .from("post")
+    .select("authorId")
+    .eq("id", relatedPostId)
+    .limit(1)
+    .maybeSingle<TargetPostOwnerRow>();
+
+  if (postError) {
+    console.error("Errore risoluzione post target per preview notifica:", postError);
+    return null;
+  }
+
+  const ownerId = sanitizeIdPart(postRow?.authorId);
+  if (!ownerId) {
+    return null;
+  }
+
+  const ownerName = await resolveProfileNameById(supabase, ownerId);
+  return { ownerId, ownerName };
+}
+
+async function resolveCommentOwnerContext(
+  supabase: SupabaseAdminClient,
+  relatedCommentId: string | null
+): Promise<{ ownerId: string | null; ownerName: string | null } | null> {
+  if (!relatedCommentId) {
+    return null;
+  }
+
+  const { data: commentRow, error: commentError } = await supabase
+    .from("comment")
+    .select("commentAuthorId")
+    .eq("commentId", relatedCommentId)
+    .limit(1)
+    .maybeSingle<TargetCommentOwnerRow>();
+
+  if (commentError) {
+    console.error(
+      "Errore risoluzione commento target per preview notifica:",
+      commentError
+    );
+    return null;
+  }
+
+  const ownerId = sanitizeIdPart(commentRow?.commentAuthorId);
+  if (!ownerId) {
+    return null;
+  }
+
+  const ownerName = await resolveProfileNameById(supabase, ownerId);
+  return { ownerId, ownerName };
+}
+
 async function resolvePostCommentPreviewText(
   supabase: SupabaseAdminClient,
   profileId: string,
@@ -333,7 +442,7 @@ async function resolveNotificationPreviewText(
   notification: UnreadNotificationRow,
   profileId: string,
   supabase: SupabaseAdminClient,
-  activityFromName: string
+  relatedEntityIds: RelatedEntityIds
 ): Promise<string | null> {
   const notificationType = notification.notificationType;
   const activityFromId = notification.activity_from;
@@ -346,12 +455,32 @@ async function resolveNotificationPreviewText(
   }
 
   if (notificationType === "postCommented") {
-    if (notificationNavigationContext.commentNotif === "owner") {
-      return "ha commentato il post di";
+    const isOwnerNotification = notificationNavigationContext.commentNotif === "owner";
+    const isAlsoNotification = notificationNavigationContext.commentNotif === "also";
+
+    if (isOwnerNotification) {
+      return "ha commentato il tuo post";
     }
 
-    if (notificationNavigationContext.commentNotif === "also") {
-      return `anche ${activityFromName} ha commentato il post di`;
+    const postOwnerContext = await resolvePostOwnerContext(
+      supabase,
+      relatedEntityIds.relatedPostId
+    );
+
+    if (postOwnerContext?.ownerId === profileId) {
+      return isAlsoNotification
+        ? "ha commentato anche il tuo post"
+        : "ha commentato il tuo post";
+    }
+
+    if (postOwnerContext?.ownerName) {
+      return isAlsoNotification
+        ? `ha commentato anche il post di ${postOwnerContext.ownerName}`
+        : `ha commentato il post di ${postOwnerContext.ownerName}`;
+    }
+
+    if (isAlsoNotification) {
+      return "ha commentato anche un post";
     }
 
     return resolvePostCommentPreviewText(
@@ -363,12 +492,32 @@ async function resolveNotificationPreviewText(
   }
 
   if (notificationType === "commentReplied") {
-    if (notificationNavigationContext.replyNotif === "owner") {
-      return "ha risposto al commento di";
+    const isOwnerNotification = notificationNavigationContext.replyNotif === "owner";
+    const isAlsoNotification = notificationNavigationContext.replyNotif === "also";
+
+    if (isOwnerNotification) {
+      return "ha risposto al tuo commento";
     }
 
-    if (notificationNavigationContext.replyNotif === "also") {
-      return `anche ${activityFromName} ha risposto al commento di`;
+    const commentOwnerContext = await resolveCommentOwnerContext(
+      supabase,
+      relatedEntityIds.relatedCommentId
+    );
+
+    if (commentOwnerContext?.ownerId === profileId) {
+      return isAlsoNotification
+        ? "ha risposto anche al tuo commento"
+        : "ha risposto al tuo commento";
+    }
+
+    if (commentOwnerContext?.ownerName) {
+      return isAlsoNotification
+        ? `ha risposto anche al commento di ${commentOwnerContext.ownerName}`
+        : `ha risposto al commento di ${commentOwnerContext.ownerName}`;
+    }
+
+    if (isAlsoNotification) {
+      return "ha risposto anche a un commento";
     }
 
     return resolveCommentReplyPreviewText(
@@ -446,16 +595,15 @@ export async function loadUnreadNotificationDtosForProfile(
         notification.activity_from
       );
       const activityFromName = activityFromProfile?.username.trim() || "Utente";
+      const relatedEntityIds = parseRelatedEntityIds(
+        notification.generatedNavigation ?? null
+      );
 
       const previewText = await resolveNotificationPreviewText(
         notification,
         profileId,
         supabase,
-        activityFromName
-      );
-
-      const relatedEntityIds = parseRelatedEntityIds(
-        notification.generatedNavigation ?? null
+        relatedEntityIds
       );
 
       return {
