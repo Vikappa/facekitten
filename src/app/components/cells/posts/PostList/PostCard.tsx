@@ -1,21 +1,35 @@
 'use client'
 
-import { PostData } from "@/lib/interfaces/CommonInterfaces"
+import { PostData, ReactionData } from "@/lib/interfaces/CommonInterfaces"
 import { useAppSelector } from "@/lib/redux/hooks"
 import Image from "next/image"
 import Link from "next/link"
 import ReactionCount from "./PostCardParts/ReactionCount"
 import ShareCount from "./PostCardParts/ShareCount"
-import ReactionSpan from "./PostCardParts/ReactionSpan"
 import CommentSpan from "./PostCardParts/CommentSpan"
 import CondividiSpan from "./PostCardParts/CondividiSpan"
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import CommentForm from "../CommentForm"
 import CommentList from "./PostCardParts/CommentList"
+import ReactInput from "@/app/components/atoms/ReactInput"
 
 interface PostCardProp {
     data:PostData
     nowMs?: number
+}
+
+function findReactionFromCurrentProfile(reactions: ReactionData[], profileId: string | undefined): ReactionData | undefined {
+    if (!profileId) {
+        return undefined;
+    }
+
+    return reactions.find((reaction) => {
+        if (reaction.authorId) {
+            return reaction.authorId === profileId;
+        }
+
+        return reaction.author === profileId;
+    });
 }
 
 export default function PostCard(prop: PostCardProp) {
@@ -24,10 +38,37 @@ export default function PostCard(prop: PostCardProp) {
     const [isCommenting, setIsCommenting] = useState(false)
     const [fallbackNowMs, setFallbackNowMs] = useState(() => Date.now());
     const effectiveNowMs = prop.nowMs ?? fallbackNowMs;
+    const userPostReaction = useMemo(
+        () => findReactionFromCurrentProfile(prop.data.reactions, userId),
+        [prop.data.reactions, userId]
+    );
+    const [optimisticUserPostReaction, setOptimisticUserPostReaction] = useState<ReactionData | undefined>(userPostReaction);
+    const [optimisticReactionsCount, setOptimisticReactionsCount] = useState(prop.data.reactionsNumber);
 
     function toggleIsCommenting(){
         setIsCommenting(!isCommenting)
     }
+
+    const handleOptimisticPostReactionChange = useCallback((payload: {
+        previousReaction: ReactionData | undefined;
+        nextReaction: ReactionData | undefined;
+    }) => {
+        setOptimisticUserPostReaction(payload.nextReaction);
+        setOptimisticReactionsCount((previousCount) => {
+            const isAddingReaction = !payload.previousReaction && !!payload.nextReaction;
+            const isRemovingReaction = !!payload.previousReaction && !payload.nextReaction;
+
+            if (isAddingReaction) {
+                return previousCount + 1;
+            }
+
+            if (isRemovingReaction) {
+                return Math.max(0, previousCount - 1);
+            }
+
+            return previousCount;
+        });
+    }, []);
 
     useEffect(() => {
         if (prop.nowMs !== undefined) {
@@ -42,6 +83,14 @@ export default function PostCard(prop: PostCardProp) {
             window.clearInterval(intervalId);
         };
     }, [prop.nowMs]);
+
+    useEffect(() => {
+        setOptimisticUserPostReaction(userPostReaction);
+    }, [userPostReaction, prop.data.postId]);
+
+    useEffect(() => {
+        setOptimisticReactionsCount(prop.data.reactionsNumber);
+    }, [prop.data.reactionsNumber, prop.data.postId]);
 
     function formatPostDate(postedAt: string): ReactNode {
         const postDate = new Date(postedAt);
@@ -104,11 +153,19 @@ export default function PostCard(prop: PostCardProp) {
                 <p>{prop.data.text}</p>
             </div>
             <div className="flex w-100">
-                <ReactionCount reactionData={prop.data.reactions} reactionCount={prop.data.reactionsNumber} />
+                <ReactionCount reactionData={prop.data.reactions} reactionCount={optimisticReactionsCount} />
                 <ShareCount {...prop.data.shares} />
             </div>
             <div className="flex w-full text-gray-900 text-sm px-2">
-                <ReactionSpan reactData={prop.data.reactions} />
+                <ReactInput
+                    InputTemplateType={{ type: "post" }}
+                    ReactionData={optimisticUserPostReaction}
+                    targetId={prop.data.postId}
+                    onOptimisticReactionChange={handleOptimisticPostReactionChange}
+                    text="Mi piace"
+                    placeholer="Mi piace"
+                    className="cursor-pointer select-none"
+                />
                 <CommentSpan isCommenting={isCommenting} updateSetIsCommenting={toggleIsCommenting} commentsCount={prop.data.commentNumber} />
                 <CondividiSpan />
             </div>

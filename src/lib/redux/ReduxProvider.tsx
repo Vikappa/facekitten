@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
 import { hydrateHomepagePostsState } from "./homepagePostsSlice";
-import { setCurrentProfile } from "./profileSlice";
+import { hydrateProfileState } from "./profileSlice";
 import {
     loadPersistedHomepagePostsState,
     loadPersistedProfileState,
@@ -32,10 +32,8 @@ export default function ReduxProvider({ children }: ReduxProviderProps) {
         hasHydratedPersistedStateRef.current = true;
 
         const persistedProfileState = loadPersistedProfileState();
-        const persistedProfile = persistedProfileState?.currentProfile;
-
-        if (persistedProfile) {
-            storeRef.current.dispatch(setCurrentProfile(persistedProfile));
+        if (persistedProfileState) {
+            storeRef.current.dispatch(hydrateProfileState(persistedProfileState));
         }
 
         const persistedHomepagePostsState = loadPersistedHomepagePostsState();

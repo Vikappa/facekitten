@@ -311,6 +311,7 @@ export type ChatMessageUpdate = TablesUpdate<'ChatMessage'>
 export type ChatMessageDb = Pick<
   ChatMessageRow,
   | 'chatId'
+  | 'created_at'
   | 'from'
   | 'to'
   | 'text'
@@ -321,23 +322,25 @@ export type ChatMessageDb = Pick<
 
 export interface ChatMessageDto {
   id: string
+  createdAt?: Date
   from?: string
   to?: string
-  text: string
+  text?: string
   extraContent?: string
   messageType?: PostType
   reaction?: ReactionType
 }
 
 export const CHAT_MESSAGE_SAFE_SELECT =
-  'chatId, from, to, text, extraContent, messageType, reaction' as const
+  'chatId, created_at, from, to, text, extraContent, messageType, reaction' as const
 
 export function toChatMessageDto(row: ChatMessageDb): ChatMessageDto {
   return {
     id: row.chatId,
+    createdAt: toDate(row.created_at),
     from: toOptionalString(row.from),
     to: toOptionalString(row.to),
-    text: toRequiredString(row.text),
+    text: toOptionalString(row.text),
     extraContent: toOptionalString(row.extraContent),
     messageType: row.messageType ?? undefined,
     reaction: row.reaction ?? undefined,

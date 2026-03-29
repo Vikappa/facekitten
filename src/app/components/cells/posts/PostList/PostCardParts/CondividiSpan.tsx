@@ -2,6 +2,6 @@ export default function CondividiSpan(){
 
 
     return (
-        <span>Condividi</span>
+        <span className="text-gray-500">Condividi</span>
     )
 }

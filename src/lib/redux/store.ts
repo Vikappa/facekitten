@@ -10,6 +10,9 @@ import homepagePostsReducer, {
 import notificationsReducer from "./notificationsSlice";
 import uiReducer from "./uiSlice";
 import {
+    type ChatData,
+    type ChatThreadData,
+    type ChatThreadProfileMetadata,
     type CommentData,
     type CommentReplyData,
     type PostData,
@@ -108,6 +111,188 @@ function normalizeProfileMetadata(value: unknown): ProfileMetadata | null {
         locationId: normalizeNullableString(value.locationId),
         tipoCuccia,
     };
+}
+
+function normalizeChatThreadProfileMetadata(value: unknown): ChatThreadProfileMetadata | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
+    if (typeof value.id !== "string" || typeof value.profileUrl !== "string") {
+        return null;
+    }
+
+    return {
+        id: value.id,
+        profileUrl: value.profileUrl,
+        username: normalizeOptionalString(value.username),
+        avatarUrl: normalizeNullableString(value.avatarUrl),
+    };
+}
+
+function normalizeChatData(value: unknown): ChatData | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
+    if (typeof value.chatId !== "string") {
+        return null;
+    }
+
+    return {
+        chatId: value.chatId,
+        text:
+            typeof value.text === "string" || value.text === null
+                ? value.text
+                : undefined,
+        fromProfileId:
+            typeof value.fromProfileId === "string" || value.fromProfileId === null
+                ? value.fromProfileId
+                : undefined,
+        toProfileId:
+            typeof value.toProfileId === "string" || value.toProfileId === null
+                ? value.toProfileId
+                : undefined,
+        createdAt: normalizeOptionalString(value.createdAt),
+    };
+}
+
+function normalizeChatThread(value: unknown): ChatThreadData | null {
+    if (!isObjectRecord(value)) {
+        return null;
+    }
+
+    if (typeof value.lastMessageAt !== "string" || !Array.isArray(value.chats)) {
+        return null;
+    }
+
+    const withProfile = normalizeChatThreadProfileMetadata(value.withProfile);
+    if (!withProfile) {
+        return null;
+    }
+
+    const normalizedChats = value.chats
+        .map((chat) => normalizeChatData(chat))
+        .filter((chat): chat is ChatData => chat !== null);
+
+    if (normalizedChats.length !== value.chats.length) {
+        return null;
+    }
+
+    return {
+        withProfile,
+        chats: normalizedChats,
+        lastMessageAt: value.lastMessageAt,
+    };
+}
+
+function normalizeChatThreads(value: unknown): ChatThreadData[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const normalizedThreads = value
+        .map((thread) => normalizeChatThread(thread))
+        .filter((thread): thread is ChatThreadData => thread !== null);
+
+    if (normalizedThreads.length !== value.length) {
+        return null;
+    }
+
+    return normalizedThreads;
+}
+
+function normalizeLegacyChatThread(value: unknown): ChatThreadData | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    if (value.length === 0) {
+        return null;
+    }
+
+    const normalizedChats: Array<{
+        withProfile: ChatThreadProfileMetadata;
+        chat: ChatData;
+        lastMessageAt: string;
+    }> = [];
+
+    for (const rawChat of value) {
+        if (!isObjectRecord(rawChat)) {
+            return null;
+        }
+
+        if (typeof rawChat.chatId !== "string" || typeof rawChat.lastMessageAt !== "string") {
+            return null;
+        }
+
+        const legacyProfile = normalizeProfileMetadata(rawChat.withProfile);
+        if (!legacyProfile) {
+            return null;
+        }
+
+        const withProfileRecord =
+            isObjectRecord(rawChat.withProfile) ? rawChat.withProfile : null;
+        const profileUrlRaw = withProfileRecord?.profileUrl;
+        const profileUrl =
+            typeof profileUrlRaw === "string"
+                ? profileUrlRaw
+                : `/profile/${encodeURIComponent(legacyProfile.id)}`;
+
+        normalizedChats.push({
+            withProfile: {
+                id: legacyProfile.id,
+                profileUrl,
+                username: legacyProfile.username,
+                avatarUrl: legacyProfile.avatarUrl,
+            },
+            chat: {
+                chatId: rawChat.chatId,
+                text:
+                    typeof rawChat.text === "string" || rawChat.text === null
+                        ? rawChat.text
+                        : undefined,
+                fromProfileId:
+                    typeof rawChat.fromProfileId === "string" || rawChat.fromProfileId === null
+                        ? rawChat.fromProfileId
+                        : undefined,
+                toProfileId:
+                    typeof rawChat.toProfileId === "string" || rawChat.toProfileId === null
+                        ? rawChat.toProfileId
+                        : undefined,
+                createdAt: normalizeOptionalString(rawChat.createdAt),
+            },
+            lastMessageAt: rawChat.lastMessageAt,
+        });
+    }
+
+    const firstEntry = normalizedChats[0];
+    const lastEntry = normalizedChats[normalizedChats.length - 1];
+    if (!firstEntry || !lastEntry) {
+        return null;
+    }
+
+    return {
+        withProfile: firstEntry.withProfile,
+        chats: normalizedChats.map((entry) => entry.chat),
+        lastMessageAt: lastEntry.lastMessageAt,
+    };
+}
+
+function normalizeLegacyChatThreads(value: unknown): ChatThreadData[] | null {
+    if (!Array.isArray(value)) {
+        return null;
+    }
+
+    const normalizedThreads = value
+        .map((thread) => normalizeLegacyChatThread(thread))
+        .filter((thread): thread is ChatThreadData => thread !== null);
+
+    if (normalizedThreads.length !== value.length) {
+        return null;
+    }
+
+    return normalizedThreads;
 }
 
 function normalizeCommentReplyData(value: unknown): CommentReplyData | null {
@@ -373,6 +558,14 @@ function loadPersistedProfileState(): ProfileState | undefined {
 
     try {
         const parsedState = JSON.parse(serializedState) as Partial<ProfileState>;
+        const normalizedChats =
+            parsedState.chats === undefined
+                ? []
+                : normalizeChatThreads(parsedState.chats) ?? normalizeLegacyChatThreads(parsedState.chats);
+
+        if (parsedState.chats !== undefined && !normalizedChats) {
+            return undefined;
+        }
 
         if (parsedState.currentProfile === null) {
             return initialProfileState;
@@ -380,7 +573,10 @@ function loadPersistedProfileState(): ProfileState | undefined {
 
         const normalizedProfile = normalizeUserProfile(parsedState.currentProfile);
         if (normalizedProfile) {
-            return { currentProfile: normalizedProfile };
+            return {
+                currentProfile: normalizedProfile,
+                chats: normalizedChats ?? [],
+            };
         }
     } catch {
         return undefined;
@@ -458,14 +654,13 @@ export const makeStore = () => {
         },
     });
 
-    let previousProfile = store.getState().profile.currentProfile;
+    let previousProfileState = store.getState().profile;
     let previousHomepagePostsState = store.getState().homepagePosts;
 
     store.subscribe(() => {
         const state = store.getState();
-        const currentProfile = state.profile.currentProfile;
-        if (currentProfile !== previousProfile) {
-            previousProfile = currentProfile;
+        if (state.profile !== previousProfileState) {
+            previousProfileState = state.profile;
             savePersistedProfileState(state.profile);
         }
 

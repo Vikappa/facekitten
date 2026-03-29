@@ -3,17 +3,20 @@
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setActiveNavFunction } from "@/lib/redux/uiSlice";
 import { usePathname } from "next/navigation";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 interface QuadratiniModalProps {
     navbarRef: MutableRefObject<HTMLDivElement | null>;
 }
+const MIN_MODAL_RIGHT_MARGIN_PX = 8;
 
 export default function QuadratiniModal({ navbarRef }: QuadratiniModalProps){
     const dispatch = useAppDispatch();
     const pathname = usePathname();
     const previousPathnameRef = useRef(pathname);
     const modalRef = useRef<HTMLDivElement | null>(null);
+    const [navbarHeight, setNavbarHeight] = useState(0);
+    const [rightOffset, setRightOffset] = useState(MIN_MODAL_RIGHT_MARGIN_PX);
 
     const isOpen = useAppSelector((state) => state.ui.activeNavFunction === "squares");
 
@@ -65,6 +68,11 @@ export default function QuadratiniModal({ navbarRef }: QuadratiniModalProps){
     }
 
     return (
-        <div ref={modalRef}>QUADRATINI</div>
-    )
+        <div
+            ref={modalRef}
+            style={{ top: `${navbarHeight}px`, right: `${rightOffset}px` }}
+            className="fixed z-50 mt-2 flex max-h-[70vh] w-60 max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-y-auto rounded-xl bg-white p-3 shadow-lg"
+        >
+            NON IMPLEMENTATO
+        </div>    )
 }

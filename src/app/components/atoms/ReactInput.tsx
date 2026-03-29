@@ -14,6 +14,10 @@ interface ReactInputProps {
     ReactionData: ReactionData | undefined;
     value?: ReactionType;
     targetId?: string;
+    onOptimisticReactionChange?: (payload: {
+        previousReaction: ReactionData | undefined;
+        nextReaction: ReactionData | undefined;
+    }) => void;
     className: string;
     text: string;
     placeholer: string;
@@ -141,6 +145,31 @@ async function sendReactionRequest(params: {
     );
 
     try {
+        if (params.inputTemplateType.type === "post") {
+            const postId = payloadReactionData.targetId ?? params.fallbackTargetId;
+            if (!postId) {
+                console.error("postId mancante per aggiornare la reaction del post");
+                return;
+            }
+
+            const response = await fetch(requestUrlBase, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    postId,
+                    reactionType: params.nextReactionType,
+                    reactionData: payloadReactionData,
+                }),
+            });
+
+            if (!response.ok) {
+                console.error("Errore API reaction post:", response.status);
+            }
+            return;
+        }
+
         if (params.inputTemplateType.type === "comment") {
             const commentId = payloadReactionData.targetId ?? params.fallbackTargetId;
             if (!commentId) {
@@ -223,6 +252,7 @@ export default function ReactInput({
     InputTemplateType,
     value,
     targetId,
+    onOptimisticReactionChange,
 }: ReactInputProps) {
     useReactionIconsPreload();
 
@@ -267,7 +297,12 @@ export default function ReactInput({
 
         if (inputState) {
             const currentReactionType = inputState.reactionType;
+            const previousReaction = inputState;
             setInputState(undefined);
+            onOptimisticReactionChange?.({
+                previousReaction,
+                nextReaction: undefined,
+            });
 
             void sendReactionRequest({
                 inputTemplateType: InputTemplateType,
@@ -286,7 +321,12 @@ export default function ReactInput({
             targetId,
             targetType: fallbackTargetType,
         });
+        const previousReaction = inputState;
         setInputState(nextReactionData);
+        onOptimisticReactionChange?.({
+            previousReaction,
+            nextReaction: nextReactionData,
+        });
 
         void sendReactionRequest({
             inputTemplateType: InputTemplateType,
@@ -296,7 +336,7 @@ export default function ReactInput({
             fallbackTargetId: targetId,
             fallbackTargetType,
         });
-    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, targetId, value]);
+    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, targetId, value]);
 
     const handleLongPress = useCallback(() => {
         setIsModalOpen(true);
@@ -316,12 +356,17 @@ export default function ReactInput({
             return;
         }
 
+        const previousReaction = inputState ?? ReactionData;
         const nextReactionData = buildOptimisticReactionData(inputState ?? ReactionData, reactionType, {
             targetId,
             targetType: fallbackTargetType,
         });
         setInputState(nextReactionData);
         setIsModalOpen(false);
+        onOptimisticReactionChange?.({
+            previousReaction,
+            nextReaction: nextReactionData,
+        });
 
         void sendReactionRequest({
             inputTemplateType: InputTemplateType,
@@ -331,7 +376,7 @@ export default function ReactInput({
             fallbackTargetId: targetId,
             fallbackTargetType,
         });
-    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, targetId]);
+    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, targetId]);
 
     const handleKeyboardClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
         if (event.detail === 0) {

@@ -49,6 +49,27 @@ export type ProfileMetadata = {
     tipoCuccia?: Database["public"]["Enums"]["Lettino"] | null;
 }
 
+export interface ChatThreadProfileMetadata {
+    id: string;
+    profileUrl: string;
+    username?: string;
+    avatarUrl?: string | null;
+}
+
+export interface ChatData {
+    chatId: string;
+    text?: string | null;
+    fromProfileId?: string | null;
+    toProfileId?: string | null;
+    createdAt?: string;
+}
+
+export interface ChatThreadData {
+    withProfile: ChatThreadProfileMetadata;
+    chats: ChatData[];
+    lastMessageAt: string;
+}
+
 export type PostData = {
     postId:string;
     postType:PostType;

@@ -41,3 +41,6 @@ ENV_SETUP.md
 .env*.local
 
 .next_backup_before_api_v1
+
+# local scripts / sql helpers
+scripts/
