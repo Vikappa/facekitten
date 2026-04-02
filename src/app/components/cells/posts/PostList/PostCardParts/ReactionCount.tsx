@@ -4,7 +4,16 @@ interface reactionCountProps {
     reactionCount: number
 }
 
-export default function ReactionCount({ reactionCount }: reactionCountProps){
+export default function ReactionCount({ reactionCount }: reactionCountProps) {
+
+    if (reactionCount === undefined || reactionCount === null) {
+        return <span className="text-xs text-gray-500 px-2">0 reazioni</span>;
+    }
+
+    if (reactionCount === 0) {
+        return null;
+    }
+
     if (reactionCount <= 0) {
         return <span className="text-xs text-gray-500 px-2">0 reazioni</span>;
     }
