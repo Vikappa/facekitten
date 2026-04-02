@@ -38,6 +38,7 @@ export default function SinglePostPage() {
     const normalizedRoutePostId = postId?.trim() ?? "";
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const navigationSearchKey = searchParams.toString();
     const [post, setPost] = useState<PostData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -66,7 +67,7 @@ export default function SinglePostPage() {
             replyId: resolvedNavigation.replyId,
             shouldAutoScroll: true,
         };
-    }, [normalizedRoutePostId, pathname, searchParams]);
+    }, [navigationSearchKey, normalizedRoutePostId, pathname, searchParams]);
 
     useEffect(() => {
         const normalizedPostId = normalizedRoutePostId;
@@ -127,7 +128,7 @@ export default function SinglePostPage() {
         return () => {
             isCancelled = true;
         };
-    }, [dispatch, normalizedRoutePostId]);
+    }, [dispatch, navigationSearchKey, normalizedRoutePostId]);
 
     const renderedPost = reduxPost ?? post;
 
@@ -135,7 +136,7 @@ export default function SinglePostPage() {
         <SideBars>
             <MobileMiniNavBar />
             <div className="mx-auto w-full max-w-2xl">
-                {isLoading && (
+                {isLoading && !renderedPost && (
                     <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center">
                         <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
                     </div>

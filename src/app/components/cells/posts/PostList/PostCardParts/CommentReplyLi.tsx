@@ -140,7 +140,7 @@ export default function CommentReplyLi({
             }`}
         >
             <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-1.5 pt-1">
                     <Link className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full" href={`/profile/${replyData.authorId}`}>
                         <Image
                             src={replyData.replyAuthorPropic && replyData.replyAuthorPropic !== "" ? replyData.replyAuthorPropic : "/assets/blankprofile.png"}
@@ -153,7 +153,7 @@ export default function CommentReplyLi({
                     <Link className="inline-flex items-center text-sm font-semibold leading-5 text-black" href={`/profile/${replyData.authorId}`}>
                         {replyData.authorName}
                     </Link>
-                    <span className="text-sm leading-5 text-gray-900">{replyData.commentReplyText}</span>
+                    <span className="text-xs leading-5 text-gray-900">{replyData.commentReplyText}</span>
                 </div>
                 <div className="flex items-center text-[10px] text-gray-500 px-8">
                     <ReactInput
