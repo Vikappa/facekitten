@@ -6,7 +6,7 @@ import { NotificationData, PostData } from "@/lib/interfaces/CommonInterfaces";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setHomepagePosts } from "@/lib/redux/homepagePostsSlice";
 import { setUnreadNotifications } from "@/lib/redux/notificationsSlice";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import PostForm from "../components/cells/posts/PostForm/PostForm";
 
 const AUTO_FETCH_INTERVAL_MS = 180_000;
@@ -50,13 +50,19 @@ export default function Home() {
     const posts = useAppSelector((state) => state.homepagePosts.posts);
     const lastUpdatedAt = useAppSelector((state) => state.homepagePosts.lastUpdatedAt);
     const isFetchingRef = useRef(false);
+    const [isHomepageLoading, setIsHomepageLoading] = useState(false);
 
-    const loadHomepageUpdates = useCallback(async () => {
+    const loadHomepageUpdates = useCallback(async (options?: { showLoader?: boolean }) => {
         if (isFetchingRef.current) {
             return;
         }
 
+        const shouldShowLoader = options?.showLoader === true;
+
         isFetchingRef.current = true;
+        if (shouldShowLoader) {
+            setIsHomepageLoading(true);
+        }
 
         try {
             const response = await fetch('/api/v1/post/get/homepage', {
@@ -82,6 +88,9 @@ export default function Home() {
             console.error("Non sono riuscito a scaricare gli aggiornamenti homepage, dettagli:", e)
         } finally {
             isFetchingRef.current = false;
+            if (shouldShowLoader) {
+                setIsHomepageLoading(false);
+            }
         }
     }, [dispatch])
 
@@ -93,7 +102,7 @@ export default function Home() {
             Date.now() - lastUpdatedAt > MOUNT_REVALIDATE_STALE_AFTER_MS;
 
         if (hasNoPosts || hasNeverFetched || isStale) {
-            void loadHomepageUpdates()
+            void loadHomepageUpdates({ showLoader: true })
         }
     }, [loadHomepageUpdates, posts.length, lastUpdatedAt])
 
@@ -110,8 +119,16 @@ export default function Home() {
     return (
         <SideBars>
             <MobileMiniNavBar />
-            <PostForm />
-            <PostList posts={posts} />
+            {isHomepageLoading ? (
+                <div className="grid min-h-[calc(100dvh-56px)] w-full place-items-center bg-white">
+                    <span className="loaderProfilePictures -translate-y-25" aria-hidden="true"></span>
+                </div>
+            ) : (
+                <>
+                    <PostForm />
+                    <PostList posts={posts} />
+                </>
+            )}
         </SideBars>
     )
 }
