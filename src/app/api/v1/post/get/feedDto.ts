@@ -88,6 +88,18 @@ export type FeedPost = {
   postReactions: FeedPostReaction[] | null;
 };
 
+export type FeedSharedPost = {
+  id: string;
+  authorId: string;
+  content: string | null;
+  extraContent: string | null;
+  mediaUrl: string | null;
+  postType: Database["public"]["Enums"]["postType"] | null;
+  created_at: string;
+  author: FeedAuthor | null;
+  postReactions: FeedPostReaction[] | null;
+};
+
 export const PROFILE_METADATA_SELECT = `
   id,
   username,
@@ -166,6 +178,29 @@ export const FEED_POST_SELECT = `
   )
 `;
 
+export const FEED_SHARED_POST_SELECT = `
+  id,
+  authorId,
+  content,
+  extraContent,
+  mediaUrl,
+  postType,
+  created_at,
+  author:Profile!Post_authorId_fkey (
+    ${PROFILE_METADATA_SELECT}
+  ),
+  postReactions:postReaction!postReaction_reactedPost_fkey (
+    id,
+    reactedPost,
+    reactedBy,
+    created_at,
+    reactionType,
+    author:Profile!postReaction_reactedBy_fkey (
+      ${PROFILE_METADATA_SELECT}
+    )
+  )
+`;
+
 const REACTION_TYPE_MAP: Record<DbReactionType, UiReactionType> = {
   like: UiReactionType.like,
   love: UiReactionType.love,
@@ -178,6 +213,36 @@ const REACTION_TYPE_MAP: Record<DbReactionType, UiReactionType> = {
   flower: UiReactionType.flower,
   boom: UiReactionType.boom,
 };
+
+const SHARE_TEXT_POST_TYPES = new Set(["sharetextpost", "shareposttext"]);
+const EMPTY_SHARED_POSTS_BY_ID = new Map<string, FeedSharedPost>();
+const UUID_V4_OR_COMPAT_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isShareTextPost(postType: string | null | undefined): boolean {
+  if (typeof postType !== "string") {
+    return false;
+  }
+
+  return SHARE_TEXT_POST_TYPES.has(postType.trim().toLowerCase());
+}
+
+function parseSharedPostId(rawExtraContent: string | null | undefined): string | null {
+  if (typeof rawExtraContent !== "string") {
+    return null;
+  }
+
+  const normalized = rawExtraContent.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  if (!UUID_V4_OR_COMPAT_PATTERN.test(normalized)) {
+    return null;
+  }
+
+  return normalized;
+}
 
 export function mapReactionType(value: DbReactionType | null): UiReactionType {
   if (!value) {
@@ -406,42 +471,93 @@ export function collectReplyAuthorIds(posts: FeedPost[]): string[] {
         (post.comments ?? []).flatMap((comment) =>
           (comment.commentReplies ?? [])
             .map((reply) => reply.commentReplyAuthorId)
-            .filter((authorId): authorId is string => !!authorId && authorId.trim().length > 0)
+            .filter(
+              (authorId): authorId is string =>
+                !!authorId &&
+                authorId.trim().length > 0 &&
+                UUID_V4_OR_COMPAT_PATTERN.test(authorId.trim())
+            )
         )
       )
     )
   );
 }
 
+export function collectSharedPostIds(posts: FeedPost[]): string[] {
+  return Array.from(
+    new Set(
+      posts
+        .filter((post) => isShareTextPost(post.postType))
+        .map((post) => parseSharedPostId(post.extraContent))
+        .filter((postId): postId is string => postId !== null)
+    )
+  );
+}
+
+function mapFeedPostToPostData(
+  post: FeedPost | FeedSharedPost,
+  replyAuthorsById: Map<string, FeedAuthor>,
+  sharedPostsById: Map<string, FeedSharedPost>,
+  options?: {
+    stripCommentsAndReplies?: boolean;
+    disableSharedSubPost?: boolean;
+  }
+): PostData {
+  const authorProfile = mapProfileMetadata(post.author, post.authorId);
+  const stripCommentsAndReplies = options?.stripCommentsAndReplies === true;
+  const comments =
+    !stripCommentsAndReplies && "comments" in post
+      ? mapComments(post.comments, replyAuthorsById)
+      : [];
+  const reactions = mapPostReactions(post.postReactions);
+  const postType = post.postType ?? "post";
+
+  let subPostData: PostData | null = null;
+  if (!options?.disableSharedSubPost && isShareTextPost(postType)) {
+    const sharedPostId = parseSharedPostId(post.extraContent);
+    if (sharedPostId) {
+      const sharedPost = sharedPostsById.get(sharedPostId);
+      if (sharedPost) {
+        subPostData = mapFeedPostToPostData(
+          sharedPost,
+          replyAuthorsById,
+          EMPTY_SHARED_POSTS_BY_ID,
+          { stripCommentsAndReplies: true, disableSharedSubPost: true }
+        );
+      }
+    }
+  }
+
+  return {
+    postId: post.id,
+    postType,
+    text: post.content ?? "",
+    imageUrl: authorProfile?.avatarUrl ?? undefined,
+    authorId: post.authorId,
+    authorName: authorProfile?.username ?? post.authorId,
+    postImageUrl: post.mediaUrl ?? undefined,
+    postedAt: post.created_at,
+    comments,
+    commentNumber: comments.length,
+    reactions,
+    reactionsNumber: reactions.length,
+    shares: {
+      sharePostId: 0,
+    },
+    postExtraContent: post.extraContent,
+    postMediaUrl: post.mediaUrl,
+    authorProfile,
+    createdAt: post.created_at,
+    subPostData,
+  };
+}
+
 export function mapFeedPostsToPostData(
   posts: FeedPost[],
-  replyAuthorsById: Map<string, FeedAuthor>
+  replyAuthorsById: Map<string, FeedAuthor>,
+  sharedPostsById: Map<string, FeedSharedPost> = EMPTY_SHARED_POSTS_BY_ID
 ): PostData[] {
-  return posts.map((post) => {
-    const authorProfile = mapProfileMetadata(post.author, post.authorId);
-    const comments = mapComments(post.comments, replyAuthorsById);
-    const reactions = mapPostReactions(post.postReactions);
-
-    return {
-      postId: post.id,
-      postType: post.postType ?? "post",
-      text: post.content ?? "",
-      imageUrl: authorProfile?.avatarUrl ?? undefined,
-      authorId: post.authorId,
-      authorName: authorProfile?.username ?? post.authorId,
-      postImageUrl: post.mediaUrl ?? undefined,
-      postedAt: post.created_at,
-      comments,
-      commentNumber: comments.length,
-      reactions,
-      reactionsNumber: reactions.length,
-      shares: {
-        sharePostId: 0,
-      },
-      postExtraContent: post.extraContent,
-      postMediaUrl: post.mediaUrl,
-      authorProfile,
-      createdAt: post.created_at,
-    };
-  });
+  return posts.map((post) =>
+    mapFeedPostToPostData(post, replyAuthorsById, sharedPostsById)
+  );
 }

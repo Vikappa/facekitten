@@ -1,5 +1,5 @@
 'use client'
-import PostList from "@/app/components/cells/posts/PostList/PostList";
+import PostList from "@/app/components/cells/posts/PostList";
 import SideBars from "@/app/components/cells/SideBars/SideBars";
 import MobileMiniNavBar from "../components/cells/NavbarParts/MobileMiniNavBar";
 import { NotificationData, PostData } from "@/lib/interfaces/CommonInterfaces";
@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef } from "react";
 import PostForm from "../components/cells/posts/PostForm/PostForm";
 
 const AUTO_FETCH_INTERVAL_MS = 180_000;
+const MOUNT_REVALIDATE_STALE_AFTER_MS = 45_000;
 
 const isNotificationData = (payload: unknown): payload is NotificationData => {
     if (typeof payload !== "object" || payload === null) {
@@ -47,6 +48,7 @@ const isHomepageRefreshPayload = (payload: unknown): payload is HomepageRefreshP
 export default function Home() {
     const dispatch = useAppDispatch();
     const posts = useAppSelector((state) => state.homepagePosts.posts);
+    const lastUpdatedAt = useAppSelector((state) => state.homepagePosts.lastUpdatedAt);
     const isFetchingRef = useRef(false);
 
     const loadHomepageUpdates = useCallback(async () => {
@@ -84,8 +86,16 @@ export default function Home() {
     }, [dispatch])
 
     useEffect(() => {
-        void loadHomepageUpdates()
-    }, [loadHomepageUpdates])
+        const hasNoPosts = posts.length === 0;
+        const hasNeverFetched = lastUpdatedAt === null;
+        const isStale =
+            typeof lastUpdatedAt === "number" &&
+            Date.now() - lastUpdatedAt > MOUNT_REVALIDATE_STALE_AFTER_MS;
+
+        if (hasNoPosts || hasNeverFetched || isStale) {
+            void loadHomepageUpdates()
+        }
+    }, [loadHomepageUpdates, posts.length, lastUpdatedAt])
 
     useEffect(() => {
         const intervalId = window.setInterval(() => {

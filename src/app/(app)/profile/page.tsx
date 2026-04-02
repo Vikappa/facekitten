@@ -1,7 +1,7 @@
 
 'use client'
 import PostForm from "@/app/components/cells/posts/PostForm/PostForm";
-import PostList from "@/app/components/cells/posts/PostList/PostList";
+import PostList from "@/app/components/cells/posts/PostList";
 import ProfilePageHero from "@/app/components/cells/ProfilePageHero/ProfilePageHero";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { useState } from "react";

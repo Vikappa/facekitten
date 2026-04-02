@@ -3,17 +3,27 @@ import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import {
+  FEED_SHARED_POST_SELECT,
   FEED_POST_SELECT,
   PROFILE_METADATA_SELECT,
   collectReplyAuthorIds,
+  collectSharedPostIds,
   mapFeedPostsToPostData,
   type FeedAuthor,
   type FeedPost,
+  type FeedSharedPost,
 } from "@/app/api/v1/post/get/feedDto";
 
 export interface GetFriendPostRequest {
   friendId: string;
   alreadyGotPosts: string[];
+}
+
+const UUID_V4_OR_COMPAT_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isUuidLike(value: string): boolean {
+  return UUID_V4_OR_COMPAT_PATTERN.test(value);
 }
 
 function normalizeExcludedPostIds(values: string[]): string[] {
@@ -22,14 +32,14 @@ function normalizeExcludedPostIds(values: string[]): string[] {
       values
         .filter((value) => typeof value === "string")
         .map((value) => value.trim())
-        .filter((value) => value.length > 0)
+        .filter((value) => value.length > 0 && isUuidLike(value))
     )
   );
 }
 
 function toPostgrestInFilter(values: string[]): string {
-  const encodedValues = values.map((value) => `'${value.replace(/'/g, "''")}'`);
-  return `(${encodedValues.join(",")})`;
+  // Values are UUID-validated, so they can be sent unquoted in PostgREST `in` filters.
+  return `(${values.join(",")})`;
 }
 
 async function loadReplyAuthorsById(
@@ -68,6 +78,44 @@ async function loadReplyAuthorsById(
   }
 
   return { ok: true, replyAuthorsById };
+}
+
+async function loadSharedPostsById(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  posts: FeedPost[]
+): Promise<
+  | { ok: true; sharedPostsById: Map<string, FeedSharedPost> }
+  | { ok: false; response: NextResponse }
+> {
+  const sharedPostIds = collectSharedPostIds(posts);
+  if (sharedPostIds.length === 0) {
+    return { ok: true, sharedPostsById: new Map<string, FeedSharedPost>() };
+  }
+
+  const { data: sharedPosts, error: sharedPostsError } = await supabase
+    .from("post")
+    .select(FEED_SHARED_POST_SELECT)
+    .in("id", sharedPostIds);
+
+  if (sharedPostsError) {
+    console.error("Errore recupero subpost condivisi in feed friend:", sharedPostsError);
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { code: "SHARED_POSTS_FETCH_ERROR", error: "Errore interno" },
+        { status: 500 }
+      ),
+    };
+  }
+
+  const sharedPostsById = new Map<string, FeedSharedPost>();
+  for (const sharedPost of (sharedPosts ?? []) as FeedSharedPost[]) {
+    if (typeof sharedPost.id === "string" && sharedPost.id.trim().length > 0) {
+      sharedPostsById.set(sharedPost.id, sharedPost);
+    }
+  }
+
+  return { ok: true, sharedPostsById };
 }
 
 export async function POST(req: NextRequest) {
@@ -166,9 +214,15 @@ export async function POST(req: NextRequest) {
     return replyAuthorsResult.response;
   }
 
+  const sharedPostsResult = await loadSharedPostsById(supabase, feedPosts);
+  if (!sharedPostsResult.ok) {
+    return sharedPostsResult.response;
+  }
+
   const responseArray = mapFeedPostsToPostData(
     feedPosts,
-    replyAuthorsResult.replyAuthorsById
+    replyAuthorsResult.replyAuthorsById,
+    sharedPostsResult.sharedPostsById
   );
 
   return NextResponse.json(responseArray);

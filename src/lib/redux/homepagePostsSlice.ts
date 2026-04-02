@@ -55,6 +55,11 @@ export interface RemoveReactionFromHomepagePayload {
     reactionId?: string;
 }
 
+export interface ReplaceHomepagePostPayload {
+    temporaryPostId: string;
+    post: PostData;
+}
+
 function findCommentById(posts: PostData[], commentId: string): CommentData | undefined {
     for (const post of posts) {
         const comment = post.comments.find((candidate) => candidate.commentId === commentId);
@@ -127,6 +132,41 @@ const homepagePostsSlice = createSlice({
             ...state.posts.filter((p) => !incomingIds.has(p.postId)),
         ];
         state.lastUpdatedAt = Date.now();
+        },
+        replaceHomepagePost(state, action: PayloadAction<ReplaceHomepagePostPayload>) {
+            const temporaryPostId = action.payload.temporaryPostId.trim();
+            if (temporaryPostId.length === 0) {
+                return;
+            }
+
+            const incomingPost = action.payload.post;
+            const targetIndex = state.posts.findIndex((post) => post.postId === temporaryPostId);
+
+            if (targetIndex === -1) {
+                state.posts = state.posts.filter((post) => post.postId !== incomingPost.postId);
+                state.posts.unshift(incomingPost);
+                state.lastUpdatedAt = Date.now();
+                return;
+            }
+
+            state.posts[targetIndex] = incomingPost;
+            state.posts = state.posts.filter((post, index) => {
+                if (index === targetIndex) {
+                    return true;
+                }
+
+                return post.postId !== incomingPost.postId;
+            });
+            state.lastUpdatedAt = Date.now();
+        },
+        removeHomepagePostById(state, action: PayloadAction<string>) {
+            const normalizedPostId = action.payload.trim();
+            if (normalizedPostId.length === 0) {
+                return;
+            }
+
+            state.posts = state.posts.filter((post) => post.postId !== normalizedPostId);
+            state.lastUpdatedAt = Date.now();
         },
         hydrateHomepagePostsState(state, action: PayloadAction<HomepagePostsState>) {
             state.posts = action.payload.posts;
@@ -355,6 +395,8 @@ export const {
     setHomepagePosts,
     prependHomepagePost,
     prependHomepagePosts,
+    replaceHomepagePost,
+    removeHomepagePostById,
     hydrateHomepagePostsState,
     clearHomepagePosts,
     addCommentToPost,

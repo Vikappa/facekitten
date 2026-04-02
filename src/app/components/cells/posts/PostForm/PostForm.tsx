@@ -88,6 +88,7 @@ export default function PostForm() {
                 reactions: [],
                 reactionsNumber: 0,
                 shares: { sharePostId: 0 },
+                subPostData: null,
             };
 
             dispatch(prependHomepagePost(postForStore));

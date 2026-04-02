@@ -4,14 +4,15 @@ import { PostData, ReactionData } from "@/lib/interfaces/CommonInterfaces"
 import { useAppSelector } from "@/lib/redux/hooks"
 import Image from "next/image"
 import Link from "next/link"
-import ReactionCount from "./PostList/PostCardParts/ReactionCount"
-import ShareCount from "./PostList/PostCardParts/ShareCount"
-import CommentSpan from "./PostList/PostCardParts/CommentSpan"
-import CondividiSpan from "./PostList/PostCardParts/CondividiSpan"
+import ReactionCount from "./PostCardParts/ReactionCount"
+import ShareCount from "./PostCardParts/ShareCount"
+import CommentSpan from "./PostCardParts/CommentSpan"
+import CondividiSpan from "./PostCardParts/CondividiSpan"
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import CommentForm from "./CommentForm"
-import CommentList from "./PostList/PostCardParts/CommentList"
+import CommentList from "./PostCardParts/CommentList"
 import ReactInput from "@/app/components/atoms/ReactInput"
+import SubPostCard from "./PostCardParts/SubPostCard"
 
 type PostCardNavigationTarget = {
     commentId: string | null;
@@ -20,7 +21,7 @@ type PostCardNavigationTarget = {
 };
 
 interface PostCardProp {
-    data:PostData
+    data: PostData
     nowMs?: number
     navigationTarget?: PostCardNavigationTarget
 }
@@ -31,6 +32,10 @@ function findReactionFromCurrentProfile(reactions: ReactionData[], profileId: st
     }
 
     return reactions.find((reaction) => reaction.authorId === profileId);
+}
+
+function canBeShared(postType: PostData["postType"] | null): boolean {
+    return postType === "post" || postType === "image" || postType === "market" || postType === "video" || postType === "shortVideo" || postType === "gamePlayer";
 }
 
 export default function PostCard(prop: PostCardProp) {
@@ -89,7 +94,7 @@ export default function PostCard(prop: PostCardProp) {
 
     const hasNavigationTarget = Boolean(resolvedNavigationTarget);
 
-    function toggleIsCommenting(){
+    function toggleIsCommenting() {
         setIsCommenting(!isCommenting)
     }
 
@@ -248,14 +253,26 @@ export default function PostCard(prop: PostCardProp) {
                     <span className="text-[11px] text-gray-400">{formatPostDate(prop.data.postedAt)}</span>
                 </div>
             </div>
-            <div className="p-2">
-                <p>{prop.data.text}</p>
-            </div>
+            {
+                prop.data.postType === "post" &&
+                <div className="p-2">
+                    <p>{prop.data.text}</p>
+                </div>
+            }
+
+            {
+                prop.data.postType === "shareTextPost" &&
+                <div className="p-2">
+                    <p>{prop.data.text}</p>
+                    <SubPostCard subPostData={prop.data.subPostData} />
+                </div>
+            }
+
             <div className="flex w-100 text-gray-500">
                 <ReactionCount reactionCount={optimisticReactionsCount} />
                 <ShareCount {...prop.data.shares} />
             </div>
-            <div className="flex w-full text-gray-900 text-sm px-">
+            <div className="flex w-full text-gray-500 text-sm px-">
                 <ReactInput
                     InputTemplateType={{ type: "post" }}
                     ReactionData={optimisticUserPostReaction}
@@ -267,7 +284,7 @@ export default function PostCard(prop: PostCardProp) {
                     customSize={16}
                 />
                 <CommentSpan isCommenting={isCommenting} updateSetIsCommenting={toggleIsCommenting} commentsCount={prop.data.commentNumber} />
-                <CondividiSpan />
+                {canBeShared(prop.data.postType) ? <CondividiSpan postToShare={prop.data} /> : <span className="text-transparent">Condividi</span>}
             </div>
             {isCommenting && <CommentForm postId={prop.data.postId} />}
             {isCommenting && (
@@ -278,7 +295,7 @@ export default function PostCard(prop: PostCardProp) {
                     navigationTarget={resolvedNavigationTarget}
                 />
             )}
-            
+
         </div>
     )
 }

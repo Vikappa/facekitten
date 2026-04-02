@@ -4,12 +4,15 @@ import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/Session
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type { FriendshipsRow } from "@/types/db.generated";
 import {
+  FEED_SHARED_POST_SELECT,
   FEED_POST_SELECT,
   PROFILE_METADATA_SELECT,
   collectReplyAuthorIds,
+  collectSharedPostIds,
   mapFeedPostsToPostData,
   type FeedAuthor,
   type FeedPost,
+  type FeedSharedPost,
 } from "@/app/api/v1/post/get/feedDto";
 
 type FriendshipPair = Pick<FriendshipsRow, "user_a" | "user_b">;
@@ -103,6 +106,44 @@ async function loadReplyAuthorsById(
   }
 
   return { ok: true, replyAuthorsById };
+}
+
+async function loadSharedPostsById(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  posts: FeedPost[]
+): Promise<
+  | { ok: true; sharedPostsById: Map<string, FeedSharedPost> }
+  | { ok: false; response: NextResponse }
+> {
+  const sharedPostIds = collectSharedPostIds(posts);
+  if (sharedPostIds.length === 0) {
+    return { ok: true, sharedPostsById: new Map<string, FeedSharedPost>() };
+  }
+
+  const { data: sharedPosts, error: sharedPostsError } = await supabase
+    .from("post")
+    .select(FEED_SHARED_POST_SELECT)
+    .in("id", sharedPostIds);
+
+  if (sharedPostsError) {
+    console.error("Errore recupero subpost condivisi in post/get:", sharedPostsError);
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { code: "SHARED_POSTS_FETCH_ERROR", error: "Errore interno" },
+        { status: 500 }
+      ),
+    };
+  }
+
+  const sharedPostsById = new Map<string, FeedSharedPost>();
+  for (const sharedPost of (sharedPosts ?? []) as FeedSharedPost[]) {
+    if (typeof sharedPost.id === "string" && sharedPost.id.trim().length > 0) {
+      sharedPostsById.set(sharedPost.id, sharedPost);
+    }
+  }
+
+  return { ok: true, sharedPostsById };
 }
 
 export async function POST(req: NextRequest) {
@@ -203,9 +244,15 @@ export async function POST(req: NextRequest) {
     return replyAuthorsResult.response;
   }
 
+  const sharedPostsResult = await loadSharedPostsById(supabase, [selectedPost]);
+  if (!sharedPostsResult.ok) {
+    return sharedPostsResult.response;
+  }
+
   const [responsePost] = mapFeedPostsToPostData(
     [selectedPost],
-    replyAuthorsResult.replyAuthorsById
+    replyAuthorsResult.replyAuthorsById,
+    sharedPostsResult.sharedPostsById
   );
 
   if (!responsePost) {

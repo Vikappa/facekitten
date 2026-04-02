@@ -1,10 +1,10 @@
 'use client'
 
 import { GetFriendPostRequest } from "@/app/api/v1/post/get/friends/route"
-import PostList from "@/app/components/cells/posts/PostList/PostList"
+import PostList from "@/app/components/cells/posts/PostList"
 import ProfilePageHeroV2, { FriendUserProfile } from "@/app/components/cells/ProfilePageHero/ProfilePageHeroV2"
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
-import { clearHomepagePosts, prependHomepagePosts } from "@/lib/redux/homepagePostsSlice"
+import { setHomepagePosts } from "@/lib/redux/homepagePostsSlice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { Database } from "@/types/database.types"
 import {
@@ -14,7 +14,7 @@ import {
     type WithFriendshipStatus,
 } from "@/types/friendship"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 
 type ProfileGetPayload = {
@@ -113,9 +113,14 @@ export default function ViewUserProfilePage() {
     const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>(
         FRIENDSHIP_STATUS.NON_AMICO
     )
-    const postData = useAppSelector((state) => state.homepagePosts.posts.filter(p => p.authorId == profileId))
-    const AlreadyDownloadedPosts = useAppSelector((state) => state.homepagePosts.posts.filter(p => p.authorId === profileId)).map(p => p.postId)
+    const homepagePosts = useAppSelector((state) => state.homepagePosts.posts)
+    const homepagePostsRef = useRef(homepagePosts)
+    const postData = homepagePosts.filter((post) => post.authorId == profileId)
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        homepagePostsRef.current = homepagePosts
+    }, [homepagePosts])
     async function getProfileData() {
         if (profileId && profileId.trim() !== "") {
             try {
@@ -165,7 +170,8 @@ export default function ViewUserProfilePage() {
 
         const requestPayload: GetFriendPostRequest = {
             friendId: profileId,
-            alreadyGotPosts: AlreadyDownloadedPosts
+            // In profile view we need a full snapshot of the target profile posts.
+            alreadyGotPosts: []
         }
 
         try {
@@ -185,8 +191,12 @@ export default function ViewUserProfilePage() {
             }
 
             if (!response.ok) {
-                const errorPayload = payload as { error?: string } | null
-                console.error(errorPayload?.error ?? "Errore nel recupero post profilo")
+                const errorPayload = payload as { code?: string; error?: string } | null
+                console.error("Errore nel recupero post profilo", {
+                    status: response.status,
+                    code: errorPayload?.code ?? null,
+                    error: errorPayload?.error ?? "Errore interno",
+                })
                 return
             }
 
@@ -195,8 +205,34 @@ export default function ViewUserProfilePage() {
                 return
             }
 
-            dispatch(clearHomepagePosts())
-            dispatch(prependHomepagePosts(payload as PostData[]))
+            const normalizedProfileId = profileId.trim()
+            const fetchedProfilePosts = (payload as PostData[]).filter(
+                (post) => post.authorId === normalizedProfileId
+            )
+            const fetchedProfilePostsById = new Map(
+                fetchedProfilePosts.map((post) => [post.postId, post] as const)
+            )
+
+            // Replace cached posts of this profile with the latest server snapshot,
+            // while preserving posts of other authors already present in the global feed.
+            const mergedPosts = homepagePostsRef.current
+                .map((cachedPost) =>
+                    fetchedProfilePostsById.get(cachedPost.postId) ?? cachedPost
+                )
+                .filter(
+                    (cachedPost) =>
+                        cachedPost.authorId !== normalizedProfileId ||
+                        fetchedProfilePostsById.has(cachedPost.postId)
+                )
+
+            const mergedPostIds = new Set(mergedPosts.map((post) => post.postId))
+            for (const incomingPost of fetchedProfilePosts) {
+                if (!mergedPostIds.has(incomingPost.postId)) {
+                    mergedPosts.push(incomingPost)
+                }
+            }
+
+            dispatch(setHomepagePosts(mergedPosts))
 
         } catch (error) {
             console.error("Errore di rete durante il recupero post profilo", error)

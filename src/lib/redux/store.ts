@@ -473,6 +473,18 @@ function normalizePostData(value: unknown): PostData | null {
             ? (post.shares as Record<string, number>).sharePostId
             : 0;
 
+    const normalizedSubPostData =
+        post.subPostData === null || post.subPostData === undefined
+            ? null
+            : normalizePostData(post.subPostData);
+    if (
+        post.subPostData !== undefined &&
+        post.subPostData !== null &&
+        normalizedSubPostData === null
+    ) {
+        return null;
+    }
+
     return {
         postId: post.postId,
         postType: post.postType as PostData["postType"],
@@ -491,6 +503,7 @@ function normalizePostData(value: unknown): PostData | null {
         postMediaUrl: normalizeNullableString(post.postMediaUrl),
         authorProfile: normalizeProfileMetadata(post.authorProfile),
         createdAt: normalizeOptionalString(post.createdAt),
+        subPostData: normalizedSubPostData,
     };
 }
 

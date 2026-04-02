@@ -155,7 +155,7 @@ export default function CommentForm(props: CommentFormProps) {
     }
 
     return (
-        <div className="flex flex-col bg-tertiary align-items rounded-full p-1 px-1.5 my-1">
+        <div className="flex flex-col bg-tertiary align-items rounded-3xl p-1 px-1.5 my-1">
             <form
                 onSubmit={handleSubmitComment}
                 onFocus={handleFormFocus}

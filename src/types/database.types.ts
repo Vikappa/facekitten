@@ -532,6 +532,11 @@ export type Database = {
         | "market"
         | "gamePlayer"
         | "shortVideo"
+        | "shareTextPost"
+        | "shareImagePost"
+        | "shareVideoPost"
+        | "shareShortVideo"
+        | "shareMarketPost"
       ReactionType:
         | "like"
         | "love"
@@ -696,6 +701,11 @@ export const Constants = {
         "market",
         "gamePlayer",
         "shortVideo",
+        "shareTextPost",
+        "shareImagePost",
+        "shareVideoPost",
+        "shareShortVideo",
+        "shareMarketPost",
       ],
       ReactionType: [
         "like",

@@ -91,6 +91,8 @@ const FRIEND_REQUEST_RECEIVED_PREVIEW_TEXT =
   "ti ha inviato una richiesta di micizia";
 const FRIEND_REQUEST_ACCEPTED_PREVIEW_TEXT =
   "ha accettato la tua richiesta di micizia";
+const SHARE_NOTIFICATION_KIND_QUERY_PARAM = "notifKind";
+const SHARE_NOTIFICATION_KIND_VALUE = "postShared";
 
 function toPreviewSnippet(rawText: string | null | undefined): string | null {
   if (!rawText) {
@@ -232,6 +234,24 @@ function parseNotificationNavigationContext(
     };
   } catch {
     return emptyResult;
+  }
+}
+
+function isShareNotificationNavigation(
+  generatedNavigation: string | null | undefined
+): boolean {
+  if (!generatedNavigation) {
+    return false;
+  }
+
+  try {
+    const url = new URL(generatedNavigation, "https://facekitten.local");
+    return (
+      url.searchParams.get(SHARE_NOTIFICATION_KIND_QUERY_PARAM) ===
+      SHARE_NOTIFICATION_KIND_VALUE
+    );
+  } catch {
+    return false;
   }
 }
 
@@ -517,6 +537,10 @@ async function resolveNotificationPreviewText(
 
   if (!activityFromId) {
     return null;
+  }
+
+  if (isShareNotificationNavigation(notification.generatedNavigation)) {
+    return "ha condiviso il tuo post";
   }
 
   if (notificationType === "postCommented") {

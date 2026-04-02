@@ -88,6 +88,7 @@ export type PostData = {
     postMediaUrl?: string | null;
     authorProfile?: ProfileMetadata | null;
     createdAt?: string;
+    subPostData: PostData | null;
 }
 
 export type CommentData = {
