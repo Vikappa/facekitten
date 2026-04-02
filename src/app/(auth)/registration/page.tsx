@@ -63,7 +63,7 @@ export default function RegistrationPage() {
           <input
             onFocus={() => setIsNameFocused(true)}
             onBlur={() => setIsNameFocused(false)}
-            className="rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
+            className="auth-input rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
             type="text"
             id="name"
             placeholder={isNameFocused ? "" : "Nome"}
@@ -78,7 +78,7 @@ export default function RegistrationPage() {
           <input
             onFocus={() => setIsEmailFocused(true)}
             onBlur={() => setIsEmailFocused(false)}
-            className="rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
+            className="auth-input rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
             type="email"
             id="email"
             placeholder={isEmailFocused ? "" : "Email"}
@@ -93,7 +93,7 @@ export default function RegistrationPage() {
           <input
             onFocus={() => setIsPasswordFocused(true)}
             onBlur={() => setIsPasswordFocused(false)}
-            className="rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
+            className="auth-input rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent"
             type="password"
             id="password"
             placeholder={isPasswordFocused ? "" : "Password"}

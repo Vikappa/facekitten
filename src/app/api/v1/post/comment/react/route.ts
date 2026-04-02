@@ -6,6 +6,7 @@ import type {
   CommentReactionInsert,
   CommentReactionRow,
   CommentRow,
+  NotificationsInsert,
 } from "@/types/db.generated";
 import type { Database } from "@/types/database.types";
 import { ReactionType as UiReactionType } from "@/lib/interfaces/CommonInterfaces";
@@ -30,7 +31,7 @@ type ReactToCommentBody = {
   reactionData?: unknown;
 };
 
-type CommentIdentityRow = Pick<CommentRow, "commentId">;
+type CommentIdentityRow = Pick<CommentRow, "commentId" | "commentAuthorId" | "postid">;
 
 type ExistingCommentReactionRow = Pick<
   CommentReactionRow,
@@ -182,7 +183,7 @@ export async function POST(req: NextRequest) {
 
   const { data: commentIdentity, error: commentIdentityError } = await supabase
     .from("comment")
-    .select("commentId")
+    .select("commentId, commentAuthorId, postid")
     .eq("commentId", body.commentId)
     .limit(1)
     .maybeSingle<CommentIdentityRow>();
@@ -285,6 +286,41 @@ export async function POST(req: NextRequest) {
       { code: "COMMENT_REACTION_CREATE_ERROR", error: "Errore interno" },
       { status: 500 }
     );
+  }
+
+  if (existingReactionIds.length === 0) {
+    const commentAuthorId = commentIdentity.commentAuthorId?.trim() ?? "";
+    if (commentAuthorId.length > 0 && commentAuthorId !== auth.profileId) {
+      const postId = commentIdentity.postid?.trim() ?? "";
+      const generatedNavigation =
+        postId.length > 0
+          ? `/post/${encodeURIComponent(postId)}?commentId=${encodeURIComponent(
+              body.commentId
+            )}`
+          : null;
+      const notificationToCreate: NotificationsInsert = {
+        activity_from: auth.profileId,
+        to: commentAuthorId,
+        generatedNavigation,
+        notificationType: "commentReacted",
+        seen: false,
+      };
+
+      const { error: createNotificationError } = await supabase
+        .from("notifications")
+        .insert(notificationToCreate);
+
+      if (createNotificationError) {
+        console.error(
+          "Errore creazione notifica reazione commento in comment/react:",
+          createNotificationError
+        );
+        return NextResponse.json(
+          { code: "NOTIFICATION_CREATE_ERROR", error: "Errore interno" },
+          { status: 500 }
+        );
+      }
+    }
   }
 
   return NextResponse.json({

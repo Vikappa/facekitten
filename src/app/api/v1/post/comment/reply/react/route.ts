@@ -6,6 +6,8 @@ import type {
   CommentReplyReactionInsert,
   CommentReplyReactionRow,
   CommentReplyRow,
+  CommentRow,
+  NotificationsInsert,
 } from "@/types/db.generated";
 import type { Database } from "@/types/database.types";
 import { ReactionType as UiReactionType } from "@/lib/interfaces/CommonInterfaces";
@@ -24,7 +26,11 @@ type ReactToCommentReplyBody = {
   reactionType?: unknown;
 };
 
-type CommentReplyIdentityRow = Pick<CommentReplyRow, "commentReplyId">;
+type CommentReplyIdentityRow = Pick<
+  CommentReplyRow,
+  "commentReplyId" | "commentReplyAuthorId" | "repliedComment"
+>;
+type ParentCommentRow = Pick<CommentRow, "commentId" | "postid">;
 
 type ExistingCommentReplyReactionRow = Pick<
   CommentReplyReactionRow,
@@ -172,7 +178,7 @@ export async function POST(req: NextRequest) {
 
   const { data: replyIdentity, error: replyIdentityError } = await supabase
     .from("commentReply")
-    .select("commentReplyId")
+    .select("commentReplyId, commentReplyAuthorId, repliedComment")
     .eq("commentReplyId", body.commentReplyId)
     .limit(1)
     .maybeSingle<CommentReplyIdentityRow>();
@@ -284,6 +290,66 @@ export async function POST(req: NextRequest) {
       { code: "COMMENT_REPLY_REACTION_CREATE_ERROR", error: "Errore interno" },
       { status: 500 }
     );
+  }
+
+  if (existingReactionIds.length === 0) {
+    const replyAuthorId = replyIdentity.commentReplyAuthorId?.trim() ?? "";
+    if (replyAuthorId.length > 0 && replyAuthorId !== auth.profileId) {
+      const parentCommentId = replyIdentity.repliedComment?.trim() ?? "";
+      let generatedNavigation: string | null = null;
+
+      if (parentCommentId.length > 0) {
+        const { data: parentComment, error: parentCommentError } = await supabase
+          .from("comment")
+          .select("commentId, postid")
+          .eq("commentId", parentCommentId)
+          .limit(1)
+          .maybeSingle<ParentCommentRow>();
+
+        if (parentCommentError) {
+          console.error(
+            "Errore recupero commento padre per notifica reazione reply in comment/reply/react:",
+            parentCommentError
+          );
+          return NextResponse.json(
+            { code: "PARENT_COMMENT_FETCH_ERROR", error: "Errore interno" },
+            { status: 500 }
+          );
+        }
+
+        const parentPostId = parentComment?.postid?.trim() ?? "";
+        if (parentPostId.length > 0) {
+          generatedNavigation = `/post/${encodeURIComponent(
+            parentPostId
+          )}?commentId=${encodeURIComponent(
+            parentCommentId
+          )}&replyId=${encodeURIComponent(body.commentReplyId)}`;
+        }
+      }
+
+      const notificationToCreate: NotificationsInsert = {
+        activity_from: auth.profileId,
+        to: replyAuthorId,
+        generatedNavigation,
+        notificationType: "commentReacted",
+        seen: false,
+      };
+
+      const { error: createNotificationError } = await supabase
+        .from("notifications")
+        .insert(notificationToCreate);
+
+      if (createNotificationError) {
+        console.error(
+          "Errore creazione notifica reazione reply in comment/reply/react:",
+          createNotificationError
+        );
+        return NextResponse.json(
+          { code: "NOTIFICATION_CREATE_ERROR", error: "Errore interno" },
+          { status: 500 }
+        );
+      }
+    }
   }
 
   return NextResponse.json({

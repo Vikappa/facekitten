@@ -1,6 +1,11 @@
 'use client'
 
 import { ReactionData, ReactionType } from "@/lib/interfaces/CommonInterfaces";
+import {
+    removeReactionFromHomepagePosts,
+    upsertReactionInHomepagePosts,
+} from "@/lib/redux/homepagePostsSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactionIcon, { useReactionIconsPreload } from "./ReactionIcon";
 import ReactionInputModal from "../modals/ReactionInputModal";
@@ -21,6 +26,7 @@ interface ReactInputProps {
     className: string;
     text: string;
     placeholer: string;
+    customSize?: number;
 }
 
 type UseLongPressOptions = {
@@ -125,6 +131,17 @@ function buildOptimisticReactionData(
     };
 }
 
+function isReactionOwnedByProfile(
+    reaction: ReactionData | undefined,
+    profileId: string | undefined
+): reaction is ReactionData {
+    if (!reaction || !profileId) {
+        return false;
+    }
+
+    return reaction.authorId === profileId;
+}
+
 async function sendReactionRequest(params: {
     inputTemplateType: InputTemplateType;
     currentReaction: ReactionData | undefined;
@@ -132,7 +149,7 @@ async function sendReactionRequest(params: {
     shouldDelete: boolean;
     fallbackTargetId?: string;
     fallbackTargetType?: ReactionTargetType;
-}) {
+}): Promise<boolean> {
     const requestUrlBase = resolveReactionRequestUrl(params.inputTemplateType);
 
     const payloadReactionData = buildOptimisticReactionData(
@@ -149,7 +166,7 @@ async function sendReactionRequest(params: {
             const postId = payloadReactionData.targetId ?? params.fallbackTargetId;
             if (!postId) {
                 console.error("postId mancante per aggiornare la reaction del post");
-                return;
+                return false;
             }
 
             const response = await fetch(requestUrlBase, {
@@ -166,15 +183,16 @@ async function sendReactionRequest(params: {
 
             if (!response.ok) {
                 console.error("Errore API reaction post:", response.status);
+                return false;
             }
-            return;
+            return true;
         }
 
         if (params.inputTemplateType.type === "comment") {
             const commentId = payloadReactionData.targetId ?? params.fallbackTargetId;
             if (!commentId) {
                 console.error("commentId mancante per aggiornare la reaction del commento");
-                return;
+                return false;
             }
 
             const response = await fetch(requestUrlBase, {
@@ -191,15 +209,16 @@ async function sendReactionRequest(params: {
 
             if (!response.ok) {
                 console.error("Errore API reaction commento:", response.status);
+                return false;
             }
-            return;
+            return true;
         }
 
         if (params.inputTemplateType.type === "commentReply") {
             const commentReplyId = payloadReactionData.targetId ?? params.fallbackTargetId;
             if (!commentReplyId) {
                 console.error("commentReplyId mancante per aggiornare la reaction della reply");
-                return;
+                return false;
             }
 
             const response = await fetch(requestUrlBase, {
@@ -216,8 +235,9 @@ async function sendReactionRequest(params: {
 
             if (!response.ok) {
                 console.error("Errore API reaction reply:", response.status);
+                return false;
             }
-            return;
+            return true;
         }
 
         const requestUrl = params.shouldDelete ? `${requestUrlBase}/delete` : requestUrlBase;
@@ -234,9 +254,13 @@ async function sendReactionRequest(params: {
 
         if (!response.ok) {
             console.error("Errore API reaction:", response.status);
+            return false;
         }
+
+        return true;
     } catch (error) {
         console.error("Errore aggiornamento reaction:", error);
+        return false;
     }
 }
 
@@ -252,15 +276,22 @@ export default function ReactInput({
     InputTemplateType,
     value,
     targetId,
+    customSize,
     onOptimisticReactionChange,
 }: ReactInputProps) {
     useReactionIconsPreload();
+    const dispatch = useAppDispatch();
+    const currentProfile = useAppSelector((state) => state.profile.currentProfile);
+    const currentProfileId = currentProfile?.id;
 
     const fallbackTargetType = mapInputTemplateToTargetType(InputTemplateType);
+    const ownedReactionData = isReactionOwnedByProfile(ReactionData, currentProfileId)
+        ? ReactionData
+        : undefined;
 
     const [inputState, setInputState] = useState<ReactionData | undefined>(() => {
-        if (ReactionData) {
-            return ReactionData;
+        if (ownedReactionData) {
+            return ownedReactionData;
         }
 
         if (value !== undefined) {
@@ -276,8 +307,8 @@ export default function ReactInput({
     const inputRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        if (ReactionData) {
-            setInputState(ReactionData);
+        if (ownedReactionData) {
+            setInputState(ownedReactionData);
             return;
         }
 
@@ -290,7 +321,73 @@ export default function ReactInput({
         }
 
         setInputState(undefined);
-    }, [ReactionData, fallbackTargetType, targetId, value]);
+    }, [ownedReactionData, fallbackTargetType, targetId, value]);
+
+    const syncReactionInRedux = useCallback((payload: {
+        previousReaction: ReactionData | undefined;
+        nextReaction: ReactionData | undefined;
+    }) => {
+        const targetType = payload.nextReaction?.targetType
+            ?? payload.previousReaction?.targetType
+            ?? fallbackTargetType;
+        const resolvedTargetId = payload.nextReaction?.targetId
+            ?? payload.previousReaction?.targetId
+            ?? targetId;
+
+        if (
+            !targetType ||
+            typeof resolvedTargetId !== "string" ||
+            resolvedTargetId.trim().length === 0
+        ) {
+            return;
+        }
+
+        if (payload.nextReaction) {
+            const authorId = payload.nextReaction.authorId
+                ?? payload.previousReaction?.authorId
+                ?? currentProfile?.id;
+
+            const reactionForStore: ReactionData = {
+                ...payload.nextReaction,
+                authorId: authorId && authorId.trim().length > 0 ? authorId : null,
+                author:
+                    payload.nextReaction.author.trim().length > 0
+                        ? payload.nextReaction.author
+                        : currentProfile?.username ?? payload.previousReaction?.author ?? "",
+                authorAvatarUrl:
+                    payload.nextReaction.authorAvatarUrl
+                    ?? currentProfile?.avatarUrl
+                    ?? payload.previousReaction?.authorAvatarUrl
+                    ?? null,
+                targetType,
+                targetId: resolvedTargetId,
+            };
+
+            dispatch(
+                upsertReactionInHomepagePosts({
+                    targetType,
+                    targetId: resolvedTargetId,
+                    reaction: reactionForStore,
+                })
+            );
+            return;
+        }
+
+        const authorId = payload.previousReaction?.authorId ?? currentProfile?.id;
+        const reactionId = payload.previousReaction?.reactionId;
+        if ((!authorId || authorId.trim().length === 0) && !reactionId) {
+            return;
+        }
+
+        dispatch(
+            removeReactionFromHomepagePosts({
+                targetType,
+                targetId: resolvedTargetId,
+                authorId,
+                reactionId,
+            })
+        );
+    }, [currentProfile?.avatarUrl, currentProfile?.id, currentProfile?.username, dispatch, fallbackTargetType, targetId]);
 
     const handleShortClick = useCallback(() => {
         setIsModalOpen(false);
@@ -304,20 +401,36 @@ export default function ReactInput({
                 nextReaction: undefined,
             });
 
-            void sendReactionRequest({
-                inputTemplateType: InputTemplateType,
-                currentReaction: inputState,
-                nextReactionType: currentReactionType,
-                shouldDelete: true,
-                fallbackTargetId: targetId,
-                fallbackTargetType,
-            });
+            void (async () => {
+                const hasSynced = await sendReactionRequest({
+                    inputTemplateType: InputTemplateType,
+                    currentReaction: inputState,
+                    nextReactionType: currentReactionType,
+                    shouldDelete: true,
+                    fallbackTargetId: targetId,
+                    fallbackTargetType,
+                });
+
+                if (hasSynced) {
+                    syncReactionInRedux({
+                        previousReaction,
+                        nextReaction: undefined,
+                    });
+                    return;
+                }
+
+                setInputState(previousReaction);
+                onOptimisticReactionChange?.({
+                    previousReaction: undefined,
+                    nextReaction: previousReaction,
+                });
+            })();
 
             return;
         }
 
         const defaultReaction = value ?? ReactionType.like;
-        const nextReactionData = buildOptimisticReactionData(ReactionData, defaultReaction, {
+        const nextReactionData = buildOptimisticReactionData(ownedReactionData, defaultReaction, {
             targetId,
             targetType: fallbackTargetType,
         });
@@ -328,15 +441,31 @@ export default function ReactInput({
             nextReaction: nextReactionData,
         });
 
-        void sendReactionRequest({
-            inputTemplateType: InputTemplateType,
-            currentReaction: ReactionData,
-            nextReactionType: defaultReaction,
-            shouldDelete: false,
-            fallbackTargetId: targetId,
-            fallbackTargetType,
-        });
-    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, targetId, value]);
+        void (async () => {
+            const hasSynced = await sendReactionRequest({
+                inputTemplateType: InputTemplateType,
+                currentReaction: ownedReactionData,
+                nextReactionType: defaultReaction,
+                shouldDelete: false,
+                fallbackTargetId: targetId,
+                fallbackTargetType,
+            });
+
+            if (hasSynced) {
+                syncReactionInRedux({
+                    previousReaction,
+                    nextReaction: nextReactionData,
+                });
+                return;
+            }
+
+            setInputState(previousReaction);
+            onOptimisticReactionChange?.({
+                previousReaction: nextReactionData,
+                nextReaction: previousReaction,
+            });
+        })();
+    }, [InputTemplateType, ownedReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, syncReactionInRedux, targetId, value]);
 
     const handleLongPress = useCallback(() => {
         setIsModalOpen(true);
@@ -356,8 +485,8 @@ export default function ReactInput({
             return;
         }
 
-        const previousReaction = inputState ?? ReactionData;
-        const nextReactionData = buildOptimisticReactionData(inputState ?? ReactionData, reactionType, {
+        const previousReaction = inputState ?? ownedReactionData;
+        const nextReactionData = buildOptimisticReactionData(inputState ?? ownedReactionData, reactionType, {
             targetId,
             targetType: fallbackTargetType,
         });
@@ -368,15 +497,31 @@ export default function ReactInput({
             nextReaction: nextReactionData,
         });
 
-        void sendReactionRequest({
-            inputTemplateType: InputTemplateType,
-            currentReaction: inputState ?? ReactionData,
-            nextReactionType: reactionType,
-            shouldDelete: false,
-            fallbackTargetId: targetId,
-            fallbackTargetType,
-        });
-    }, [InputTemplateType, ReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, targetId]);
+        void (async () => {
+            const hasSynced = await sendReactionRequest({
+                inputTemplateType: InputTemplateType,
+                currentReaction: inputState ?? ownedReactionData,
+                nextReactionType: reactionType,
+                shouldDelete: false,
+                fallbackTargetId: targetId,
+                fallbackTargetType,
+            });
+
+            if (hasSynced) {
+                syncReactionInRedux({
+                    previousReaction,
+                    nextReaction: nextReactionData,
+                });
+                return;
+            }
+
+            setInputState(previousReaction);
+            onOptimisticReactionChange?.({
+                previousReaction: nextReactionData,
+                nextReaction: previousReaction,
+            });
+        })();
+    }, [InputTemplateType, ownedReactionData, fallbackTargetType, inputState, onOptimisticReactionChange, syncReactionInRedux, targetId]);
 
     const handleKeyboardClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
         if (event.detail === 0) {
@@ -411,7 +556,7 @@ export default function ReactInput({
                     {selectedReactionType === undefined ? (
                         <span>{defaultText}</span>
                     ) : (
-                        <ReactionIcon reactionType={selectedReactionType} size={18} />
+                        <ReactionIcon reactionType={selectedReactionType} size={customSize ?? 18} />
                     )}
                 </span>
             </button>

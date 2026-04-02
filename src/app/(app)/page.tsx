@@ -9,7 +9,6 @@ import { setUnreadNotifications } from "@/lib/redux/notificationsSlice";
 import { useCallback, useEffect, useRef } from "react";
 import PostForm from "../components/cells/posts/PostForm/PostForm";
 
-const MIN_UPDATE_INTERVAL_MS = 60_000;
 const AUTO_FETCH_INTERVAL_MS = 180_000;
 
 const isNotificationData = (payload: unknown): payload is NotificationData => {
@@ -48,18 +47,10 @@ const isHomepageRefreshPayload = (payload: unknown): payload is HomepageRefreshP
 export default function Home() {
     const dispatch = useAppDispatch();
     const posts = useAppSelector((state) => state.homepagePosts.posts);
-    const lastUpdatedAt = useAppSelector((state) => state.homepagePosts.lastUpdatedAt);
     const isFetchingRef = useRef(false);
 
     const loadHomepageUpdates = useCallback(async () => {
         if (isFetchingRef.current) {
-            return;
-        }
-
-        if (
-            lastUpdatedAt !== null &&
-            Date.now() - lastUpdatedAt < MIN_UPDATE_INTERVAL_MS
-        ) {
             return;
         }
 
@@ -90,7 +81,7 @@ export default function Home() {
         } finally {
             isFetchingRef.current = false;
         }
-    }, [dispatch, lastUpdatedAt])
+    }, [dispatch])
 
     useEffect(() => {
         void loadHomepageUpdates()

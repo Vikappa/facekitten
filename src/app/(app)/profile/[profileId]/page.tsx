@@ -196,9 +196,7 @@ export default function ViewUserProfilePage() {
             }
 
             dispatch(clearHomepagePosts())
-            if (friendshipStatus == "amico") {
-                prependHomepagePosts(payload as PostData[])
-            }
+            dispatch(prependHomepagePosts(payload as PostData[]))
 
         } catch (error) {
             console.error("Errore di rete durante il recupero post profilo", error)

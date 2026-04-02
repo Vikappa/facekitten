@@ -4,8 +4,11 @@ import PostCard from "@/app/components/cells/posts/PostList/PostCard";
 import MobileMiniNavBar from "@/app/components/cells/NavbarParts/MobileMiniNavBar";
 import SideBars from "@/app/components/cells/SideBars/SideBars";
 import { PostData } from "@/lib/interfaces/CommonInterfaces";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { resolvePostNavigationTarget } from "@/lib/navigation/postNavigationResolver";
+import { prependHomepagePost } from "@/lib/redux/homepagePostsSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 function isPostData(value: unknown): value is PostData {
     if (typeof value !== "object" || value === null) {
@@ -30,13 +33,43 @@ function isPostData(value: unknown): value is PostData {
 }
 
 export default function SinglePostPage() {
+    const dispatch = useAppDispatch();
     const { postId } = useParams<{ postId: string }>();
+    const normalizedRoutePostId = postId?.trim() ?? "";
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [post, setPost] = useState<PostData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const reduxPost = useAppSelector((state) =>
+        state.homepagePosts.posts.find((candidate) => candidate.postId === normalizedRoutePostId) ?? null
+    );
+
+    const navigationTarget = useMemo(() => {
+        const normalizedPostId = normalizedRoutePostId;
+        if (normalizedPostId.length === 0) {
+            return undefined;
+        }
+
+        const currentNavigation = `${pathname}${searchParams.toString().length > 0 ? `?${searchParams.toString()}` : ""}`;
+        const resolvedNavigation = resolvePostNavigationTarget(currentNavigation);
+        if (!resolvedNavigation || resolvedNavigation.postId !== normalizedPostId) {
+            return undefined;
+        }
+
+        if (!resolvedNavigation.commentId && !resolvedNavigation.replyId) {
+            return undefined;
+        }
+
+        return {
+            commentId: resolvedNavigation.commentId,
+            replyId: resolvedNavigation.replyId,
+            shouldAutoScroll: true,
+        };
+    }, [normalizedRoutePostId, pathname, searchParams]);
 
     useEffect(() => {
-        const normalizedPostId = postId?.trim() ?? "";
+        const normalizedPostId = normalizedRoutePostId;
         if (normalizedPostId.length === 0) {
             setError("Post non valido");
             setIsLoading(false);
@@ -75,6 +108,7 @@ export default function SinglePostPage() {
 
                 if (!isCancelled) {
                     setPost(payload);
+                    dispatch(prependHomepagePost(payload));
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
@@ -93,7 +127,9 @@ export default function SinglePostPage() {
         return () => {
             isCancelled = true;
         };
-    }, [postId]);
+    }, [dispatch, normalizedRoutePostId]);
+
+    const renderedPost = reduxPost ?? post;
 
     return (
         <SideBars>
@@ -111,8 +147,11 @@ export default function SinglePostPage() {
                     </div>
                 )}
 
-                {!isLoading && !error && post && (
-                    <PostCard data={post} />
+                {!isLoading && !error && renderedPost && (
+                    <PostCard
+                        data={renderedPost}
+                        navigationTarget={navigationTarget}
+                    />
                 )}
             </div>
         </SideBars>

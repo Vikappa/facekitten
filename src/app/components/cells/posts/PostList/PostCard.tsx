@@ -8,14 +8,21 @@ import ReactionCount from "./PostCardParts/ReactionCount"
 import ShareCount from "./PostCardParts/ShareCount"
 import CommentSpan from "./PostCardParts/CommentSpan"
 import CondividiSpan from "./PostCardParts/CondividiSpan"
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import CommentForm from "../CommentForm"
 import CommentList from "./PostCardParts/CommentList"
 import ReactInput from "@/app/components/atoms/ReactInput"
 
+type PostCardNavigationTarget = {
+    commentId: string | null;
+    replyId: string | null;
+    shouldAutoScroll?: boolean;
+};
+
 interface PostCardProp {
     data:PostData
     nowMs?: number
+    navigationTarget?: PostCardNavigationTarget
 }
 
 function findReactionFromCurrentProfile(reactions: ReactionData[], profileId: string | undefined): ReactionData | undefined {
@@ -23,13 +30,7 @@ function findReactionFromCurrentProfile(reactions: ReactionData[], profileId: st
         return undefined;
     }
 
-    return reactions.find((reaction) => {
-        if (reaction.authorId) {
-            return reaction.authorId === profileId;
-        }
-
-        return reaction.author === profileId;
-    });
+    return reactions.find((reaction) => reaction.authorId === profileId);
 }
 
 export default function PostCard(prop: PostCardProp) {
@@ -44,6 +45,49 @@ export default function PostCard(prop: PostCardProp) {
     );
     const [optimisticUserPostReaction, setOptimisticUserPostReaction] = useState<ReactionData | undefined>(userPostReaction);
     const [optimisticReactionsCount, setOptimisticReactionsCount] = useState(prop.data.reactionsNumber);
+    const scrolledNavigationKeyRef = useRef<string>("");
+
+    const resolvedNavigationTarget = useMemo(() => {
+        const rawCommentId = prop.navigationTarget?.commentId ?? null;
+        const rawReplyId = prop.navigationTarget?.replyId ?? null;
+        const commentId = typeof rawCommentId === "string" && rawCommentId.trim().length > 0
+            ? rawCommentId
+            : null;
+        const replyId = typeof rawReplyId === "string" && rawReplyId.trim().length > 0
+            ? rawReplyId
+            : null;
+
+        if (!commentId && !replyId) {
+            return undefined;
+        }
+
+        const commentIds = new Set(prop.data.comments.map((comment) => comment.commentId));
+
+        let targetCommentId = commentId;
+        if (replyId) {
+            const commentWithTargetReply = prop.data.comments.find((comment) =>
+                comment.commentReplies.some((reply) => reply.commentReplyId === replyId)
+            );
+
+            if (commentWithTargetReply) {
+                targetCommentId = commentWithTargetReply.commentId;
+            } else if (!targetCommentId) {
+                return undefined;
+            }
+        }
+
+        if (!targetCommentId || !commentIds.has(targetCommentId)) {
+            return undefined;
+        }
+
+        return {
+            commentId: targetCommentId,
+            replyId,
+            shouldAutoScroll: prop.navigationTarget?.shouldAutoScroll === true,
+        };
+    }, [prop.data.comments, prop.navigationTarget?.commentId, prop.navigationTarget?.replyId, prop.navigationTarget?.shouldAutoScroll]);
+
+    const hasNavigationTarget = Boolean(resolvedNavigationTarget);
 
     function toggleIsCommenting(){
         setIsCommenting(!isCommenting)
@@ -92,6 +136,61 @@ export default function PostCard(prop: PostCardProp) {
         setOptimisticReactionsCount(prop.data.reactionsNumber);
     }, [prop.data.reactionsNumber, prop.data.postId]);
 
+    useEffect(() => {
+        if (!hasNavigationTarget) {
+            return;
+        }
+
+        setIsCommenting(true);
+    }, [hasNavigationTarget, prop.data.postId, resolvedNavigationTarget?.commentId, resolvedNavigationTarget?.replyId]);
+
+    useEffect(() => {
+        if (!resolvedNavigationTarget?.shouldAutoScroll) {
+            return;
+        }
+
+        const targetElementId = resolvedNavigationTarget.replyId
+            ? `reply-${resolvedNavigationTarget.replyId}`
+            : `comment-${resolvedNavigationTarget.commentId}`;
+        const scrollKey = `${prop.data.postId}:${targetElementId}`;
+        if (scrolledNavigationKeyRef.current === scrollKey) {
+            return;
+        }
+
+        let cancelled = false;
+        let attempts = 0;
+
+        const scrollToTarget = () => {
+            if (cancelled) {
+                return;
+            }
+
+            const targetElement = document.getElementById(targetElementId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+                scrolledNavigationKeyRef.current = scrollKey;
+                return;
+            }
+
+            attempts += 1;
+            if (attempts < 20) {
+                window.setTimeout(scrollToTarget, 120);
+            }
+        };
+
+        scrollToTarget();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [
+        isCommenting,
+        prop.data.postId,
+        resolvedNavigationTarget?.commentId,
+        resolvedNavigationTarget?.replyId,
+        resolvedNavigationTarget?.shouldAutoScroll,
+    ]);
+
     function formatPostDate(postedAt: string): ReactNode {
         const postDate = new Date(postedAt);
         if (Number.isNaN(postDate.getTime())) {
@@ -133,7 +232,7 @@ export default function PostCard(prop: PostCardProp) {
     }
 
     return (
-        <div className="flex flex-col shadow-sm bg-white m-2 rounded-md p-2 mb-0">
+        <div className="relative flex flex-col overflow-hidden shadow-sm bg-white m-2 rounded-md p-2 mb-0">
             <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
                     <Image
@@ -156,7 +255,7 @@ export default function PostCard(prop: PostCardProp) {
                 <ReactionCount reactionCount={optimisticReactionsCount} />
                 <ShareCount {...prop.data.shares} />
             </div>
-            <div className="flex w-full text-gray-900 text-sm px-2">
+            <div className="flex w-full text-gray-900 text-sm px-">
                 <ReactInput
                     InputTemplateType={{ type: "post" }}
                     ReactionData={optimisticUserPostReaction}
@@ -165,12 +264,20 @@ export default function PostCard(prop: PostCardProp) {
                     text="Mi piace"
                     placeholer="Mi piace"
                     className="cursor-pointer select-none"
+                    customSize={16}
                 />
                 <CommentSpan isCommenting={isCommenting} updateSetIsCommenting={toggleIsCommenting} commentsCount={prop.data.commentNumber} />
                 <CondividiSpan />
             </div>
             {isCommenting && <CommentForm postId={prop.data.postId} />}
-            {isCommenting && <CommentList commentData={prop.data.comments} nowMs={effectiveNowMs} />}
+            {isCommenting && (
+                <CommentList
+                    postId={prop.data.postId}
+                    commentData={prop.data.comments}
+                    nowMs={effectiveNowMs}
+                    navigationTarget={resolvedNavigationTarget}
+                />
+            )}
             
         </div>
     )

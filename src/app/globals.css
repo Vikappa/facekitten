@@ -52,11 +52,40 @@ box-shadow:0px 4px 18px 0px #ACACAC;
   animation: future-post-rainbow-flow 2.6s linear infinite;
 }
 
+.deeplink-target-highlight {
+  box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0.24);
+  animation: deeplink-target-fade-out 2s ease-out forwards;
+}
+
+/* Keep auth inputs transparent even when the browser applies autofill styles. */
+.auth-input,
+.auth-input:focus,
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus,
+.auth-input:-webkit-autofill:active,
+.auth-input:-moz-autofill {
+  background-color: transparent !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: currentColor !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
 @keyframes future-post-rainbow-flow {
   0% {
     background-position: 0% 50%;
   }
   100% {
     background-position: 280% 50%;
+  }
+}
+
+@keyframes deeplink-target-fade-out {
+  0% {
+    box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0.24);
+  }
+  100% {
+    box-shadow: inset 0 0 0 9999px rgba(59, 130, 246, 0);
   }
 }

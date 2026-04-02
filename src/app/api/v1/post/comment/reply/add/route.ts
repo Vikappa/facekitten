@@ -357,6 +357,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       code: "COMMENT_REPLY_CREATED",
+      postId: parentPostId,
       commentId: targetComment.commentId,
       reply: replyForClient,
     },

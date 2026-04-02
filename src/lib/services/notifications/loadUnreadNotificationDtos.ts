@@ -44,6 +44,7 @@ type ActivityProfileRow = Pick<
 type TargetPostOwnerRow = Pick<PostRow, "authorId">;
 type TargetCommentOwnerRow = Pick<CommentRow, "commentAuthorId">;
 type TargetProfileNameRow = Pick<ProfileRow, "id" | "username">;
+type TargetCommentIdRow = Pick<CommentRow, "commentId">;
 
 type CommentPreviewRow = {
   commentText: string | null;
@@ -232,6 +233,69 @@ function parseNotificationNavigationContext(
   } catch {
     return emptyResult;
   }
+}
+
+function buildCanonicalPostNavigationFromRelatedEntities(
+  relatedEntityIds: RelatedEntityIds
+): string | null {
+  if (!relatedEntityIds.relatedPostId) {
+    return null;
+  }
+
+  const queryParams = new URLSearchParams();
+  if (relatedEntityIds.relatedCommentId) {
+    queryParams.set("commentId", relatedEntityIds.relatedCommentId);
+  }
+  if (relatedEntityIds.relatedCommentReplyId) {
+    queryParams.set("replyId", relatedEntityIds.relatedCommentReplyId);
+  }
+
+  const encodedPostId = encodeURIComponent(relatedEntityIds.relatedPostId);
+  const normalizedQuery = queryParams.toString();
+
+  return normalizedQuery.length > 0
+    ? `/post/${encodedPostId}?${normalizedQuery}`
+    : `/post/${encodedPostId}`;
+}
+
+async function resolveRelatedCommentIdForPostCommentedNotification(
+  supabase: SupabaseAdminClient,
+  notification: UnreadNotificationRow,
+  relatedEntityIds: RelatedEntityIds
+): Promise<string | null> {
+  if (notification.notificationType !== "postCommented") {
+    return null;
+  }
+
+  if (relatedEntityIds.relatedCommentId) {
+    return relatedEntityIds.relatedCommentId;
+  }
+
+  const relatedPostId = relatedEntityIds.relatedPostId;
+  const activityFromId = sanitizeIdPart(notification.activity_from);
+  if (!relatedPostId || !activityFromId) {
+    return null;
+  }
+
+  const { data: targetComment, error: targetCommentError } = await supabase
+    .from("comment")
+    .select("commentId")
+    .eq("postid", relatedPostId)
+    .eq("commentAuthorId", activityFromId)
+    .lte("created_at", notification.created_at)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<TargetCommentIdRow>();
+
+  if (targetCommentError) {
+    console.error(
+      "Errore risoluzione commentId mancante in postCommented:",
+      targetCommentError
+    );
+    return null;
+  }
+
+  return sanitizeIdPart(targetComment?.commentId);
 }
 
 function toProfileMetadata(
@@ -442,7 +506,8 @@ async function resolveNotificationPreviewText(
   notification: UnreadNotificationRow,
   profileId: string,
   supabase: SupabaseAdminClient,
-  relatedEntityIds: RelatedEntityIds
+  relatedEntityIds: RelatedEntityIds,
+  activityFromName: string
 ): Promise<string | null> {
   const notificationType = notification.notificationType;
   const activityFromId = notification.activity_from;
@@ -469,18 +534,18 @@ async function resolveNotificationPreviewText(
 
     if (postOwnerContext?.ownerId === profileId) {
       return isAlsoNotification
-        ? "ha commentato anche il tuo post"
+        ? `Anche ${activityFromName} ha commentato il tuo post`
         : "ha commentato il tuo post";
     }
 
     if (postOwnerContext?.ownerName) {
       return isAlsoNotification
-        ? `ha commentato anche il post di ${postOwnerContext.ownerName}`
+        ? `Anche ${activityFromName} ha commentato il post di ${postOwnerContext.ownerName}`
         : `ha commentato il post di ${postOwnerContext.ownerName}`;
     }
 
     if (isAlsoNotification) {
-      return "ha commentato anche un post";
+      return `Anche ${activityFromName} ha commentato un post`;
     }
 
     return resolvePostCommentPreviewText(
@@ -506,18 +571,18 @@ async function resolveNotificationPreviewText(
 
     if (commentOwnerContext?.ownerId === profileId) {
       return isAlsoNotification
-        ? "ha risposto anche al tuo commento"
+        ? `Anche ${activityFromName} ha risposto al tuo commento`
         : "ha risposto al tuo commento";
     }
 
     if (commentOwnerContext?.ownerName) {
       return isAlsoNotification
-        ? `ha risposto anche al commento di ${commentOwnerContext.ownerName}`
+        ? `Anche ${activityFromName} ha risposto al commento di ${commentOwnerContext.ownerName}`
         : `ha risposto al commento di ${commentOwnerContext.ownerName}`;
     }
 
     if (isAlsoNotification) {
-      return "ha risposto anche a un commento";
+      return `Anche ${activityFromName} ha risposto a un commento`;
     }
 
     return resolveCommentReplyPreviewText(
@@ -534,6 +599,17 @@ async function resolveNotificationPreviewText(
 
   if (notificationType === "friendRequestAccepted") {
     return FRIEND_REQUEST_ACCEPTED_PREVIEW_TEXT;
+  }
+
+  if (notificationType === "postReacted") {
+    return "ha reagito al tuo post";
+  }
+
+  if (notificationType === "commentReacted") {
+    const isReplyReaction = relatedEntityIds.relatedCommentReplyId !== null;
+    return isReplyReaction
+      ? "ha reagito alla tua risposta"
+      : "ha reagito al tuo commento";
   }
 
   return null;
@@ -595,21 +671,37 @@ export async function loadUnreadNotificationDtosForProfile(
         notification.activity_from
       );
       const activityFromName = activityFromProfile?.username.trim() || "Utente";
-      const relatedEntityIds = parseRelatedEntityIds(
+      const parsedRelatedEntityIds = parseRelatedEntityIds(
         notification.generatedNavigation ?? null
       );
+      const resolvedRelatedCommentId =
+        await resolveRelatedCommentIdForPostCommentedNotification(
+          supabase,
+          notification,
+          parsedRelatedEntityIds
+        );
+      const relatedEntityIds: RelatedEntityIds = {
+        ...parsedRelatedEntityIds,
+        relatedCommentId:
+          resolvedRelatedCommentId ?? parsedRelatedEntityIds.relatedCommentId,
+      };
+      const canonicalPostNavigation =
+        buildCanonicalPostNavigationFromRelatedEntities(relatedEntityIds);
+      const resolvedGeneratedNavigation =
+        canonicalPostNavigation ?? notification.generatedNavigation ?? null;
 
       const previewText = await resolveNotificationPreviewText(
         notification,
         profileId,
         supabase,
-        relatedEntityIds
+        relatedEntityIds,
+        activityFromName
       );
 
       return {
         id: notification.notificationId,
         createdAt: notification.created_at,
-        generatedNavigation: notification.generatedNavigation ?? null,
+        generatedNavigation: resolvedGeneratedNavigation,
         notificationType: notification.notificationType ?? null,
         activityFrom: {
           id: notification.activity_from ?? null,

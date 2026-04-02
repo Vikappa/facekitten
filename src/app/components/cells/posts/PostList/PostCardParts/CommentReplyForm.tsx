@@ -15,12 +15,13 @@ import { useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 
 interface CommentReplyFormProps {
+    PostId: string;
     CommentId: string;
     isRepling: boolean;
     setIsRepling: (val: boolean) => void
 }
 
-export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }: CommentReplyFormProps) {
+export default function CommentReplyForm({ PostId, CommentId, isRepling, setIsRepling }: CommentReplyFormProps) {
     const [commentReplyText, setCommentReplyText] = useState("");
     const [isSendingCommentReply, setIsSendingCommentReply] = useState(false);
     const dispatch = useAppDispatch();
@@ -57,7 +58,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
 
     function parseAddCommentReplyResponse(
         payload: unknown
-    ): { commentId: string; reply: CommentReplyData } | null {
+    ): { commentId: string; postId: string | null; reply: CommentReplyData } | null {
         if (typeof payload !== "object" || payload === null) {
             return null;
         }
@@ -69,6 +70,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
 
         return {
             commentId: body.commentId,
+            postId: typeof body.postId === "string" ? body.postId : null,
             reply: body.reply,
         };
     }
@@ -109,6 +111,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
         const optimisticReply = createOptimisticReply(CommentId, normalizedCommentReplyText);
         dispatch(
             addCommentReplyToComment({
+                PostId,
                 CommentId,
                 CommentReplyData: optimisticReply.reply,
             })
@@ -153,6 +156,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
 
             dispatch(
                 replaceCommentReplyInComment({
+                    PostId: parsedResponse.postId ?? PostId,
                     CommentId: parsedResponse.commentId,
                     TempCommentReplyId: optimisticReply.tempReplyId,
                     CommentReplyData: parsedResponse.reply,
@@ -161,6 +165,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
         } catch (error) {
             dispatch(
                 removeCommentReplyFromComment({
+                    PostId,
                     CommentId,
                     CommentReplyId: optimisticReply.tempReplyId,
                 })
@@ -183,7 +188,7 @@ export default function CommentReplyForm({ CommentId, isRepling, setIsRepling }:
     }
 
     return (
-        <form className={`${!isRepling && `hidden`} mt-2 ms-10 bg-tertiary rounded-xl`} onSubmit={handleSubmit} >
+        <form className={`${!isRepling && `hidden`} ms-10 bg-tertiary rounded-xl mb-3`} onSubmit={handleSubmit} >
             <input
                 type="text"
                 value={commentReplyText}

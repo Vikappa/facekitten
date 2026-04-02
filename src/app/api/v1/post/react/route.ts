@@ -3,6 +3,7 @@ import { SESSION_COOKIE_NAME } from "@/lib/Security/SessionSecurity";
 import { resolveAuthenticatedProfileIdFromRequest } from "@/lib/Security/SessionRequestProfileResolver";
 import { createSupabaseAdminClient } from "@/lib/supabase/serverAdminClient";
 import type {
+  NotificationsInsert,
   PostReactionInsert,
   PostReactionRow,
   PostRow,
@@ -30,7 +31,7 @@ type ReactToPostBody = {
   reactionData?: unknown;
 };
 
-type PostIdentityRow = Pick<PostRow, "id">;
+type PostIdentityRow = Pick<PostRow, "id" | "authorId">;
 
 type ExistingPostReactionRow = Pick<
   PostReactionRow,
@@ -182,7 +183,7 @@ export async function POST(req: NextRequest) {
 
   const { data: postIdentity, error: postIdentityError } = await supabase
     .from("post")
-    .select("id")
+    .select("id, authorId")
     .eq("id", body.postId)
     .limit(1)
     .maybeSingle<PostIdentityRow>();
@@ -283,6 +284,36 @@ export async function POST(req: NextRequest) {
       { code: "POST_REACTION_CREATE_ERROR", error: "Errore interno" },
       { status: 500 }
     );
+  }
+
+  if (existingReactionIds.length === 0) {
+    const postAuthorId = postIdentity.authorId?.trim() ?? "";
+    if (postAuthorId.length > 0 && postAuthorId !== auth.profileId) {
+      const notificationToCreate: NotificationsInsert = {
+        activity_from: auth.profileId,
+        to: postAuthorId,
+        generatedNavigation: `/post/${encodeURIComponent(
+          body.postId
+        )}?postId=${encodeURIComponent(body.postId)}`,
+        notificationType: "postReacted",
+        seen: false,
+      };
+
+      const { error: createNotificationError } = await supabase
+        .from("notifications")
+        .insert(notificationToCreate);
+
+      if (createNotificationError) {
+        console.error(
+          "Errore creazione notifica reazione post in post/react:",
+          createNotificationError
+        );
+        return NextResponse.json(
+          { code: "NOTIFICATION_CREATE_ERROR", error: "Errore interno" },
+          { status: 500 }
+        );
+      }
+    }
   }
 
   return NextResponse.json({

@@ -20,6 +20,7 @@ export default function MessengerModal({ navbarRef }: MessengerModalProps) {
     const [navbarHeight, setNavbarHeight] = useState(0);
     const [rightOffset, setRightOffset] = useState(MIN_MODAL_RIGHT_MARGIN_PX);
     const chatMessages = useAppSelector((state) => state.profile.chats);
+    const [isUpdating, setIsUpdating] = useState(false);
     
     useEffect(() => {
         const previousPathname = previousPathnameRef.current;

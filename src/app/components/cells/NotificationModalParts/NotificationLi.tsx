@@ -4,10 +4,11 @@ import { NotificationData } from "@/lib/interfaces/CommonInterfaces"
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { removeUnreadNotificationById } from "@/lib/redux/notificationsSlice";
 import { setActiveNavFunction } from "@/lib/redux/uiSlice";
+import { normalizeNavigationHref } from "@/lib/navigation/postNavigationResolver";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 
 interface NotificationModalLiProps {
     notification: NotificationData
@@ -20,7 +21,12 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
     const activityFromName = props.notification.activityFrom.name.trim() || "Utente";
     const activityFromAvatar = props.notification.activityFrom.avatarUrl?.trim() || "/assets/blankprofile.png";
     const previewText = props.notification.previewText?.trim() ?? "";
+    const isStandaloneSentencePreview = previewText.startsWith("Anche ");
     const generatedNavigation = props.notification.generatedNavigation?.trim() ?? "";
+    const resolvedNavigation = useMemo(
+        () => normalizeNavigationHref(generatedNavigation),
+        [generatedNavigation]
+    );
 
     async function markNotificationAsSeen(notificationId: string) {
         const response = await fetch("/api/v1/notifications/mark-seen", {
@@ -53,8 +59,8 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
             dispatch(removeUnreadNotificationById(props.notification.id));
             dispatch(setActiveNavFunction(null));
 
-            if (generatedNavigation.length > 0) {
-                router.push(generatedNavigation);
+            if (resolvedNavigation.length > 0) {
+                router.push(resolvedNavigation);
             }
         } catch (error) {
             console.error("Errore apertura notifica:", error);
@@ -66,7 +72,7 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
     return (
             <Link
                 className="flex w-full items-start gap-2 rounded-lg p-2 hover:bg-gray-100"
-                href={generatedNavigation.length > 0 ? generatedNavigation : "#"}
+                href={resolvedNavigation.length > 0 ? resolvedNavigation : "#"}
                 onClick={handleClickNotification}
                 aria-disabled={isNavigating}
             >
@@ -80,9 +86,11 @@ export default function NotificationModalLi(props: NotificationModalLiProps) {
                     />
                 </div>
                 <div className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-semibold text-gray-900">
-                        {activityFromName}
-                    </span>
+                    {!isStandaloneSentencePreview && (
+                        <span className="truncate text-sm font-semibold text-gray-900">
+                            {activityFromName}
+                        </span>
+                    )}
                     {
                         previewText.length > 0 &&
                         <span className="line-clamp-2 text-xs text-gray-600">

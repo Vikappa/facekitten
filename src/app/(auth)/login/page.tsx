@@ -196,7 +196,7 @@ export default function LoginPage() {
           <input
             onFocus={() => setIsEmailFocused(true)}
             onBlur={() => setIsEmailFocused(false)}
-            className={`rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent
+            className={`auth-input rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent
               ${isEmailFocused ? ``
                 :
                 ``
@@ -216,7 +216,7 @@ export default function LoginPage() {
           <input
             onFocus={() => setIsPasswordFocused(true)}
             onBlur={() => setIsPasswordFocused(false)}
-            className={`rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent
+            className={`auth-input rounded-full border-0 px-6 py-4 pt-0 bg-transparent focus:outline-none focus:ring-transparent focus:border-transparent
               ${isPasswordFocused ? ``
                 :
                 ``
