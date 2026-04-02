@@ -198,7 +198,7 @@ export default function CommentLi({ comment, postId, nowMs, navigationTarget }: 
             className="flex flex-col scroll-mt-28"
         >
             <div
-                className={`flex gap-3 bg-tertiary rounded-full p-2 px-2 mt-3 ${
+                className={`flex gap-3 bg-tertiary rounded-full p-2 px-2 mt-3 mb-1${
                     isTemporarilyHighlighted ? "deeplink-target-highlight" : ""
                 }`}
             >                

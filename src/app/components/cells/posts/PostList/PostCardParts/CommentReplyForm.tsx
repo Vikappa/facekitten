@@ -11,8 +11,8 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { CiCamera } from "react-icons/ci";
 import { MdGif } from "react-icons/md";
 import { LuSticker } from "react-icons/lu";
-import { useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
+import type { FocusEvent, FormEvent, KeyboardEvent } from "react";
 
 interface CommentReplyFormProps {
     PostId: string;
@@ -24,8 +24,15 @@ interface CommentReplyFormProps {
 export default function CommentReplyForm({ PostId, CommentId, isRepling, setIsRepling }: CommentReplyFormProps) {
     const [commentReplyText, setCommentReplyText] = useState("");
     const [isSendingCommentReply, setIsSendingCommentReply] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
     const dispatch = useAppDispatch();
     const currentProfile = useAppSelector((state) => state.profile.currentProfile);
+
+    useEffect(() => {
+        if (!isRepling) {
+            setIsFocused(false);
+        }
+    }, [isRepling]);
 
     function isReactionData(value: unknown): value is ReactionData {
         if (typeof value !== "object" || value === null) {
@@ -187,17 +194,36 @@ export default function CommentReplyForm({ PostId, CommentId, isRepling, setIsRe
         event.currentTarget.form?.requestSubmit();
     }
 
+    function handleFormFocus() {
+        setIsFocused(true);
+    }
+
+    function handleFormBlur(event: FocusEvent<HTMLFormElement>) {
+        const nextFocusedElement = event.relatedTarget;
+        if (nextFocusedElement instanceof Node && event.currentTarget.contains(nextFocusedElement)) {
+            return;
+        }
+
+        setIsFocused(false);
+    }
+
     return (
-        <form className={`${!isRepling && `hidden`} ms-10 bg-tertiary rounded-xl mb-3`} onSubmit={handleSubmit} >
+        <form
+            className={`${!isRepling && `hidden`} ms-10 bg-tertiary rounded-xl mb-3`}
+            onSubmit={handleSubmit}
+            onFocus={handleFormFocus}
+            onBlur={handleFormBlur}
+        >
             <input
                 type="text"
                 value={commentReplyText}
                 onChange={(event) => setCommentReplyText(event.target.value)}
                 readOnly={isSendingCommentReply}
                 onKeyDown={handleInputKeyDown}
-                className={`flex w-full p-1 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 px-3 ${isSendingCommentReply ? "text-gray-500 cursor-not-allowed" : "text-black"}`}
+                placeholder="Rrrispondi?"
+                className={`flex w-full focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isFocused || commentReplyText?.length>0 ? "p-1 px-3" : "p-3"} ${isSendingCommentReply ? "text-gray-500 cursor-not-allowed" : "text-black"}`}
             />
-            <div className="flex w-full justify-content-between p-2">
+            <div className={`flex w-full justify-content-between p-2 ${isFocused || commentReplyText?.length>0 ? "" : "hidden"}`}>
                 <div className="flex text-gray-500 gap-1">
                     <BsEmojiSmile />
                     <CiCamera />
