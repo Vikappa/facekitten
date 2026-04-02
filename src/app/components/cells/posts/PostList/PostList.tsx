@@ -1,7 +1,7 @@
 'use client'
 
 import { PostData } from "@/lib/interfaces/CommonInterfaces"
-import PostCard from "./PostCard"
+import PostCard from "../PostCard"
 import { useEffect, useState } from "react"
 
 interface PostlistProp{

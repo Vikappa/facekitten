@@ -1,6 +1,6 @@
 'use client'
 
-import PostCard from "@/app/components/cells/posts/PostList/PostCard";
+import PostCard from "@/app/components/cells/posts/PostCard";
 import MobileMiniNavBar from "@/app/components/cells/NavbarParts/MobileMiniNavBar";
 import SideBars from "@/app/components/cells/SideBars/SideBars";
 import { PostData } from "@/lib/interfaces/CommonInterfaces";
