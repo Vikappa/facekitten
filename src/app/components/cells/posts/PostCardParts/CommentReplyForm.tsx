@@ -209,7 +209,7 @@ export default function CommentReplyForm({ PostId, CommentId, isRepling, setIsRe
 
     return (
         <form
-            className={`${!isRepling && `hidden`} ms-10 bg-tertiary rounded-xl mb-3`}
+            className={`${!isRepling && `hidden`} mt-2 ms-10 bg-tertiary rounded-xl mb-3`}
             onSubmit={handleSubmit}
             onFocus={handleFormFocus}
             onBlur={handleFormBlur}
