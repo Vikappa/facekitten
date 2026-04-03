@@ -8,6 +8,7 @@ import type { NewPostPayload } from "@/app/api/v1/post/add/route";
 import { useState, type FormEvent } from "react";
 import { VercelLogger } from "@/lib/logging/VercelLogger";
 import { ProfilePicture } from "../../NavbarParts/MidNavbarButtonFunction";
+import ImageSubmitter from "../PostCardParts/ImageSubmitter";
 
 type CreatedPostResponse = {
     code?: string;
@@ -30,6 +31,7 @@ export default function PostForm() {
     const [postTextValue, setPostTextValue] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [postError, setPostError] = useState<string | null>(null);
+    const [submittingImage, setSubmittingImage] = useState(false);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -109,11 +111,13 @@ export default function PostForm() {
                 className="rounded-full overflow-hidden w-12 h-12 ms-1 me-2"
             />
             <input id="nameInput" type="text" placeholder={`Prrrr-rra ${profileName}?`} className="w-full px-5 py-0 bg-tertiary border-0 rounded-full border-gray-300 focus:outline-none " value={postTextValue} onChange={(e) => {setPostTextValue(e.target.value)}} />
-            <div className="flex flex-col py-0 pt-1 px-2 gap-1 items-center justify-content-center">
+                        
+            <button type="button" onClick={() => setSubmittingImage(!submittingImage)} className="flex flex-col py-0 pt-1 px-2 gap-1 items-center justify-content-center lg:hidden">
                 <ImFilePicture className="text-green-500 text-2xl " />
                 <span className="text-center text-xs">Foto</span>
-            </div>
-            {postError ? <span className="text-xs text-red-600">{postError}</span> : null}
+            </button>
+
+            <ImageSubmitter isSubmitting={isSubmitting} submittingImage={submittingImage} setSubmittingImage={setSubmittingImage} />
         </form>
     )
 }
