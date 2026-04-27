@@ -74,6 +74,7 @@ function toGattiBotProfileDto(row: any): GattiBotProfileDto {
           bio: profile.bio,
           confirmedAccount: profile.confirmedAccount,
           createdAt: profile.created_at,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           posts: (profile.post ?? []).map((p: any) => ({
             id: p.id,
             content: p.content,
@@ -87,6 +88,10 @@ function toGattiBotProfileDto(row: any): GattiBotProfileDto {
   }
 }
 
+function log(tag: string, data?: unknown) {
+  VercelLogger(`[igor/bots] ${tag}${data !== undefined ? ' ' + JSON.stringify(data) : ''}`)
+}
+
 // ——————————————————————————————————————————————————————————
 
 interface RegisterBotBody {
@@ -96,12 +101,23 @@ interface RegisterBotBody {
 }
 
 export async function POST(req: NextRequest) {
-  if (!verifyIgorToken(req)) return igorUnauthorized()
+  log('POST start', { url: req.url })
+
+  const authHeader = req.headers.get('Authorization')
+  log('Authorization header', { present: !!authHeader, prefix: authHeader?.slice(0, 14) })
+
+  if (!verifyIgorToken(req)) {
+    log('Token non valido - 401')
+    return igorUnauthorized()
+  }
+  log('Token verificato')
 
   let body: RegisterBotBody
   try {
     body = await req.json()
-  } catch {
+    log('Body parsed', { username: body.username, email: body.email, hasPassword: !!body.password })
+  } catch (e) {
+    log('Errore parsing body', { error: String(e) })
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
@@ -110,6 +126,7 @@ export async function POST(req: NextRequest) {
   const { password } = body
 
   if (!username || !password || !email) {
+    log('Campi mancanti', { username: !!username, email: !!email, password: !!password })
     return NextResponse.json(
       { error: 'username, email e password sono obbligatori' },
       { status: 400 }
@@ -119,12 +136,22 @@ export async function POST(req: NextRequest) {
   let passwordHash: string
   try {
     passwordHash = await hashProfilePassword(password)
-  } catch {
+    log('Password hashata')
+  } catch (e) {
+    log('Errore hashing password', { error: String(e) })
     return NextResponse.json({ error: 'Errore durante hashing password' }, { status: 500 })
   }
 
-  const supabase = createSupabaseAdminClient()
+  let supabase: ReturnType<typeof createSupabaseAdminClient>
+  try {
+    supabase = createSupabaseAdminClient()
+    log('Supabase admin client creato')
+  } catch (e) {
+    log('Errore creazione Supabase client', { error: String(e) })
+    return NextResponse.json({ error: 'Errore configurazione server' }, { status: 500 })
+  }
 
+  log('Creazione utente auth', { email, username })
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
     password,
@@ -133,10 +160,14 @@ export async function POST(req: NextRequest) {
   })
 
   if (authError || !authData.user) {
+    log('Errore auth.admin.createUser', {
+      message: authError?.message,
+      status: authError?.status,
+      code: (authError as unknown as Record<string, unknown>)?.code,
+    })
     if (authError?.message?.toLowerCase().includes('already')) {
       return NextResponse.json({ error: 'Email già in uso' }, { status: 409 })
     }
-    VercelLogger('Errore creazione auth bot: ' + (authError?.message ?? 'unknown'))
     return NextResponse.json(
       { error: authError?.message ?? 'Errore creazione utente auth' },
       { status: 400 }
@@ -144,6 +175,7 @@ export async function POST(req: NextRequest) {
   }
 
   const profileId = authData.user.id
+  log('Utente auth creato', { profileId })
 
   const profileToInsert: ProfileInsert = {
     id: profileId,
@@ -156,13 +188,21 @@ export async function POST(req: NextRequest) {
     password: passwordHash,
   }
 
+  log('Inserimento Profile', { profileId, username, email })
   const { error: profileError } = await supabase.from('Profile').insert(profileToInsert)
 
   if (profileError) {
+    log('Errore inserimento Profile', {
+      message: profileError.message,
+      code: profileError.code,
+      details: profileError.details,
+      hint: profileError.hint,
+    })
     await supabase.auth.admin.deleteUser(profileId)
-    VercelLogger('Errore creazione profile bot: ' + profileError.message)
+    log('Rollback auth utente eseguito', { profileId })
     return NextResponse.json({ error: profileError.message }, { status: 500 })
   }
+  log('Profile inserito', { profileId })
 
   const botToInsert: BotInsert = {
     username,
@@ -170,6 +210,7 @@ export async function POST(req: NextRequest) {
     profileId,
   }
 
+  log('Inserimento bot', { username, profileId })
   const { data: botData, error: botError } = await supabase
     .from('bots')
     .insert(botToInsert)
@@ -177,27 +218,51 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (botError) {
+    log('Errore inserimento bots', {
+      message: botError.message,
+      code: botError.code,
+      details: botError.details,
+      hint: botError.hint,
+    })
     await supabase.auth.admin.deleteUser(profileId)
+    log('Rollback auth utente eseguito', { profileId })
     if (botError.code === '23505') {
       return NextResponse.json({ error: 'Username già in uso nella tabella bots' }, { status: 409 })
     }
-    VercelLogger('Errore inserimento bot: ' + botError.message)
     return NextResponse.json({ error: botError.message }, { status: 500 })
   }
 
+  log('Bot registrato con successo', { botId: botData.id, username, profileId })
   return NextResponse.json(botData, { status: 201 })
 }
 
 export async function GET(req: NextRequest) {
-  if (!verifyIgorToken(req)) return igorUnauthorized()
+  log('GET start', { url: req.url })
+
+  const authHeader = req.headers.get('Authorization')
+  log('Authorization header', { present: !!authHeader, prefix: authHeader?.slice(0, 14) })
+
+  if (!verifyIgorToken(req)) {
+    log('Token non valido - 401')
+    return igorUnauthorized()
+  }
+  log('Token verificato')
 
   const { searchParams } = req.nextUrl
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
   const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') ?? '20', 10)))
   const offset = (page - 1) * pageSize
+  log('Parametri paginazione', { page, pageSize, offset })
 
-  const supabase = createSupabaseAdminClient()
+  let supabase: ReturnType<typeof createSupabaseAdminClient>
+  try {
+    supabase = createSupabaseAdminClient()
+  } catch (e) {
+    log('Errore creazione Supabase client', { error: String(e) })
+    return NextResponse.json({ error: 'Errore configurazione server' }, { status: 500 })
+  }
 
+  log('Esecuzione query bots con profile e post annidati')
   const { data, error, count } = await supabase
     .from('bots')
     .select(BOT_WITH_PROFILE_SELECT, { count: 'exact' })
@@ -205,10 +270,16 @@ export async function GET(req: NextRequest) {
     .range(offset, offset + pageSize - 1)
 
   if (error) {
-    VercelLogger('Errore fetch bots: ' + error.message)
+    log('Errore query bots', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    })
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  log('Query completata', { righe: data?.length ?? 0, totale: count })
   return NextResponse.json({
     data: (data ?? []).map(toGattiBotProfileDto),
     page,
