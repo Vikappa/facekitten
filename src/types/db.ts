@@ -430,6 +430,33 @@ export function toRegistrationCodeDto(row: RegistrationCodeDb): RegistrationCode
   }
 }
 
+// Bot
+export type BotRow = Tables<'bots'>
+export type BotInsert = TablesInsert<'bots'>
+export type BotUpdate = TablesUpdate<'bots'>
+
+export type BotDb = Pick<BotRow, 'id' | 'username' | 'profileId' | 'is_active' | 'created_at'>
+
+export interface BotDto {
+  id: string
+  username: string
+  profileId?: string
+  isActive: boolean
+  createdAt?: Date
+}
+
+export const BOT_SAFE_SELECT = 'id, username, profileId, is_active, created_at' as const
+
+export function toBotDto(row: BotDb): BotDto {
+  return {
+    id: row.id,
+    username: row.username,
+    profileId: toOptionalString(row.profileId),
+    isActive: toBoolean(row.is_active),
+    createdAt: toDate(row.created_at),
+  }
+}
+
 // Short aliases for common usage
 export type Profile = ProfileDto
 export type Post = PostDto
@@ -441,6 +468,7 @@ export type CommentReaction = CommentReactionDto
 export type Friendship = FriendshipDto
 export type Notification = NotificationDto
 export type RegistrationCode = RegistrationCodeDto
+export type Bot = BotDto
 
 // Registration
 export interface ProfileRegistrationDTO {

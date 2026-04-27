@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      bots: {
+        Row: {
+          id: string
+          profileId: string | null
+          username: string
+          password_hash: string
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          profileId?: string | null
+          username: string
+          password_hash: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          profileId?: string | null
+          username?: string
+          password_hash?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bots_profileId_fkey"
+            columns: ["profileId"]
+            isOneToOne: false
+            referencedRelation: "Profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ChatMessage: {
         Row: {
           chatId: string

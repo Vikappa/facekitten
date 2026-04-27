@@ -10,7 +10,8 @@
     "db:types": "bash scripts/db-types.sh",
     "db:exports": "node scripts/generate-db-exports.mjs",
     "db:typecheck": "tsc --noEmit",
-    "db:sync": "npm run db:types && npm run db:exports && npm run db:typecheck"
+    "db:sync": "npm run db:types && npm run db:exports && npm run db:typecheck",
+    "db:migrate": "bash scripts/db-migrate.sh"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
