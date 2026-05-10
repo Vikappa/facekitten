@@ -4,7 +4,14 @@ import { createSupabaseAdminClient } from '@/lib/supabase/serverAdminClient'
 import { hashProfilePassword } from '@/lib/Security/ProfilePasswordSecurity'
 import { igorUnauthorized, verifyIgorToken } from '@/lib/Security/IgorAuth'
 import { VercelLogger } from '@/lib/logging/VercelLogger'
-import { BotInsert, ProfileInsert } from '@/types/db'
+import {
+  BotInsert,
+  NOTIFICATION_SAFE_SELECT,
+  NotificationDb,
+  NotificationDto,
+  ProfileInsert,
+  toNotificationDto,
+} from '@/types/db'
 
 // DTO restituito dal GET
 interface PostSummaryDto {
@@ -20,6 +27,8 @@ interface GattiBotProfileDto {
   botId: string
   isActive: boolean
   createdAt: string
+  posts: PostSummaryDto[]
+  notifications: NotificationDto[]
   profile: {
     id: string
     username: string | null
@@ -29,7 +38,6 @@ interface GattiBotProfileDto {
     bio: string | null
     confirmedAccount: boolean | null
     createdAt: string
-    posts: PostSummaryDto[]
   } | null
 }
 
@@ -57,13 +65,27 @@ const BOT_WITH_PROFILE_SELECT = `
   )
 ` as const
 
+const BOT_PROFILE_POSTS_LIMIT = 30
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toGattiBotProfileDto(row: any): GattiBotProfileDto {
+function toGattiBotProfileDto(row: any, notifications: NotificationDto[] = []): GattiBotProfileDto {
   const profile = row.Profile ?? null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const posts: PostSummaryDto[] = (profile?.post ?? []).map((p: any) => ({
+    id: p.id,
+    content: p.content,
+    extraContent: p.extraContent,
+    mediaUrl: p.mediaUrl,
+    postType: p.postType,
+    createdAt: p.created_at,
+  }))
+
   return {
     botId: row.id,
     isActive: row.is_active,
     createdAt: row.created_at,
+    posts,
+    notifications,
     profile: profile
       ? {
           id: profile.id,
@@ -74,15 +96,6 @@ function toGattiBotProfileDto(row: any): GattiBotProfileDto {
           bio: profile.bio,
           confirmedAccount: profile.confirmedAccount,
           createdAt: profile.created_at,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          posts: (profile.post ?? []).map((p: any) => ({
-            id: p.id,
-            content: p.content,
-            extraContent: p.extraContent,
-            mediaUrl: p.mediaUrl,
-            postType: p.postType,
-            createdAt: p.created_at,
-          })),
         }
       : null,
   }
@@ -90,6 +103,45 @@ function toGattiBotProfileDto(row: any): GattiBotProfileDto {
 
 function log(tag: string, data?: unknown) {
   VercelLogger(`[igor/bots] ${tag}${data !== undefined ? ' ' + JSON.stringify(data) : ''}`)
+}
+
+async function loadNotificationsByProfileId(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  profileIds: string[]
+): Promise<{
+  notificationsByProfileId: Map<string, NotificationDto[]>
+  notifications: NotificationDto[]
+}> {
+  const notificationsByProfileId = new Map<string, NotificationDto[]>(
+    profileIds.map((profileId) => [profileId, []])
+  )
+
+  if (profileIds.length === 0) {
+    return { notificationsByProfileId, notifications: [] }
+  }
+
+  const { data, error } = await supabase
+    .from('notifications')
+    .select(NOTIFICATION_SAFE_SELECT)
+    .in('to', profileIds)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw error
+  }
+
+  const notifications: NotificationDto[] = []
+
+  for (const row of (data ?? []) as NotificationDb[]) {
+    const notification = toNotificationDto(row)
+    notifications.push(notification)
+
+    const profileId = row.to
+    if (!profileId || !notificationsByProfileId.has(profileId)) continue
+    notificationsByProfileId.get(profileId)!.push(notification)
+  }
+
+  return { notificationsByProfileId, notifications }
 }
 
 // ——————————————————————————————————————————————————————————
@@ -267,6 +319,8 @@ export async function GET(req: NextRequest) {
     .from('bots')
     .select(BOT_WITH_PROFILE_SELECT, { count: 'exact' })
     .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false, referencedTable: 'Profile.post' })
+    .limit(BOT_PROFILE_POSTS_LIMIT, { referencedTable: 'Profile.post' })
     .range(offset, offset + pageSize - 1)
 
   if (error) {
@@ -279,9 +333,56 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  log('Query completata', { righe: data?.length ?? 0, totale: count })
+  const profileIds = Array.from(
+    new Set(
+      (data ?? [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((row: any) => row.Profile?.id)
+        .filter(
+          (profileId): profileId is string =>
+            typeof profileId === 'string' && profileId.length > 0
+        )
+    )
+  )
+
+  let notificationsByProfileId: Map<string, NotificationDto[]>
+  let notifications: NotificationDto[]
+  try {
+    const notificationResult = await loadNotificationsByProfileId(supabase, profileIds)
+    notificationsByProfileId = notificationResult.notificationsByProfileId
+    notifications = notificationResult.notifications
+  } catch (e) {
+    const notificationError = e as { message?: string; code?: string; details?: string; hint?: string }
+    log('Errore query notifiche bots', {
+      message: notificationError.message,
+      code: notificationError.code,
+      details: notificationError.details,
+      hint: notificationError.hint,
+    })
+    return NextResponse.json(
+      { error: notificationError.message ?? 'Errore recupero notifiche bots' },
+      { status: 500 }
+    )
+  }
+
+  const bots = (data ?? []).map((row) => {
+    const profileId = row.Profile?.id
+    return toGattiBotProfileDto(
+      row,
+      typeof profileId === 'string' ? (notificationsByProfileId.get(profileId) ?? []) : []
+    )
+  })
+  const posts = bots.flatMap((bot) => bot.posts)
+
+  log('Query completata', {
+    righe: data?.length ?? 0,
+    totale: count,
+    notifiche: notifications.length,
+  })
   return NextResponse.json({
-    data: (data ?? []).map(toGattiBotProfileDto),
+    data: bots,
+    posts,
+    notifications,
     page,
     pageSize,
     total: count ?? 0,
