@@ -8,6 +8,8 @@ const LOGIN_ROUTE = "/login";
 const REISSUE_ROUTE = "/login/reissue";
 const VERIFY_ROUTE = "/profile/verify";
 const DEFAULT_NEXT_PATH = "/";
+const IGOR_API_ROUTE_PREFIX = "/api/v2/igor";
+const IGOR_TOKEN_NAME = "IGOR_TOKEN";
 
 const PUBLIC_AUTH_ROUTES = new Set([
   "/login",
@@ -26,8 +28,38 @@ const ALLOWED_WITHOUT_SESSION = new Set([
   VERIFY_ROUTE,
 ]);
 
+function isIgorApiRoute(pathname: string): boolean {
+  return (
+    pathname === IGOR_API_ROUTE_PREFIX ||
+    pathname.startsWith(`${IGOR_API_ROUTE_PREFIX}/`)
+  );
+}
+
+function hasValidIgorToken(request: NextRequest): boolean {
+  const expectedToken = process.env[IGOR_TOKEN_NAME]?.trim();
+  if (!expectedToken) {
+    return false;
+  }
+
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return false;
+  }
+
+  const token = authHeader.slice("Bearer ".length).trim();
+  return token.length > 0 && token === expectedToken;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  if (isIgorApiRoute(pathname)) {
+    if (hasValidIgorToken(request)) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const hasSessionCookie =
     request.cookies
       .getAll(SESSION_COOKIE_NAME)
@@ -87,5 +119,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
+  matcher: ["/api/v2/igor/:path*", "/((?!api|_next/static|_next/image|.*\\..*).*)"],
 };

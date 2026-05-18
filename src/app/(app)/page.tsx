@@ -95,16 +95,15 @@ export default function Home() {
     }, [dispatch])
 
     useEffect(() => {
-        const hasNoPosts = posts.length === 0;
         const hasNeverFetched = lastUpdatedAt === null;
         const isStale =
             typeof lastUpdatedAt === "number" &&
             Date.now() - lastUpdatedAt > MOUNT_REVALIDATE_STALE_AFTER_MS;
 
-        if (hasNoPosts || hasNeverFetched || isStale) {
+        if (hasNeverFetched || isStale) {
             void loadHomepageUpdates({ showLoader: true })
         }
-    }, [loadHomepageUpdates, posts.length, lastUpdatedAt])
+    }, [loadHomepageUpdates, lastUpdatedAt])
 
     useEffect(() => {
         const intervalId = window.setInterval(() => {
