@@ -1,14 +1,16 @@
 'use client'
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setActiveNavFunction, setSearchTerm, setSmallSearchBarVisible, toggleSmallSearchBarVisible } from "@/lib/redux/uiSlice";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
+import { SearchResultOl } from "./SearchResultOl";
 
 export default function NavBarSearchLeft() {
     const dispatch = useAppDispatch();
     const searchTerm = useAppSelector((state) => state.ui.searchTerm);
     const isSmallSearchBarVisible = useAppSelector((state) => state.ui.isSmallSearchBarVisible);
     const searchContainerRef = useRef<HTMLDivElement | null>(null);
+    const [isDesktopSearchVisible, setIsDesktopSearchVisible] = useState(false);
 
     useEffect(() => {
         if (!isSmallSearchBarVisible) {
@@ -33,13 +35,32 @@ export default function NavBarSearchLeft() {
         };
     }, [dispatch, isSmallSearchBarVisible]);
 
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(min-width: 768px)");
+        const syncDesktopSearchState = () => {
+            setIsDesktopSearchVisible(mediaQuery.matches);
+        };
+
+        syncDesktopSearchState();
+        mediaQuery.addEventListener("change", syncDesktopSearchState);
+
+        return () => {
+            mediaQuery.removeEventListener("change", syncDesktopSearchState);
+        };
+    }, []);
+
     function openSmallSearchBar() {
         dispatch(toggleSmallSearchBarVisible())
         dispatch(setActiveNavFunction(null))
     }
 
+    function closeSearchResults() {
+        dispatch(setSearchTerm(""));
+        dispatch(setSmallSearchBarVisible(false));
+    }
+
     return (
-        <div ref={searchContainerRef} className="relative ps-2">
+        <div ref={searchContainerRef} className="relative ps-2 md:w-80">
             <div
                 className="
                     md:hidden
@@ -103,6 +124,11 @@ export default function NavBarSearchLeft() {
                 "
             />
             <HiOutlineMagnifyingGlass className="hidden md:block absolute left-5 top-3 text-gray-400 text-xl drop-shadow-[0_0_0.5px_currentColor]" />
+            <SearchResultOl
+                query={searchTerm}
+                isVisible={isSmallSearchBarVisible || isDesktopSearchVisible}
+                onSelect={closeSearchResults}
+            />
             <div className="md:hidden absolute py-2 rounded-full px-2.5 m-px bg-tertiary border border-tertiary">
                 <HiOutlineMagnifyingGlass
                     className=" left-5 top-3 text-gray-400 text-xl drop-shadow-[0_0_0.5px_currentColor] "
