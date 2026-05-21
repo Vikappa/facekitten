@@ -8,9 +8,8 @@ import {
   BotInsert,
   NOTIFICATION_SAFE_SELECT,
   NotificationDb,
-  NotificationDto,
+  NotificationType,
   ProfileInsert,
-  toNotificationDto,
 } from '@/types/db'
 
 // DTO restituito dal GET
@@ -28,7 +27,7 @@ interface GattiBotProfileDto {
   isActive: boolean
   createdAt: string
   posts: PostSummaryDto[]
-  notifications: NotificationDto[]
+  notifications: IgorBotNotificationDto[]
   profile: {
     id: string
     username: string | null
@@ -39,6 +38,28 @@ interface GattiBotProfileDto {
     confirmedAccount: boolean | null
     createdAt: string
   } | null
+}
+
+interface NotificationProfileDto {
+  id: string
+  username: string | null
+  avatarUrl: string | null
+  bannerUrl: string | null
+  bio: string | null
+  confirmedAccount: boolean | null
+  createdAt: string | null
+}
+
+interface IgorBotNotificationDto {
+  id: string
+  createdAt: string | null
+  activityFromId: string | null
+  toProfileId: string | null
+  from: NotificationProfileDto | null
+  to: NotificationProfileDto | null
+  generatedNavigation: string | null
+  notificationType: NotificationType | null
+  seen: boolean
 }
 
 const BOT_WITH_PROFILE_SELECT = `
@@ -66,9 +87,14 @@ const BOT_WITH_PROFILE_SELECT = `
 ` as const
 
 const BOT_PROFILE_POSTS_LIMIT = 30
+const NOTIFICATION_PROFILE_SELECT =
+  'id, username, avatarUrl, bannerUrl, bio, confirmedAccount, created_at' as const
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toGattiBotProfileDto(row: any, notifications: NotificationDto[] = []): GattiBotProfileDto {
+function toGattiBotProfileDto(
+  row: any,
+  notifications: IgorBotNotificationDto[] = []
+): GattiBotProfileDto {
   const profile = row.Profile ?? null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const posts: PostSummaryDto[] = (profile?.post ?? []).map((p: any) => ({
@@ -105,14 +131,85 @@ function log(tag: string, data?: unknown) {
   VercelLogger(`[igor/bots] ${tag}${data !== undefined ? ' ' + JSON.stringify(data) : ''}`)
 }
 
+function toNullableString(value: string | null | undefined): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toNotificationProfileDto(row: any): NotificationProfileDto | null {
+  if (!row?.id) return null
+
+  return {
+    id: row.id,
+    username: row.username,
+    avatarUrl: row.avatarUrl,
+    bannerUrl: row.bannerUrl,
+    bio: row.bio,
+    confirmedAccount: row.confirmedAccount,
+    createdAt: row.created_at,
+  }
+}
+
+async function loadNotificationProfilesById(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  profileIds: string[]
+): Promise<Map<string, NotificationProfileDto>> {
+  const uniqueProfileIds = Array.from(new Set(profileIds.filter(Boolean)))
+  const profileById = new Map<string, NotificationProfileDto>()
+
+  if (uniqueProfileIds.length === 0) {
+    return profileById
+  }
+
+  const { data, error } = await supabase
+    .from('Profile')
+    .select(NOTIFICATION_PROFILE_SELECT)
+    .in('id', uniqueProfileIds)
+
+  if (error) {
+    throw error
+  }
+
+  for (const row of data ?? []) {
+    const profile = toNotificationProfileDto(row)
+    if (profile) {
+      profileById.set(profile.id, profile)
+    }
+  }
+
+  return profileById
+}
+
+function toIgorBotNotificationDto(
+  row: NotificationDb,
+  profileById: Map<string, NotificationProfileDto>
+): IgorBotNotificationDto {
+  const activityFromId = toNullableString(row.activity_from)
+  const toProfileId = toNullableString(row.to)
+
+  return {
+    id: row.notificationId,
+    createdAt: row.created_at ?? null,
+    activityFromId,
+    toProfileId,
+    from: activityFromId ? (profileById.get(activityFromId) ?? null) : null,
+    to: toProfileId ? (profileById.get(toProfileId) ?? null) : null,
+    generatedNavigation: toNullableString(row.generatedNavigation),
+    notificationType: row.notificationType ?? null,
+    seen: row.seen ?? false,
+  }
+}
+
 async function loadNotificationsByProfileId(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
   profileIds: string[]
 ): Promise<{
-  notificationsByProfileId: Map<string, NotificationDto[]>
-  notifications: NotificationDto[]
+  notificationsByProfileId: Map<string, IgorBotNotificationDto[]>
+  notifications: IgorBotNotificationDto[]
 }> {
-  const notificationsByProfileId = new Map<string, NotificationDto[]>(
+  const notificationsByProfileId = new Map<string, IgorBotNotificationDto[]>(
     profileIds.map((profileId) => [profileId, []])
   )
 
@@ -130,10 +227,16 @@ async function loadNotificationsByProfileId(
     throw error
   }
 
-  const notifications: NotificationDto[] = []
+  const notificationRows = (data ?? []) as NotificationDb[]
+  const notificationProfileIds = notificationRows.flatMap((row) =>
+    [row.activity_from, row.to].filter((profileId): profileId is string => Boolean(profileId))
+  )
+  const notificationProfileById = await loadNotificationProfilesById(supabase, notificationProfileIds)
 
-  for (const row of (data ?? []) as NotificationDb[]) {
-    const notification = toNotificationDto(row)
+  const notifications: IgorBotNotificationDto[] = []
+
+  for (const row of notificationRows) {
+    const notification = toIgorBotNotificationDto(row, notificationProfileById)
     notifications.push(notification)
 
     const profileId = row.to
@@ -345,8 +448,8 @@ export async function GET(req: NextRequest) {
     )
   )
 
-  let notificationsByProfileId: Map<string, NotificationDto[]>
-  let notifications: NotificationDto[]
+  let notificationsByProfileId: Map<string, IgorBotNotificationDto[]>
+  let notifications: IgorBotNotificationDto[]
   try {
     const notificationResult = await loadNotificationsByProfileId(supabase, profileIds)
     notificationsByProfileId = notificationResult.notificationsByProfileId
