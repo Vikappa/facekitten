@@ -196,6 +196,44 @@ function sortByCreatedAtDesc<T extends { created_at: string }>(rows: T[]): T[] {
   return [...rows].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
 }
 
+function toPostContextDto(
+  post: PostContextRow | null | undefined,
+  profilesById: Map<string, ProfileContextRow>
+) {
+  if (!post) return null
+
+  return {
+    id: post.id,
+    authorId: post.authorId,
+    author: toProfileMini(profilesById.get(post.authorId), post.authorId),
+    content: post.content,
+    extraContent: post.extraContent,
+    mediaUrl: post.mediaUrl,
+    postType: post.postType,
+    createdAt: post.created_at,
+  }
+}
+
+function toCommentContextDto(
+  comment: CommentContextRow | null | undefined,
+  profilesById: Map<string, ProfileContextRow>
+) {
+  if (!comment) return null
+
+  return {
+    id: comment.commentId,
+    authorId: comment.commentAuthorId,
+    author: toProfileMini(
+      comment.commentAuthorId ? profilesById.get(comment.commentAuthorId) : null,
+      comment.commentAuthorId
+    ),
+    postId: comment.postid,
+    text: comment.commentText,
+    extraContent: comment.extraContent,
+    createdAt: comment.created_at,
+  }
+}
+
 function summarizeError(error: unknown) {
   if (error instanceof Error) {
     return { name: error.name, message: error.message }
@@ -360,6 +398,53 @@ export async function GET(req: NextRequest) {
     const authoredReplyReactions = (authoredReplyReactionRows ?? []) as CommentReplyReactionContextRow[]
     const notifications = (notificationRows ?? []) as NotificationContextRow[]
 
+    const authoredReplyParentCommentIds = Array.from(
+      new Set(
+        authoredReplies
+          .map((reply) => reply.repliedComment)
+          .filter((commentId): commentId is string => Boolean(commentId))
+      )
+    )
+
+    const { data: authoredReplyParentCommentRows, error: authoredReplyParentCommentsError } =
+      authoredReplyParentCommentIds.length > 0
+        ? await supabase
+            .from('comment')
+            .select(COMMENT_CONTEXT_SELECT)
+            .in('commentId', authoredReplyParentCommentIds)
+        : { data: [], error: null }
+
+    if (authoredReplyParentCommentsError) throw authoredReplyParentCommentsError
+
+    const authoredReplyParentComments = (authoredReplyParentCommentRows ?? []) as CommentContextRow[]
+    const parentCommentsById = new Map<string, CommentContextRow>(
+      authoredReplyParentComments.map((comment) => [comment.commentId, comment])
+    )
+
+    const parentPostIds = Array.from(
+      new Set(
+        [
+          ...authoredComments.map((comment) => comment.postid),
+          ...authoredReplyParentComments.map((comment) => comment.postid),
+        ].filter((postId): postId is string => Boolean(postId))
+      )
+    )
+
+    const { data: parentPostRows, error: parentPostsError } =
+      parentPostIds.length > 0
+        ? await supabase
+            .from('post')
+            .select(POST_CONTEXT_SELECT)
+            .in('id', parentPostIds)
+        : { data: [], error: null }
+
+    if (parentPostsError) throw parentPostsError
+
+    const parentPosts = (parentPostRows ?? []) as PostContextRow[]
+    const parentPostsById = new Map<string, PostContextRow>(
+      parentPosts.map((post) => [post.id, post])
+    )
+
     const profilesById = await loadProfilesById(
       supabase,
       collectProfileIds(
@@ -367,6 +452,8 @@ export async function GET(req: NextRequest) {
         targetPostComments.map((comment) => comment.commentAuthorId),
         targetPostReplies.map((reply) => reply.commentReplyAuthorId),
         targetPostReactions.map((reaction) => reaction.reactedBy),
+        authoredReplyParentComments.map((comment) => comment.commentAuthorId),
+        parentPosts.map((post) => post.authorId),
         notifications.flatMap((notification) => [notification.activity_from, notification.to])
       )
     )
@@ -404,6 +491,8 @@ export async function GET(req: NextRequest) {
       targetProfile: toProfileContextDto(targetProfile as ProfileContextRow),
       latestOwnPosts: ownPosts.map((post) => ({
         id: post.id,
+        authorId: post.authorId,
+        author: toProfileMini(profilesById.get(post.authorId), post.authorId),
         content: post.content,
         extraContent: post.extraContent,
         mediaUrl: post.mediaUrl,
@@ -450,6 +539,10 @@ export async function GET(req: NextRequest) {
           text: comment.commentText,
           extraContent: comment.extraContent,
           createdAt: comment.created_at,
+          parentPost: toPostContextDto(
+            comment.postid ? parentPostsById.get(comment.postid) : null,
+            profilesById
+          ),
         })),
         replies: authoredReplies.map((reply) => ({
           id: reply.commentReplyId,
@@ -458,6 +551,16 @@ export async function GET(req: NextRequest) {
           mediaUrl: reply.mediaUrl,
           extraContent: reply.extraContent,
           createdAt: reply.created_at,
+          parentComment: toCommentContextDto(
+            reply.repliedComment ? parentCommentsById.get(reply.repliedComment) : null,
+            profilesById
+          ),
+          parentPost: toPostContextDto(
+            reply.repliedComment
+              ? parentPostsById.get(parentCommentsById.get(reply.repliedComment)?.postid ?? '')
+              : null,
+            profilesById
+          ),
         })),
         reactions: [
           ...authoredPostReactions.map((reaction) => ({
